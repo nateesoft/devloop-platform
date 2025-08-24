@@ -1,0 +1,48 @@
+version: '3.8'
+
+networks:
+  lowcode-network:
+    external: true
+
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: lowcode-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"      # Main application
+      - "81:81"      # Admin services
+      - "443:443"    # HTTPS (when SSL is configured)
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./ssl:/etc/ssl:ro  # SSL certificates directory
+      - nginx_logs:/var/log/nginx
+    networks:
+      - lowcode-network
+    depends_on:
+      - lowcode-portal
+      - lowcode-portal-service
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+  # Create external services references
+  lowcode-portal:
+    image: lowcode-portal:latest
+    container_name: lowcode-portal
+    networks:
+      - lowcode-network
+    # This should be your actual frontend service
+
+  lowcode-portal-service:
+    image: lowcode-portal-service:latest
+    container_name: lowcode-portal-service
+    networks:
+      - lowcode-network
+    # This should be your actual backend service
+
+volumes:
+  nginx_logs:

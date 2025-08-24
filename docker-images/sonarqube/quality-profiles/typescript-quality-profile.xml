@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TON Lowcode Platform - Custom TypeScript Quality Profile -->
+<profile>
+  <name>TON Lowcode TypeScript</name>
+  <language>ts</language>
+  <rules>
+    <!-- Code Smell Rules -->
+    <rule>
+      <repositoryKey>typescript</repositoryKey>
+      <key>S101</key> <!-- Class names should comply with naming convention -->
+      <priority>MINOR</priority>
+    </rule>
+    <rule>
+      <repositoryKey>typescript</repositoryKey>
+      <key>S100</key> <!-- Function and method names should comply with naming convention -->
+      <priority>MINOR</priority>
+    </rule>
+    <rule>
+      <repositoryKey>typescript</repositoryKey>
+      <key>S117</key> <!-- Local variable and function parameter names should comply with naming convention -->
+      <priority>MINOR</priority>
+    </rule>
+    
+    <!-- Bug Rules -->
+    <rule>
+      <repositoryKey>typescript</repositoryKey>
+      <key>S3923</key> <!-- All branches in a conditional structure should not have exactly the same implementation -->
+      <priority>CRITICAL</priority>
+    </rule>
+    <rule>
+      <repositoryKey>typescript</repositoryKey>
+      <key>S3972</key> <!-- Conditionals should start on new lines -->
+      <priority>MINOR</priority>
+    </rule>
+    <rule>
+      <repositoryKey>typescript</repositoryKey>
+      <key>S1764</key> <!-- Identical expressions should not be used on both sides of a binary operator -->
+      <priority>CRITICAL</priority>
+    </rule>
+    
+    <!-- Security Rules -->
+    <rule>
+      <repositoryKey>typescript</repositoryKey>
+      <key>S5852</key> <!-- Regular expressions should not be vulnerable to Denial of Service attacks -->
+      <priority>CRITICAL</priority>
+    </rule>
+    <rule>
+      <repositoryKey>typescript</repositoryKey>
+      <key>S4426</key> <!-- Cryptographic keys should be robust -->
+      <priority>CRITICAL</priority>
+    </rule>
+    <rule>
+      <repositoryKey>typescript</repositoryKey>
+      <key>S2245</key> <!-- Using pseudorandom number generators (PRNGs) is security-sensitive -->
+      <priority>MAJOR</priority>
+    </rule>
+    
+    <!-- Performance Rules -->
+    <rule>
+      <repositoryKey>typescript</repositoryKey>
+      <key>S1656</key> <!-- Variables should not be self-assigned -->
+      <priority>CRITICAL</priority>
+    </rule>
+    <rule>
+      <repositoryKey>typescript</repositoryKey>
+      <key>S3498</key> <!-- Object shorthand syntax should be used -->
+      <priority>MINOR</priority>
+    </rule>
+    
+    <!-- Maintainability Rules -->
+    <rule>
+      <repositoryKey>typescript</repositoryKey>
+      <key>S3776</key> <!-- Cognitive Complexity of functions should not be too high -->
+      <priority>CRITICAL</priority>
+      <parameters>
+        <parameter>
+          <key>threshold</key>
+          <value>15</value> <!-- Default is 15, keep it reasonable for lowcode platform -->
+        </parameter>
+      </parameters>
+    </rule>
+    <rule>
+      <repositoryKey>typescript</repositoryKey>
+      <key>S1541</key> <!-- Functions and methods should not have too many parameters -->
+      <priority>MAJOR</priority>
+      <parameters>
+        <parameter>
+          <key>maximumFunctionParameters</key>
+          <value>7</value> <!-- Allow up to 7 parameters for complex lowcode functions -->
+        </parameter>
+      </parameters>
+    </rule>
+    <rule>
+      <repositoryKey>typescript</repositoryKey>
+      <key>S138</key> <!-- Functions should not have too many lines -->
+      <priority>MAJOR</priority>
+      <parameters>
+        <parameter>
+          <key>max</key>
+          <value>80</value> <!-- Reasonable limit for complex lowcode logic -->
+        </parameter>
+      </parameters>
+    </rule>
+    
+    <!-- Documentation Rules -->
+    <rule>
+      <repositoryKey>typescript</repositoryKey>
+      <key>S1186</key> <!-- Methods should not be empty -->
+      <priority>CRITICAL</priority>
+    </rule>
+    <rule>
+      <repositoryKey>typescript</repositoryKey>
+      <key>S1116</key> <!-- Empty statements should be removed -->
+      <priority>MINOR</priority>
+    </rule>
+    
+    <!-- Type Safety Rules -->
+    <rule>
+      <repositoryKey>typescript</repositoryKey>
+      <key>S4123</key> <!-- Unused function parameters should be removed -->
+      <priority>MINOR</priority>
+    </rule>
+    <rule>
+      <repositoryKey>typescript</repositoryKey>
+      <key>S1481</key> <!-- Unused local variables should be removed -->
+      <priority>MINOR</priority>
+    </rule>
+    <rule>
+      <repositoryKey>typescript</repositoryKey>
+      <key>S6544</key> <!-- Prefer readonly parameter types over mutable parameter types -->
+      <priority>MINOR</priority>
+    </rule>
+    
+    <!-- React/JSX Specific Rules (if applicable) -->
+    <rule>
+      <repositoryKey>typescript</repositoryKey>
+      <key>S6749</key> <!-- React components should use TypeScript -->
+      <priority>MAJOR</priority>
+    </rule>
+    
+    <!-- Error Handling Rules -->
+    <rule>
+      <repositoryKey>typescript</repositoryKey>
+      <key>S1143</key> <!-- Jump statements should not occur in "finally" blocks -->
+      <priority>CRITICAL</priority>
+    </rule>
+    <rule>
+      <repositoryKey>typescript</repositoryKey>
+      <key>S1128</key> <!-- Unused "import"s should be removed -->
+      <priority>MINOR</priority>
+    </rule>
+    
+    <!-- Async/Promise Rules -->
+    <rule>
+      <repositoryKey>typescript</repositoryKey>
+      <key>S4822</key> <!-- Using command line arguments is security-sensitive -->
+      <priority>MAJOR</priority>
+    </rule>
+    
+    <!-- Code Duplication Rules -->
+    <rule>
+      <repositoryKey>typescript</repositoryKey>
+      <key>S4144</key> <!-- Methods should not have identical implementations -->
+      <priority>CRITICAL</priority>
+    </rule>
+    
+    <!-- Lowcode Platform Specific Customizations -->
+    <!-- Allow console.log in development but warn about it -->
+    <rule>
+      <repositoryKey>typescript</repositoryKey>
+      <key>S2228</key> <!-- Console logging should not be used in production code -->
+      <priority>MINOR</priority> <!-- Reduced from MAJOR to MINOR for development -->
+    </rule>
+    
+    <!-- More lenient on TODO comments for active development -->
+    <rule>
+      <repositoryKey>typescript</repositoryKey>
+      <key>S1135</key> <!-- Track uses of "TODO" tags -->
+      <priority>INFO</priority> <!-- Reduced severity for active development -->
+    </rule>
+    
+    <!-- Allow magic numbers in test files and configuration -->
+    <rule>
+      <repositoryKey>typescript</repositoryKey>
+      <key>S109</key> <!-- Magic numbers should not be used -->
+      <priority>MINOR</priority>
+      <parameters>
+        <parameter>
+          <key>exceptions</key>
+          <value>0,1,-1,2,10,100,1000</value> <!-- Common numbers allowed -->
+        </parameter>
+      </parameters>
+    </rule>
+  </rules>
+</profile>

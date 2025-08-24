@@ -1,0 +1,27 @@
+services:
+  vault:
+    image: hashicorp/vault:latest
+    container_name: vault-oss
+    cap_add:
+      - IPC_LOCK
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: root
+      VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
+      VAULT_ADDR: http://0.0.0.0:8200
+    command: server -dev
+    volumes:
+      - vault-data:/vault/data
+      - vault-logs:/vault/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "vault", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  vault-data:
+  vault-logs:

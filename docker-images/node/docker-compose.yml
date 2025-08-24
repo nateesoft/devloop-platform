@@ -1,0 +1,265 @@
+version: '3.8'
+
+networks:
+  lowcode-network:
+    external: true
+
+volumes:
+  node_cache:
+  pnpm_cache:
+  npm_cache:
+
+services:
+  # Node.js 20 LTS - For development and building
+  node-dev:
+    image: node:20-alpine
+    container_name: lowcode-node-dev
+    working_dir: /app
+    volumes:
+      - ../..:/app:cached  # Mount project root
+      - node_cache:/home/node/.cache
+      - npm_cache:/home/node/.npm
+      - pnpm_cache:/home/node/.local/share/pnpm
+    networks:
+      - lowcode-network
+    environment:
+      - NODE_ENV=development
+      - NPM_CONFIG_CACHE=/home/node/.npm
+      - PNPM_HOME=/home/node/.local/share/pnpm
+      - PATH=/home/node/.local/share/pnpm:$PATH
+    user: "1000:1000"  # Use host user ID to avoid permission issues
+    command: tail -f /dev/null  # Keep container running
+    profiles:
+      - dev
+    healthcheck:
+      test: ["CMD", "node", "--version"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # Frontend Development Server
+  lowcode-portal-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      target: development
+    container_name: lowcode-portal-dev
+    working_dir: /app
+    volumes:
+      - ../../lowcode-portal:/app:cached
+      - node_cache:/home/node/.cache
+      - npm_cache:/home/node/.npm
+      - /app/node_modules  # Prevent host node_modules from overriding
+    ports:
+      - "3000:3000"
+    networks:
+      - lowcode-network
+    environment:
+      - NODE_ENV=development
+      - NEXT_TELEMETRY_DISABLED=1
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    command: npm run dev
+    depends_on:
+      - lowcode-portal-service-dev
+    profiles:
+      - frontend-dev
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Backend Development Server
+  lowcode-portal-service-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+      target: development
+    container_name: lowcode-portal-service-dev
+    working_dir: /app
+    volumes:
+      - ../../lowcode-portal-service:/app:cached
+      - node_cache:/home/node/.cache
+      - npm_cache:/home/node/.npm
+      - /app/node_modules  # Prevent host node_modules from overriding
+    ports:
+      - "8080:8080"
+      - "9229:9229"  # Debug port
+    networks:
+      - lowcode-network
+    environment:
+      - NODE_ENV=development
+      - PORT=8080
+      - DATABASE_HOST=lowcode-postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USERNAME=lowcode
+      - DATABASE_PASSWORD=lowcode_password_2024
+      - DATABASE_NAME=lowcode_db
+      - DATABASE_SCHEMA=public
+      # Redis configuration
+      - REDIS_HOST=lowcode-redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=lowcode_redis_2024
+      # Kafka configuration
+      - KAFKA_BROKERS=lowcode-kafka:29092
+      # MinIO configuration
+      - MINIO_ENDPOINT=minio
+      - MINIO_PORT=9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+      # Vault configuration
+      - VAULT_ENABLED=true
+      - VAULT_ENDPOINT=http://vault:8200
+      - VAULT_TOKEN=root
+    command: npm run start:debug
+    depends_on:
+      - lowcode-postgres
+    profiles:
+      - backend-dev
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Production Frontend Build
+  lowcode-portal-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      target: production
+    container_name: lowcode-portal-prod
+    ports:
+      - "3001:3000"
+    networks:
+      - lowcode-network
+    environment:
+      - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1
+    profiles:
+      - frontend-prod
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+
+  # Production Backend Build
+  lowcode-portal-service-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+      target: production
+    container_name: lowcode-portal-service-prod
+    ports:
+      - "8081:8080"
+    networks:
+      - lowcode-network
+    environment:
+      - NODE_ENV=production
+      - PORT=8080
+      - DATABASE_HOST=lowcode-postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USERNAME=lowcode
+      - DATABASE_PASSWORD=lowcode_password_2024
+      - DATABASE_NAME=lowcode_db
+      - DATABASE_SCHEMA=public
+    depends_on:
+      - lowcode-postgres
+    profiles:
+      - backend-prod
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '2.0'
+        reservations:
+          memory: 1G
+          cpus: '1.0'
+
+  # PostgreSQL Database
+  lowcode-postgres:
+    image: postgres:15-alpine
+    container_name: lowcode-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init-scripts:/docker-entrypoint-initdb.d:ro
+      - ./postgres/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+    environment:
+      POSTGRES_DB: lowcode_db
+      POSTGRES_USER: lowcode
+      POSTGRES_PASSWORD: lowcode_password_2024
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+      PGDATA: /var/lib/postgresql/data/pgdata
+    networks:
+      - lowcode-network
+    command: >
+      postgres
+      -c config_file=/etc/postgresql/postgresql.conf
+      -c log_statement=mod
+      -c log_destination=stderr
+      -c log_line_prefix='%t [%p]: [%l-1] user=%u,db=%d,app=%a,client=%h '
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lowcode -d lowcode_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '2.0'
+        reservations:
+          memory: 1G
+          cpus: '1.0'
+
+  # PostgreSQL Admin Interface
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: lowcode-pgadmin
+    restart: unless-stopped
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@lowcode.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./postgres/servers.json:/pgadmin4/servers.json:ro
+    networks:
+      - lowcode-network
+    depends_on:
+      - lowcode-postgres
+    profiles:
+      - pgadmin
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/misc/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres_data:
+  pgadmin_data:

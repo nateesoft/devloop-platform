@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TON Lowcode Platform - Custom JavaScript Quality Profile -->
+<profile>
+  <name>TON Lowcode JavaScript</name>
+  <language>js</language>
+  <rules>
+    <!-- Code Smell Rules -->
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S101</key> <!-- Class names should comply with naming convention -->
+      <priority>MINOR</priority>
+    </rule>
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S100</key> <!-- Function and method names should comply with naming convention -->
+      <priority>MINOR</priority>
+    </rule>
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S117</key> <!-- Local variable and function parameter names should comply with naming convention -->
+      <priority>MINOR</priority>
+    </rule>
+    
+    <!-- Bug Rules -->
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S3923</key> <!-- All branches in a conditional structure should not have exactly the same implementation -->
+      <priority>CRITICAL</priority>
+    </rule>
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S1764</key> <!-- Identical expressions should not be used on both sides of a binary operator -->
+      <priority>CRITICAL</priority>
+    </rule>
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S1656</key> <!-- Variables should not be self-assigned -->
+      <priority>CRITICAL</priority>
+    </rule>
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S3981</key> <!-- Collection sizes and array length comparisons should make sense -->
+      <priority>CRITICAL</priority>
+    </rule>
+    
+    <!-- Security Rules -->
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S5852</key> <!-- Regular expressions should not be vulnerable to Denial of Service attacks -->
+      <priority>CRITICAL</priority>
+    </rule>
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S4426</key> <!-- Cryptographic keys should be robust -->
+      <priority>CRITICAL</priority>
+    </rule>
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S2245</key> <!-- Using pseudorandom number generators (PRNGs) is security-sensitive -->
+      <priority>MAJOR</priority>
+    </rule>
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S5148</key> <!-- HTTP request redirections should not be open to forging attacks -->
+      <priority>CRITICAL</priority>
+    </rule>
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S2755</key> <!-- XML parsers should not be vulnerable to XXE attacks -->
+      <priority>CRITICAL</priority>
+    </rule>
+    
+    <!-- Performance Rules -->
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S3498</key> <!-- Object shorthand syntax should be used -->
+      <priority>MINOR</priority>
+    </rule>
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S6571</key> <!-- Don't use Array index in keys -->
+      <priority>MAJOR</priority>
+    </rule>
+    
+    <!-- ES6+ Rules -->
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S3512</key> <!-- Prefer "const" over "let" and "var" -->
+      <priority>MINOR</priority>
+    </rule>
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S2392</key> <!-- Variables should be declared before they are used -->
+      <priority>CRITICAL</priority>
+    </rule>
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S2871</key> <!-- "const" variables should not be reassigned -->
+      <priority>CRITICAL</priority>
+    </rule>
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S3514</key> <!-- Destructuring syntax should be used for assignments -->
+      <priority>MINOR</priority>
+    </rule>
+    
+    <!-- Function Rules -->
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S3776</key> <!-- Cognitive Complexity of functions should not be too high -->
+      <priority>CRITICAL</priority>
+      <parameters>
+        <parameter>
+          <key>threshold</key>
+          <value>15</value> <!-- Reasonable complexity limit -->
+        </parameter>
+      </parameters>
+    </rule>
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S1541</key> <!-- Functions should not have too many parameters -->
+      <priority>MAJOR</priority>
+      <parameters>
+        <parameter>
+          <key>maximumFunctionParameters</key>
+          <value>7</value> <!-- Allow more parameters for complex lowcode functions -->
+        </parameter>
+      </parameters>
+    </rule>
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S138</key> <!-- Functions should not have too many lines -->
+      <priority>MAJOR</priority>
+      <parameters>
+        <parameter>
+          <key>max</key>
+          <value>80</value> <!-- Reasonable line limit -->
+        </parameter>
+      </parameters>
+    </rule>
+    
+    <!-- Error Handling Rules -->
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S1143</key> <!-- Jump statements should not occur in "finally" blocks -->
+      <priority>CRITICAL</priority>
+    </rule>
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S3696</key> <!-- Literals should not be thrown -->
+      <priority>CRITICAL</priority>
+    </rule>
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S2681</key> <!-- Multiline blocks should be enclosed in curly braces -->
+      <priority>CRITICAL</priority>
+    </rule>
+    
+    <!-- Promise/Async Rules -->
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S4123</key> <!-- Unused function parameters should be removed -->
+      <priority>MINOR</priority>
+    </rule>
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S1481</key> <!-- Unused local variables should be removed -->
+      <priority>MINOR</priority>
+    </rule>
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S1128</key> <!-- Unused "import"s should be removed -->
+      <priority>MINOR</priority>
+    </rule>
+    
+    <!-- React/JSX Specific Rules -->
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S6748</key> <!-- React.Fragment syntax should be used instead of arrays -->
+      <priority>MINOR</priority>
+    </rule>
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S6747</key> <!-- useEffect should be used over useLayoutEffect when possible -->
+      <priority>MINOR</priority>
+    </rule>
+    
+    <!-- Node.js Specific Rules -->
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S4507</key> <!-- Delivery of debug features should be avoided -->
+      <priority>MAJOR</priority>
+    </rule>
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S4829</key> <!-- Reading the Standard Input is security-sensitive -->
+      <priority>MAJOR</priority>
+    </rule>
+    
+    <!-- Documentation Rules -->
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S1186</key> <!-- Methods should not be empty -->
+      <priority>CRITICAL</priority>
+    </rule>
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S1116</key> <!-- Empty statements should be removed -->
+      <priority>MINOR</priority>
+    </rule>
+    
+    <!-- Code Duplication Rules -->
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S4144</key> <!-- Methods should not have identical implementations -->
+      <priority>CRITICAL</priority>
+    </rule>
+    
+    <!-- Switch Statement Rules -->
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S131</key> <!-- Switch statements should have at least 3 cases -->
+      <priority>MINOR</priority>
+    </rule>
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S1871</key> <!-- Two branches in a conditional structure should not have exactly the same implementation -->
+      <priority>MAJOR</priority>
+    </rule>
+    
+    <!-- Lowcode Platform Specific Customizations -->
+    <!-- Allow console.log in development -->
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S2228</key> <!-- Console logging should not be used in production code -->
+      <priority>MINOR</priority> <!-- Reduced from MAJOR for development -->
+    </rule>
+    
+    <!-- Allow debugger statements in development -->
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S1525</key> <!-- "debugger" statements should not be used -->
+      <priority>MINOR</priority> <!-- Reduced severity for development -->
+    </rule>
+    
+    <!-- More lenient on TODO comments -->
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S1135</key> <!-- Track uses of "TODO" tags -->
+      <priority>INFO</priority>
+    </rule>
+    
+    <!-- Allow magic numbers in common cases -->
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S109</key> <!-- Magic numbers should not be used -->
+      <priority>MINOR</priority>
+      <parameters>
+        <parameter>
+          <key>exceptions</key>
+          <value>0,1,-1,2,10,100,1000</value>
+        </parameter>
+      </parameters>
+    </rule>
+    
+    <!-- Allow alert/confirm in lowcode platform for user interactions -->
+    <rule>
+      <repositoryKey>javascript</repositoryKey>
+      <key>S2814</key> <!-- "alert" should not be used -->
+      <priority>MINOR</priority> <!-- Reduced severity for lowcode platform -->
+    </rule>
+  </rules>
+</profile>
