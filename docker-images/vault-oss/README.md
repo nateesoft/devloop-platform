@@ -6,7 +6,7 @@ This directory contains the setup for integrating HashiCorp Vault OSS with the L
 
 1. **Start Vault**:
    ```bash
-   docker-compose up -d
+   docker compose up -d
    ```
 
 2. **Setup Vault for Lowcode Platform**:
@@ -18,7 +18,7 @@ This directory contains the setup for integrating HashiCorp Vault OSS with the L
 
 ## What's Included
 
-- **docker-compose.yml**: Vault OSS container with development configuration
+- **docker compose.yml**: Vault OSS container with development configuration
 - **setup-vault.sh**: Automated setup script that configures Vault for the platform
 - **README.md**: This documentation
 
@@ -74,7 +74,7 @@ curl -H "X-Vault-Token: YOUR_TOKEN" \
 ### Vault Not Starting
 - Check if port 8200 is available
 - Ensure Docker has sufficient resources
-- Check container logs: `docker-compose logs vault`
+- Check container logs: `docker compose logs vault`
 
 ### Setup Script Fails
 - Ensure Vault is fully started before running setup

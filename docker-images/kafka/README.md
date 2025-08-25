@@ -59,7 +59,7 @@ cd docker-images/kafka
 ./setup-kafka.sh
 
 # หรือ manual start
-docker-compose up -d
+docker compose up -d
 ```
 
 ### Manual Setup
@@ -68,14 +68,14 @@ docker-compose up -d
 docker network create lowcode-network
 
 # 2. Start Zookeeper first
-docker-compose up -d zookeeper
+docker compose up -d zookeeper
 
 # 3. Wait for Zookeeper, then start Kafka
 sleep 30
-docker-compose up -d kafka
+docker compose up -d kafka
 
 # 4. Start Kafka UI
-docker-compose up -d kafka-ui
+docker compose up -d kafka-ui
 
 # 5. Initialize topics (automatic via kafka-init service)
 ```

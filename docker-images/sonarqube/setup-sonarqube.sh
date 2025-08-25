@@ -78,7 +78,7 @@ fi
 
 # Start PostgreSQL database first
 print_status "Starting PostgreSQL database..."
-docker-compose up -d sonarqube-db
+docker compose up -d sonarqube-db
 
 # Wait for PostgreSQL to be ready
 print_status "Waiting for PostgreSQL to be ready..."
@@ -87,7 +87,7 @@ counter=0
 while ! docker exec lowcode-sonarqube-db pg_isready -U sonarqube -d sonarqubedb > /dev/null 2>&1; do
     if [ $counter -eq $timeout ]; then
         print_error "PostgreSQL failed to start within $timeout seconds"
-        docker-compose logs sonarqube-db
+        docker compose logs sonarqube-db
         exit 1
     fi
     echo -n "."
@@ -98,7 +98,7 @@ print_success "PostgreSQL is ready!"
 
 # Start SonarQube
 print_status "Starting SonarQube server..."
-docker-compose up -d sonarqube
+docker compose up -d sonarqube
 
 # Wait for SonarQube to be ready (can take 2-3 minutes)
 print_status "Waiting for SonarQube to start (this may take 2-3 minutes)..."
@@ -108,7 +108,7 @@ while ! curl -s http://localhost:9000/api/system/status | grep -q '"status":"UP"
     if [ $counter -eq $timeout ]; then
         print_error "SonarQube failed to start within $(($timeout/60)) minutes"
         echo "Checking SonarQube logs..."
-        docker-compose logs --tail=50 sonarqube
+        docker compose logs --tail=50 sonarqube
         exit 1
     fi
     if [ $((counter % 10)) -eq 0 ]; then
@@ -317,9 +317,9 @@ fi
 
 echo
 echo "🐳 Useful Commands:"
-echo "  View logs: docker-compose logs -f sonarqube"
-echo "  Stop services: docker-compose down"
-echo "  Restart SonarQube: docker-compose restart sonarqube"
+echo "  View logs: docker compose logs -f sonarqube"
+echo "  Stop services: docker compose down"
+echo "  Restart SonarQube: docker compose restart sonarqube"
 echo "  Database backup: docker exec lowcode-sonarqube-db pg_dump -U sonarqube sonarqubedb > backup.sql"
 echo
 
@@ -334,6 +334,6 @@ read -p "Would you like to start PgAdmin for database management? (y/N): " -n 1 
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     print_status "Starting PgAdmin..."
-    docker-compose --profile pgadmin up -d pgadmin
+    docker compose --profile pgadmin up -d pgadmin
     print_success "PgAdmin is available at http://localhost:5050"
 fi

@@ -43,11 +43,11 @@ docker network create lowcode-network
 
 # เริ่ม NGINX
 cd docker-images/nginx
-docker-compose up -d
+docker compose up -d
 
 # ตรวจสอบสถานะ
-docker-compose ps
-docker-compose logs nginx
+docker compose ps
+docker compose logs nginx
 ```
 
 ### Manual Setup
@@ -59,7 +59,7 @@ mkdir ssl
 docker run --rm -v $(pwd)/nginx.conf:/etc/nginx/conf.d/default.conf nginx:alpine nginx -t
 
 # 3. Start NGINX
-docker-compose up -d nginx
+docker compose up -d nginx
 ```
 
 ## 🔧 Configuration Details
@@ -132,7 +132,7 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
 ```bash
 # แก้ไข nginx.conf - uncomment SSL server block
 # Restart NGINX
-docker-compose restart nginx
+docker compose restart nginx
 ```
 
 ### 3. Production SSL (Let's Encrypt)
@@ -148,7 +148,7 @@ docker run -it --rm --name certbot \
 ### Access Logs
 ```bash
 # ดู access logs
-docker-compose logs -f nginx
+docker compose logs -f nginx
 
 # ดู error logs
 docker exec lowcode-nginx tail -f /var/log/nginx/error.log
@@ -324,8 +324,8 @@ docker run --rm -v $(pwd)/nginx.conf:/etc/nginx/conf.d/default.conf nginx:alpine
 ### Updates
 ```bash
 # Update NGINX image
-docker-compose pull nginx
-docker-compose up -d nginx
+docker compose pull nginx
+docker compose up -d nginx
 
 # Zero-downtime config reload
 docker exec lowcode-nginx nginx -s reload

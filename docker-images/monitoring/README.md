@@ -58,7 +58,7 @@ cd docker-images/monitoring
 ./setup-monitoring.sh
 
 # หรือ manual start
-docker-compose up -d
+docker compose up -d
 ```
 
 ### Manual Setup
@@ -70,10 +70,10 @@ mkdir -p prometheus/rules grafana/{provisioning/{datasources,dashboards},dashboa
 sudo chown -R 472:472 grafana/
 
 # 3. Start services
-docker-compose up -d
+docker compose up -d
 
 # 4. Check status
-docker-compose ps
+docker compose ps
 ```
 
 ## 🔧 Configuration Files
@@ -235,7 +235,7 @@ cp prometheus/ /backup/prometheus/
 ### Health Checks
 ```bash
 # Check all services
-docker-compose ps
+docker compose ps
 
 # Check Prometheus targets
 curl http://localhost:9090/api/v1/targets
@@ -265,7 +265,7 @@ curl http://admin:admin123@localhost:3001/api/health
 #### Grafana Permission Denied
 ```bash
 sudo chown -R 472:472 grafana/
-docker-compose restart grafana
+docker compose restart grafana
 ```
 
 #### Prometheus Config Error

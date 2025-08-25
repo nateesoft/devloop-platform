@@ -38,12 +38,12 @@ if ! docker info > /dev/null 2>&1; then
 fi
 
 # Check if Docker Compose is available
-if ! command -v docker-compose &> /dev/null && ! docker compose version &> /dev/null; then
+if ! command -v docker compose &> /dev/null && ! docker compose version &> /dev/null; then
     print_error "Docker Compose is not available. Please install Docker Compose and try again."
     exit 1
 fi
 
-COMPOSE_CMD="docker-compose"
+COMPOSE_CMD="docker compose"
 if command -v docker &> /dev/null && docker compose version &> /dev/null; then
     COMPOSE_CMD="docker compose"
 fi
@@ -338,10 +338,10 @@ echo
 read -p "Which service logs would you like to view? (1-4): " choice
 
 case $choice in
-    1) docker-compose logs -f lowcode-postgres ;;
-    2) docker-compose logs -f lowcode-portal-service-dev ;;
-    3) docker-compose logs -f lowcode-portal-dev ;;
-    4) docker-compose logs -f ;;
+    1) docker compose logs -f lowcode-postgres ;;
+    2) docker compose logs -f lowcode-portal-service-dev ;;
+    3) docker compose logs -f lowcode-portal-dev ;;
+    4) docker compose logs -f ;;
     *) echo "Invalid choice" ;;
 esac
 EOF
@@ -438,17 +438,17 @@ echo "📖 Quick Commands:"
 case $choice in
     1)
         echo "  Database Shell: docker exec -it lowcode-postgres psql -U lowcode -d lowcode_db"
-        echo "  Start Backend:  docker-compose --profile backend-dev up -d"
-        echo "  Start Frontend: docker-compose --profile frontend-dev up -d"
+        echo "  Start Backend:  docker compose --profile backend-dev up -d"
+        echo "  Start Frontend: docker compose --profile frontend-dev up -d"
         ;;
     2|3)
-        echo "  View Logs:      docker-compose logs -f"
+        echo "  View Logs:      docker compose logs -f"
         echo "  Database Shell: docker exec -it lowcode-postgres psql -U lowcode -d lowcode_db"
-        echo "  Restart:        docker-compose restart"
+        echo "  Restart:        docker compose restart"
         ;;
 esac
 
-echo "  Stop All:       docker-compose down"
+echo "  Stop All:       docker compose down"
 echo
 
 if [ "$all_healthy" = true ]; then

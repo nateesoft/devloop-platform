@@ -45,7 +45,7 @@ fi
 
 # Start Redis services
 print_status "Starting Redis services..."
-docker-compose up -d redis
+docker compose up -d redis
 
 # Wait for Redis to be ready
 print_status "Waiting for Redis to be ready..."
@@ -64,7 +64,7 @@ print_success "Redis is ready!"
 
 # Start UI services
 print_status "Starting Redis UI services..."
-docker-compose up -d redis-commander
+docker compose up -d redis-commander
 
 # Wait for Redis Commander to be ready
 print_status "Waiting for Redis Commander to be ready..."
@@ -212,11 +212,11 @@ fi
 
 echo
 echo "🐳 Useful Commands:"
-echo "  View logs: docker-compose logs -f redis"
+echo "  View logs: docker compose logs -f redis"
 echo "  Redis CLI: docker exec -it lowcode-redis redis-cli -a lowcode_redis_2024"
 echo "  Redis info: docker exec lowcode-redis redis-cli -a lowcode_redis_2024 info"
-echo "  Stop services: docker-compose down"
-echo "  Restart Redis: docker-compose restart redis"
+echo "  Stop services: docker compose down"
+echo "  Restart Redis: docker compose restart redis"
 echo
 
 print_success "Redis is ready for TON Lowcode Platform! 🎯"

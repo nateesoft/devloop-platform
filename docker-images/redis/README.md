@@ -34,7 +34,7 @@ cd docker-images/redis
 ./setup-redis.sh
 
 # หรือ manual start
-docker-compose up -d
+docker compose up -d
 ```
 
 ### Manual Setup
@@ -43,10 +43,10 @@ docker-compose up -d
 docker network create lowcode-network
 
 # 2. Start Redis
-docker-compose up -d redis
+docker compose up -d redis
 
 # 3. Start Management UI
-docker-compose up -d redis-commander
+docker compose up -d redis-commander
 
 # 4. Test connection
 docker exec lowcode-redis redis-cli -a lowcode_redis_2024 ping

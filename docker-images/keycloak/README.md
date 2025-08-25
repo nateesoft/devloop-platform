@@ -7,7 +7,7 @@ This directory contains the complete setup for integrating Keycloak with the Low
 1. **Start Keycloak**:
    ```bash
    cd docker-images/keycloak
-   docker-compose up -d
+   docker compose up -d
    ```
 
 2. **Wait for Keycloak to be ready** (may take 1-2 minutes)
@@ -27,7 +27,7 @@ This directory contains the complete setup for integrating Keycloak with the Low
 ## What's Included
 
 ### Docker Setup
-- **docker-compose.yml**: Keycloak container with proper configuration
+- **docker compose.yml**: Keycloak container with proper configuration
 - **Port**: 9090 (to avoid conflicts with other services)
 - **Admin**: admin/admin123
 
@@ -155,13 +155,13 @@ Role: admin
 ### Keycloak Not Starting
 ```bash
 # Check container status
-docker-compose ps
+docker compose ps
 
 # Check logs
-docker-compose logs keycloak
+docker compose logs keycloak
 
 # Restart container
-docker-compose restart
+docker compose restart
 ```
 
 ### Frontend Connection Issues

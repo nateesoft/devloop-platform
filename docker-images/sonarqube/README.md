@@ -45,7 +45,7 @@ cd docker-images/sonarqube
 ./setup-sonarqube.sh
 
 # หรือ manual start
-docker-compose up -d
+docker compose up -d
 ```
 
 ### Manual Setup
@@ -57,11 +57,11 @@ docker network create lowcode-network
 sudo sysctl -w vm.max_map_count=262144
 
 # 3. Start PostgreSQL database
-docker-compose up -d sonarqube-db
+docker compose up -d sonarqube-db
 
 # 4. Wait for database, then start SonarQube
 sleep 30
-docker-compose up -d sonarqube
+docker compose up -d sonarqube
 
 # 5. Wait for SonarQube initialization (2-3 minutes)
 ```
@@ -437,7 +437,7 @@ sysctl vm.max_map_count  # Should be >= 262144
 free -h  # Should have at least 4GB available
 
 # Check logs
-docker-compose logs sonarqube
+docker compose logs sonarqube
 ```
 
 #### Database Connection Issues
@@ -446,11 +446,11 @@ docker-compose logs sonarqube
 docker exec lowcode-sonarqube-db pg_isready -U sonarqube
 
 # Check database logs
-docker-compose logs sonarqube-db
+docker compose logs sonarqube-db
 
 # Reset database (if needed)
-docker-compose down -v
-docker-compose up -d
+docker compose down -v
+docker compose up -d
 ```
 
 #### Analysis Failures
@@ -468,7 +468,7 @@ docker run --rm -v $(pwd):/usr/src sonarsource/sonar-scanner-cli -X
 #### Memory Issues
 ```bash
 # Increase JVM heap size
-# Edit docker-compose.yml:
+# Edit docker compose.yml:
 SONAR_WEB_JAVAOPTS: "-Xmx2g -Xms512m"
 SONAR_CE_JAVAOPTS: "-Xmx4g -Xms512m"
 
@@ -538,10 +538,10 @@ docker exec -i lowcode-sonarqube-db psql -U sonarqube -d sonarqubedb < backup.sq
 ### Log Monitoring
 ```bash
 # Monitor SonarQube logs
-docker-compose logs -f sonarqube
+docker compose logs -f sonarqube
 
 # Monitor database logs
-docker-compose logs -f sonarqube-db
+docker compose logs -f sonarqube-db
 
 # Check application logs inside container
 docker exec lowcode-sonarqube tail -f /opt/sonarqube/logs/sonar.log
@@ -571,8 +571,8 @@ curl -X POST -u admin:admin \
   -d "analyzedBefore=$(date -d '30 days ago' '+%Y-%m-%d')"
 
 # Update plugins
-docker-compose pull sonarqube
-docker-compose up -d sonarqube
+docker compose pull sonarqube
+docker compose up -d sonarqube
 
 # Database maintenance
 docker exec lowcode-sonarqube-db psql -U sonarqube -d sonarqubedb -c "VACUUM ANALYZE;"

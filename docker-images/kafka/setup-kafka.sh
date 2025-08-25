@@ -45,7 +45,7 @@ fi
 
 # Start Kafka cluster
 print_status "Starting Kafka cluster..."
-docker-compose up -d
+docker compose up -d
 
 # Wait for services to be ready
 print_status "Waiting for Zookeeper to be ready..."
@@ -186,8 +186,8 @@ fi
 
 echo
 echo "🐳 Useful Commands:"
-echo "  Stop services: docker-compose down"
-echo "  View logs: docker-compose logs -f kafka"
+echo "  Stop services: docker compose down"
+echo "  View logs: docker compose logs -f kafka"
 echo "  List topics: docker exec lowcode-kafka kafka-topics --list --bootstrap-server localhost:9092"
 echo "  Topic details: docker exec lowcode-kafka kafka-topics --describe --bootstrap-server localhost:9092 --topic [topic-name]"
 echo

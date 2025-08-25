@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Get, Req } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get, Req, Delete, Param, Ip, Headers } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -14,8 +14,17 @@ export class AuthController {
   }
 
   @Post('login')
-  async login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+  async login(
+    @Body() loginDto: LoginDto,
+    @Ip() ip: string,
+    @Headers('user-agent') userAgent: string
+  ) {
+    const deviceInfo = {
+      ip,
+      userAgent,
+      deviceInfo: this.extractDeviceInfo(userAgent)
+    };
+    return this.authService.login(loginDto, deviceInfo);
   }
 
   @Post('refresh')
@@ -36,12 +45,64 @@ export class AuthController {
   }
 
   @Post('keycloak-sync')
-  async keycloakSync(@Body() keycloakData: any) {
-    return this.authService.syncKeycloakUser(keycloakData);
+  async keycloakSync(
+    @Body() keycloakData: any,
+    @Ip() ip: string,
+    @Headers('user-agent') userAgent: string
+  ) {
+    const deviceInfo = {
+      ip,
+      userAgent,
+      deviceInfo: 'Keycloak SSO'
+    };
+    return this.authService.syncKeycloakUser(keycloakData, deviceInfo);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('logout')
   async logout(@Req() req: any) {
-    return { message: 'Logout successful' };
+    const userId = req.user.id;
+    const sessionId = req.user.sessionId;
+    const tokenId = req.user.tokenId;
+    
+    return this.authService.logout(userId, sessionId, tokenId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('logout-all')
+  async logoutAllSessions(@Req() req: any) {
+    const userId = req.user.id;
+    return this.authService.logoutAllSessions(userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('sessions')
+  async getUserSessions(@Req() req: any) {
+    const userId = req.user.id;
+    const sessions = await this.authService.getUserActiveSessions(userId);
+    return { sessions };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('sessions/:sessionId')
+  async terminateSession(
+    @Req() req: any,
+    @Param('sessionId') sessionId: string
+  ) {
+    const userId = req.user.id;
+    return this.authService.terminateSessionById(userId, sessionId);
+  }
+
+  private extractDeviceInfo(userAgent: string): string {
+    if (!userAgent) return 'Unknown Device';
+    
+    if (userAgent.includes('Mobile')) return 'Mobile Device';
+    if (userAgent.includes('Tablet')) return 'Tablet';
+    if (userAgent.includes('Chrome')) return 'Chrome Browser';
+    if (userAgent.includes('Firefox')) return 'Firefox Browser';
+    if (userAgent.includes('Safari')) return 'Safari Browser';
+    if (userAgent.includes('Edge')) return 'Edge Browser';
+    
+    return 'Desktop Browser';
   }
 }

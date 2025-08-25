@@ -38,7 +38,7 @@ if ! docker info > /dev/null 2>&1; then
 fi
 
 # Check if Docker Compose is available
-if ! command -v docker-compose &> /dev/null && ! command -v docker &> /dev/null; then
+if ! command -v docker compose &> /dev/null && ! command -v docker &> /dev/null; then
     print_error "Docker Compose is not available. Please install Docker Compose and try again."
     exit 1
 fi
@@ -69,8 +69,8 @@ sudo chown -R 472:472 grafana/ 2>/dev/null || {
 
 # Start the monitoring stack
 print_status "Starting monitoring services..."
-if command -v docker-compose &> /dev/null; then
-    docker-compose up -d
+if command -v docker compose &> /dev/null; then
+    docker compose up -d
 else
     docker compose up -d
 fi
@@ -135,6 +135,6 @@ print_status "Container Status:"
 docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep -E "(prometheus|grafana|loki|promtail|node-exporter|cadvisor)"
 
 echo
-echo "🐳 To stop all services: docker-compose down"
-echo "📋 To view logs: docker-compose logs -f [service-name]"
+echo "🐳 To stop all services: docker compose down"
+echo "📋 To view logs: docker compose logs -f [service-name]"
 echo
