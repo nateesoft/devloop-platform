@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { UserRole } from '@/lib/types';
-import { authAPI } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useKeycloakSafe } from '@/hooks/useKeycloakSafe';
 import { useKeycloakSync } from '@/hooks/useKeycloakSync';
 import { useRouter } from 'next/navigation';
-import { getDefaultRedirectForRole } from '@/lib/routes';
 import KeycloakStatus from '@/components/debug/KeycloakStatus';
+import { extractErrorMessage } from '@/utils/errorUtils';
 
 interface LoginPageProps {
   setIsAuthenticated: (authenticated: boolean) => void;
@@ -17,7 +16,7 @@ const LoginPage: React.FC<LoginPageProps> = ({
   setIsAuthenticated,
   setUserRole,
 }) => {
-  const { login, register, user } = useAuth();
+  const { login, register } = useAuth();
   const keycloakAuth = useKeycloakSafe();
   const { isSyncing, syncError, isKeycloakAuthenticated, isLocalAuthenticated } = useKeycloakSync();
   const router = useRouter();
@@ -82,7 +81,10 @@ const LoginPage: React.FC<LoginPageProps> = ({
         response: err.response?.data, 
         status: err.response?.status 
       });
-      setError(err.response?.data?.message || err.message || 'An error occurred');
+      
+      // Use our new error utility to extract user-friendly message with login context
+      const errorMessage = extractErrorMessage(err, 'login');
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

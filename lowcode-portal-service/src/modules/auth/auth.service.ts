@@ -83,12 +83,20 @@ export class AuthService {
 
     const user = await this.usersRepository.findOne({ where: { email } });
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException({
+        message: 'Login failed',
+        error: 'Invalid email or password',
+        statusCode: 401
+      });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException({
+        message: 'Login failed',
+        error: 'Invalid email or password',
+        statusCode: 401
+      });
     }
 
     // Check for existing active sessions
@@ -133,7 +141,11 @@ export class AuthService {
     if (payload.tokenId) {
       const isBlacklisted = await this.redisService.isTokenBlacklisted(payload.tokenId);
       if (isBlacklisted) {
-        throw new UnauthorizedException('Token has been revoked');
+        throw new UnauthorizedException({
+          message: 'Authentication failed',
+          error: 'Your session has been terminated. Please log in again.',
+          statusCode: 401
+        });
       }
     }
 
@@ -146,7 +158,11 @@ export class AuthService {
     if (payload.sessionId) {
       const session = await this.redisService.getSession(payload.sessionId);
       if (!session || !session.isActive || session.userId !== user.id) {
-        throw new UnauthorizedException('Invalid session');
+        throw new UnauthorizedException({
+          message: 'Authentication failed',
+          error: 'Your session has expired or is invalid. Please log in again.',
+          statusCode: 401
+        });
       }
 
       // Update session activity
@@ -164,20 +180,32 @@ export class AuthService {
       if (payload.tokenId) {
         const isBlacklisted = await this.redisService.isTokenBlacklisted(payload.tokenId);
         if (isBlacklisted) {
-          throw new UnauthorizedException('Refresh token has been revoked');
+          throw new UnauthorizedException({
+            message: 'Token refresh failed',
+            error: 'Your session has been terminated. Please log in again.',
+            statusCode: 401
+          });
         }
       }
 
       const user = await this.usersRepository.findOne({ where: { id: payload.sub } });
       if (!user) {
-        throw new UnauthorizedException('Invalid token');
+        throw new UnauthorizedException({
+          message: 'Authentication failed',
+          error: 'User account not found. Please log in again.',
+          statusCode: 401
+        });
       }
 
       // Validate session
       if (payload.sessionId) {
         const session = await this.redisService.getSession(payload.sessionId);
         if (!session || !session.isActive || session.userId !== user.id) {
-          throw new UnauthorizedException('Invalid session');
+          throw new UnauthorizedException({
+          message: 'Authentication failed',
+          error: 'Your session has expired or is invalid. Please log in again.',
+          statusCode: 401
+        });
         }
       }
 
@@ -198,7 +226,14 @@ export class AuthService {
       
       return { access_token };
     } catch (error) {
-      throw new UnauthorizedException('Invalid refresh token');
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
+      throw new UnauthorizedException({
+        message: 'Token refresh failed',
+        error: 'Your session has expired or is invalid. Please log in again.',
+        statusCode: 401
+      });
     }
   }
 
@@ -291,7 +326,11 @@ export class AuthService {
     const sessionExists = sessions.some(session => session.sessionId === targetSessionId);
 
     if (!sessionExists) {
-      throw new UnauthorizedException('Session not found or not authorized');
+      throw new UnauthorizedException({
+        message: 'Session termination failed',
+        error: 'The specified session was not found or you are not authorized to terminate it.',
+        statusCode: 401
+      });
     }
 
     await this.redisService.terminateSession(targetSessionId);

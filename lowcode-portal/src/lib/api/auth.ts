@@ -29,7 +29,7 @@ export const authAPI = {
   refreshToken: async (): Promise<RefreshTokenResponse> => {
     const refreshToken = localStorage.getItem('refresh_token');
     if (!refreshToken) {
-      throw new Error('No refresh token available');
+      throw new Error('Your session has expired. Please log in again.');
     }
     
     const response = await apiClient.post('/auth/refresh', {

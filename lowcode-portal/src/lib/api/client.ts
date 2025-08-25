@@ -30,7 +30,12 @@ apiClient.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as any;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Don't try to refresh token for login/register endpoints
+    const isAuthEndpoint = originalRequest?.url?.includes('/auth/login') || 
+                          originalRequest?.url?.includes('/auth/register') ||
+                          originalRequest?.url?.includes('/auth/refresh');
+
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       originalRequest._retry = true;
 
       try {
@@ -62,7 +67,7 @@ apiClient.interceptors.response.use(
           return apiClient(originalRequest);
         } else {
           console.log('No refresh token found, redirecting to login');
-          throw new Error('No refresh token available');
+          throw new Error('Your session has expired. Please log in again.');
         }
       } catch (refreshError) {
         console.error('Token refresh failed:', refreshError);

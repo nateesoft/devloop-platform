@@ -31,7 +31,12 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Don't try to refresh token for login/register endpoints
+    const isAuthEndpoint = originalRequest?.url?.includes('/auth/login') || 
+                          originalRequest?.url?.includes('/auth/register') ||
+                          originalRequest?.url?.includes('/auth/refresh');
+
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       originalRequest._retry = true;
 
       try {
@@ -63,7 +68,7 @@ api.interceptors.response.use(
           return api(originalRequest);
         } else {
           console.log('No refresh token found, redirecting to login');
-          throw new Error('No refresh token available');
+          throw new Error('Your session has expired. Please log in again.');
         }
       } catch (refreshError) {
         console.error('Token refresh failed:', refreshError);
@@ -206,7 +211,7 @@ export const authAPI = {
   refreshToken: async (): Promise<{ access_token: string }> => {
     const refreshToken = localStorage.getItem('refresh_token');
     if (!refreshToken) {
-      throw new Error('No refresh token available');
+      throw new Error('Your session has expired. Please log in again.');
     }
     
     const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {

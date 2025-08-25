@@ -1,10 +1,12 @@
-import { Controller, Post, Body, UseGuards, Get, Req, Delete, Param, Ip, Headers } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get, Req, Delete, Param, Ip, Headers, UseFilters } from '@nestjs/common';
+import { AuthExceptionFilter } from '../../common/filters/auth-exception.filter';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Controller('auth')
+@UseFilters(AuthExceptionFilter)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
