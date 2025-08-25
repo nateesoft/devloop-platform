@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   Code2, Layers, Settings, Users, LogOut, Home, 
@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { UserRole, UserTier, Project } from '@/lib/types';
 import CollapsibleMenuGroup from '@/components/ui/CollapsibleMenuGroup';
+import LogoutConfirmModal from '@/components/modals/LogoutConfirmModal';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSecretManagement } from '@/contexts/SecretManagementContext';
@@ -35,6 +36,13 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   const { t } = useTranslation();
   const { logout } = useAuth();
   const { secrets } = useSecretManagement();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  const handleLogout = () => {
+    logout(); 
+    setIsAuthenticated(false); // Keep legacy support
+    router.push('/landing'); 
+  };
 
   return (
     <div className={`fixed left-0 top-0 h-full w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 z-50 transform transition-transform duration-300 ease-in-out ${
@@ -232,13 +240,9 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
             </div>
           </div>
           <button 
-            onClick={() => { 
-              logout(); 
-              setIsAuthenticated(false); // Keep legacy support
-              router.push('/landing'); 
-            }}
-            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-            title="Logout"
+            onClick={() => setShowLogoutModal(true)}
+            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+            title={t('logout')}
           >
             <LogOut className="h-5 w-5" />
           </button>
@@ -247,6 +251,13 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
           {t('upgradePlan')}
         </button>
       </div>
+
+      {/* Logout Confirmation Modal */}
+      <LogoutConfirmModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={handleLogout}
+      />
     </div>
   );
 };

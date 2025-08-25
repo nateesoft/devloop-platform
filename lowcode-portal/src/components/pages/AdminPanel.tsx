@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { AdminViewType } from '@/lib/types';
+import LogoutConfirmModal from '@/components/modals/LogoutConfirmModal';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import SiteMap from '@/components/ui/SiteMap';
 import OverviewPage from './admin/OverviewPage';
@@ -30,6 +31,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   const router = useRouter();
   const { logout } = useAuth();
   const [showSiteMap, setShowSiteMap] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -116,7 +118,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
 
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <button 
-            onClick={handleLogout}
+            onClick={() => setShowLogoutModal(true)}
             className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg font-medium hover:bg-red-200 dark:hover:bg-red-900/50 transition"
           >
             <LogOut className="h-4 w-4" />
@@ -163,6 +165,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
           </div>
         </div>
       )}
+
+      {/* Logout Confirmation Modal */}
+      <LogoutConfirmModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={handleLogout}
+      />
     </div>
   );
 };

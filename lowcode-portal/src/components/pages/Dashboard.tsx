@@ -60,6 +60,7 @@ import PageHistoryPanel from '@/components/panels/PageHistoryPanel';
 import MyProjectModal from '@/components/modals/MyProjectModal';
 import { useAuth } from '@/contexts/AuthContext';
 import UserGroups from '@/components/pages/UserGroups';
+import LogoutConfirmModal from '@/components/modals/LogoutConfirmModal';
 
 interface DashboardProps {
   projects: Project[];
@@ -130,6 +131,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   const [showWeUIModal, setShowWeUIModal] = useState(false);
   const [showServiceFlowModal, setShowServiceFlowModal] = useState(false);
   const [showPlanUpgradeModal, setShowPlanUpgradeModal] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [flows, setFlows] = useState<ServiceResponse[]>([]);
   const [editingFlow, setEditingFlow] = useState<ServiceResponse | null>(null);
   
@@ -171,6 +173,12 @@ const Dashboard: React.FC<DashboardProps> = ({
     } finally {
       setComponentsLoading(false);
     }
+  };
+
+  const handleLogout = () => {
+    logout(); 
+    setIsAuthenticated(false); // Keep legacy support
+    router.push('/landing'); 
   };
 
   const handleCreateComponent = () => {
@@ -2125,13 +2133,9 @@ const Dashboard: React.FC<DashboardProps> = ({
               </div>
             </div>
             <button 
-              onClick={() => { 
-                logout(); 
-                setIsAuthenticated(false); // Keep legacy support
-                router.push('/landing'); 
-              }}
+              onClick={() => setShowLogoutModal(true)}
               className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-              title="Logout"
+              title={t('logout')}
             >
               <LogOut className="h-5 w-5" />
             </button>
@@ -2685,6 +2689,13 @@ const Dashboard: React.FC<DashboardProps> = ({
         isOpen={showPlanUpgradeModal}
         onClose={() => setShowPlanUpgradeModal(false)}
         currentTier={userTier}
+      />
+
+      {/* Logout Confirmation Modal */}
+      <LogoutConfirmModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={handleLogout}
       />
     </div>
   );

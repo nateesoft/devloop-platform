@@ -94,6 +94,12 @@ const resources = {
       
       // Common
       "upgradePlan": "Upgrade Plan",
+      
+      // Logout
+      "logout": "Logout",
+      "confirmLogout": "Confirm Logout",
+      "logoutConfirmMessage": "Are you sure you want to sign out of your account?",
+      "logoutWarning": "Any unsaved changes will be lost.",
       "plan": "Plan",
       "userTier": "{{tier}} Plan",
       "loading": "Loading...",
@@ -210,6 +216,12 @@ const resources = {
       "iot": "IoT",
       "cancel": "ยกเลิก",
       "createProject": "สร้างโปรเจค",
+      
+      // Logout
+      "logout": "ออกจากระบบ",
+      "confirmLogout": "ยืนยันการออกจากระบบ",
+      "logoutConfirmMessage": "คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?",
+      "logoutWarning": "การเปลี่ยนแปลงที่ยังไม่ได้บันทึกจะหายไป",
       
       // Common
       "upgradePlan": "อัปเกรดแผน",
