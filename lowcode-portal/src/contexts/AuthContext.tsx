@@ -2,6 +2,8 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { authAPI, User, KeycloakUserSyncRequest } from '@/lib/api';
 import { useKeycloakSafe } from '@/hooks/useKeycloakSafe';
 import { useRouter } from 'next/navigation';
+import { useAutoLogout } from '@/hooks/useAutoLogout';
+import SessionTimeoutWarning from '@/components/ui/SessionTimeoutWarning';
 
 interface AuthContextType {
   user: User | null;
@@ -37,6 +39,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const router = useRouter();
   
   const isAdmin = user?.role === 'admin';
+
+  // Define handleLogout function first
+  const handleLogout = () => {
+    // Clear local tokens and user
+    authAPI.logout();
+    setUser(null);
+    setIsAuthenticated(false);
+    
+    // Also logout from Keycloak if available
+    if (keycloakContext?.logout) {
+      keycloakContext.logout();
+    } else {
+      // If no Keycloak, redirect manually
+      router.push('/login');
+    }
+  };
+
+  // Auto logout after 5 minutes of inactivity
+  const { resetTimeout, showWarning, remainingTime } = useAutoLogout({
+    timeout: 5 * 60 * 1000, // 5 minutes
+    warningTime: 60 * 1000, // 1 minute warning
+    isAuthenticated,
+    logout: handleLogout,
+    onLogout: () => {
+      console.log('Auto-logout triggered: Session expired due to inactivity');
+      // This will be called automatically by useAutoLogout when timeout occurs
+    }
+  });
 
   // Check authentication status on mount
   useEffect(() => {
@@ -126,6 +156,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await authAPI.login({ email, password });
       setUser(response.user);
       setIsAuthenticated(true);
+      
+      // Reset auto-logout timeout after successful login
+      resetTimeout();
     } catch (error) {
       throw error;
     }
@@ -136,6 +169,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await authAPI.register({ email, password, firstName, lastName, role });
       setUser(response.user);
       setIsAuthenticated(true);
+      
+      // Reset auto-logout timeout after successful registration
+      resetTimeout();
     } catch (error) {
       throw error;
     }
@@ -148,24 +184,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(response.user);
       setIsAuthenticated(true);
       console.log('Keycloak user sync successful:', response.user);
+      
+      // Reset auto-logout timeout after successful Keycloak sync
+      resetTimeout();
     } catch (error) {
       console.error('Keycloak user sync failed:', error);
       throw error;
-    }
-  };
-
-  const handleLogout = () => {
-    // Clear local tokens and user
-    authAPI.logout();
-    setUser(null);
-    setIsAuthenticated(false);
-    
-    // Also logout from Keycloak if available
-    if (keycloakContext?.logout) {
-      keycloakContext.logout();
-    } else {
-      // If no Keycloak, redirect manually
-      router.push('/login');
     }
   };
 
@@ -192,6 +216,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   return (
     <AuthContext.Provider value={value}>
       {children}
+      
+      {/* Session Timeout Warning */}
+      {isAuthenticated && (
+        <SessionTimeoutWarning
+          remainingTime={remainingTime}
+          showWarning={showWarning}
+          onExtendSession={resetTimeout}
+        />
+      )}
     </AuthContext.Provider>
   );
 };
