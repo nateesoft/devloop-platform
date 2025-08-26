@@ -16,3 +16,4 @@ export { WorkFlowNode } from './work-flow-node.entity';
 export { WorkFlowHistory } from './work-flow-history.entity';
 export { MediaFile } from './media-file.entity';
 export { MediaFolder } from './media-folder.entity';
+export { Task } from './task.entity';

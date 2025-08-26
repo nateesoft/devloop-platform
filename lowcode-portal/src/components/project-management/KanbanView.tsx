@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   Plus, 
   MoreVertical, 
@@ -11,11 +11,16 @@ import {
   Eye,
   CheckCircle
 } from 'lucide-react';
-import { useProjectManagement, Task } from '@/contexts/ProjectManagementContext';
+import { Task as APITask, taskAPI } from '@/lib/api/tasks';
+import { useProjectManagement, Task as ContextTask } from '@/contexts/ProjectManagementContext';
+
+// Combined Task type that works with both API and Context
+type Task = APITask & ContextTask;
 
 interface KanbanViewProps {
   onTaskClick: (task: Task) => void;
   onCreateTask: () => void;
+  refreshTrigger?: number; // Add this to trigger refresh from parent
 }
 
 interface ColumnConfig {
@@ -26,17 +31,157 @@ interface ColumnConfig {
   maxItems?: number;
 }
 
-const KanbanView: React.FC<KanbanViewProps> = ({ onTaskClick, onCreateTask }) => {
-  const { 
-    currentProject, 
-    updateTask, 
-    deleteTask,
-    formatDate 
-  } = useProjectManagement();
-  
+const KanbanView: React.FC<KanbanViewProps> = ({ onTaskClick, onCreateTask, refreshTrigger }) => {
+  const { currentProject, generateDemoData, updateTask: updateContextTask } = useProjectManagement();
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isUsingApi, setIsUsingApi] = useState(false);
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
   const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
   const dragRef = useRef<HTMLDivElement>(null);
+
+  // Function to load tasks from context or API
+  const loadTasks = async () => {
+    try {
+      setLoading(true);
+      
+      // Try to get tasks from API first
+      console.log('🔄 Loading tasks from API...');
+      const allTasks = await taskAPI.getAll();
+      console.log('✅ Tasks received from API:', allTasks);
+      setTasks(allTasks);
+      setIsUsingApi(true);
+      
+      // If API returns empty array and we have context data, use it as fallback
+      if (allTasks.length === 0 && currentProject && currentProject.tasks.length > 0) {
+        console.log('📊 No API data, falling back to context:', currentProject.tasks.length);
+        // Convert context tasks to match API format
+        const contextTasks = currentProject.tasks.map((task, index) => ({
+          ...task,
+          id: parseInt(task.id) || Date.now() + index,
+          createdBy: 1,
+          assignedTo: task.assignee ? 1 : undefined,
+          createdAt: task.createdAt.toISOString(),
+          updatedAt: task.updatedAt.toISOString(),
+          isOverdue: new Date(task.endDate) < new Date() && task.status !== 'completed',
+          isDueSoon: new Date(task.endDate) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          endDate: task.endDate.toISOString(),
+          startDate: task.startDate.toISOString(),
+          dueDate: task.endDate.toISOString()
+        }));
+        setTasks(contextTasks as Task[]);
+        setIsUsingApi(false);
+      }
+    } catch (error) {
+      console.error('❌ Failed to load tasks from API:', error);
+      
+      // If API fails, try context data as fallback
+      setIsUsingApi(false);
+      if (currentProject && currentProject.tasks.length > 0) {
+        console.log('📊 API failed, falling back to context:', currentProject.tasks.length);
+        const contextTasks = currentProject.tasks.map((task, index) => ({
+          ...task,
+          id: parseInt(task.id) || Date.now() + index,
+          createdBy: 1,
+          assignedTo: task.assignee ? 1 : undefined,
+          createdAt: task.createdAt.toISOString(),
+          updatedAt: task.updatedAt.toISOString(),
+          isOverdue: new Date(task.endDate) < new Date() && task.status !== 'completed',
+          isDueSoon: new Date(task.endDate) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          endDate: task.endDate.toISOString(),
+          startDate: task.startDate.toISOString(),
+          dueDate: task.endDate.toISOString()
+        }));
+        setTasks(contextTasks as Task[]);
+      } else {
+        // If both fail, generate demo data automatically
+        console.log('🎯 No data available, auto-generating demo data...');
+        generateDemoData();
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load tasks on mount and when currentProject changes
+  useEffect(() => {
+    loadTasks();
+  }, [currentProject]);
+
+  // Refresh tasks when refreshTrigger changes
+  useEffect(() => {
+    if (refreshTrigger) {
+      loadTasks();
+    }
+  }, [refreshTrigger]);
+
+  const formatDate = (date: string, format: 'short' | 'long' = 'long'): string => {
+    if (!date) return '';
+    const dateObj = new Date(date);
+    if (format === 'short') {
+      return dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+    return dateObj.toLocaleDateString();
+  };
+
+  const updateTask = async (taskId: number | string, updates: { status: 'todo' | 'in_progress' | 'review' | 'completed' }) => {
+    try {
+      // Try to update via API first
+      try {
+        const updatedTask = await taskAPI.update(Number(taskId), updates);
+        setTasks(prevTasks => 
+          prevTasks.map(task => 
+            task.id === taskId ? updatedTask : task
+          )
+        );
+        console.log('✅ Task updated via API:', updatedTask);
+        return;
+      } catch (apiError) {
+        console.log('⚠️ API update failed, falling back to context:', apiError);
+        
+        // Fallback to context task update if API fails
+        if (currentProject) {
+          updateContextTask(taskId.toString(), updates);
+          // Update local state immediately
+          setTasks(prevTasks => 
+            prevTasks.map(task => 
+              task.id === taskId ? { ...task, ...updates } : task
+            )
+          );
+          console.log('📊 Task updated via context');
+          return;
+        }
+        
+        throw apiError;
+      }
+    } catch (error) {
+      console.error('❌ Failed to update task:', error);
+      // Show user-friendly error message
+      alert('Failed to update task. Please try again.');
+    }
+  };
+
+  const deleteTask = async (taskId: number) => {
+    try {
+      // Try to delete via API first
+      try {
+        await taskAPI.delete(taskId);
+        setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
+        console.log('✅ Task deleted via API:', taskId);
+        return;
+      } catch (apiError) {
+        console.log('⚠️ API delete failed, falling back to local state:', apiError);
+        
+        // Fallback to local state update if API fails
+        setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
+        console.log('📊 Task deleted from local state');
+        return;
+      }
+    } catch (error) {
+      console.error('❌ Failed to delete task:', error);
+      alert('Failed to delete task. Please try again.');
+    }
+  };
 
   const columns: ColumnConfig[] = [
     {
@@ -66,7 +211,6 @@ const KanbanView: React.FC<KanbanViewProps> = ({ onTaskClick, onCreateTask }) =>
     }
   ];
 
-  const tasks = currentProject?.tasks || [];
 
   const getTasksByStatus = (status: string) => {
     return tasks.filter(task => task.status === status);
@@ -123,7 +267,7 @@ const KanbanView: React.FC<KanbanViewProps> = ({ onTaskClick, onCreateTask }) =>
     setDragOverColumn(null);
     
     if (draggedTask && draggedTask.status !== columnId) {
-      updateTask(draggedTask.id, { status: columnId });
+      updateTask(draggedTask.id, { status: columnId as 'todo' | 'in_progress' | 'review' | 'completed' });
     }
     setDraggedTask(null);
   };
@@ -133,16 +277,16 @@ const KanbanView: React.FC<KanbanViewProps> = ({ onTaskClick, onCreateTask }) =>
     return !column?.maxItems || tasksCount < column.maxItems;
   };
 
-  if (!currentProject) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
           <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-            No Project Selected
+            Loading Tasks...
           </h3>
           <p className="text-gray-500 dark:text-gray-400">
-            Select a project to view tasks in kanban format
+            Please wait while we fetch your tasks
           </p>
         </div>
       </div>
@@ -157,18 +301,38 @@ const KanbanView: React.FC<KanbanViewProps> = ({ onTaskClick, onCreateTask }) =>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
             Kanban Board
           </h2>
-          <span className="text-sm text-gray-500 dark:text-gray-400">
-            {tasks.length} tasks total
-          </span>
+          <div className="flex items-center space-x-2">
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              {tasks.length} tasks total
+            </span>
+            <span className={`px-2 py-1 text-xs rounded-full ${
+              isUsingApi 
+                ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' 
+                : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400'
+            }`}>
+              {isUsingApi ? 'API Connected' : 'Demo Data'}
+            </span>
+          </div>
         </div>
         
-        <button
-          onClick={onCreateTask}
-          className="flex items-center space-x-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-        >
-          <Plus className="h-4 w-4" />
-          <span className="hidden sm:inline">New Task</span>
-        </button>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={loadTasks}
+            disabled={loading}
+            className="flex items-center space-x-2 px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors disabled:opacity-50"
+            title="Refresh tasks"
+          >
+            <Clock className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline">Refresh</span>
+          </button>
+          <button
+            onClick={onCreateTask}
+            className="flex items-center space-x-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            <span className="hidden sm:inline">New Task</span>
+          </button>
+        </div>
       </div>
 
       {/* Kanban Board */}

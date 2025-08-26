@@ -11,6 +11,7 @@ export * from './services';
 export * from './flows';
 export * from './media';
 export * from './notes';
+export * from './tasks';
 
 // Export all types
 export * from '../types';
@@ -34,4 +35,5 @@ export const APIs = {
   nodeContents: require('./flows').nodeContentAPI,
   media: require('./media').mediaAPI,
   notes: require('./notes').notesAPI,
+  tasks: require('./tasks').taskAPI,
 };

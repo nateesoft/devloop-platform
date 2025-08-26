@@ -17,6 +17,7 @@ import { UserGroupsModule } from './modules/user-groups/user-groups.module';
 import { SecretKeysModule } from './modules/secret-keys/secret-keys.module';
 import { DatabaseModule } from './modules/database.module';
 import { MediaModule } from './modules/media/media.module';
+import { TasksModule } from './modules/tasks/tasks.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { MediaModule } from './modules/media/media.module';
     SecretKeysModule,
     DatabaseModule,
     MediaModule,
+    TasksModule,
   ],
   controllers: [AppController],
   providers: [AppService],

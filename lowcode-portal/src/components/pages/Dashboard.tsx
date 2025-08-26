@@ -36,9 +36,9 @@ import {
   TimelineView,
   TableView,
   KanbanView, 
-  TaskDetailModal, 
   TaskSummary 
 } from '@/components/project-management';
+import TaskModal from '@/components/modals/TaskModal';
 import { 
   DocumentationView 
 } from '@/components/documentation';
@@ -50,6 +50,7 @@ import { useSecretManagement } from '@/contexts/SecretManagementContext';
 import CollapsibleMenuGroup from '@/components/ui/CollapsibleMenuGroup';
 import NotesBoard from '@/components/ui/NotesBoard';
 import { serviceAPI, ServiceResponse, componentAPI, ComponentData, ComponentStats, CreateComponentRequest, pageAPI, PageData, PageStats, CreatePageRequest, myProjectAPI, MyProjectData } from '@/lib/api';
+import { taskAPI, CreateTaskRequest, UpdateTaskRequest, Task } from '@/lib/api/tasks';
 import { useAlertActions } from '@/hooks/useAlert';
 import { useAlert } from '@/contexts/AlertContext';
 import AlertDemo from '@/components/ui/AlertDemo';
@@ -416,7 +417,8 @@ const Dashboard: React.FC<DashboardProps> = ({
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [selectedTask, setSelectedTask] = useState<any>(null);
   const [isCreatingTask, setIsCreatingTask] = useState(false);
-  const [projectManagementView, setProjectManagementView] = useState<'timeline' | 'table' | 'kanban' | 'summary'>('timeline');
+  const [projectManagementView, setProjectManagementView] = useState<'timeline' | 'table' | 'kanban' | 'summary'>('kanban');
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   
   // Secret Management states
   const [showSecretModal, setShowSecretModal] = useState(false);
@@ -1615,17 +1617,6 @@ const Dashboard: React.FC<DashboardProps> = ({
             <div className="px-4 sm:px-6 py-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
               <div className="flex items-center space-x-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg p-1">
                 <button
-                  onClick={() => setProjectManagementView('timeline')}
-                  className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                    projectManagementView === 'timeline'
-                      ? 'bg-blue-600 text-white shadow-sm'
-                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  <Calendar className="h-4 w-4 mr-2 inline" />
-                  Timeline
-                </button>
-                <button
                   onClick={() => setProjectManagementView('kanban')}
                   className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                     projectManagementView === 'kanban'
@@ -1635,6 +1626,17 @@ const Dashboard: React.FC<DashboardProps> = ({
                 >
                   <Layers className="h-4 w-4 mr-2 inline" />
                   Kanban
+                </button>
+                <button
+                  onClick={() => setProjectManagementView('timeline')}
+                  className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                    projectManagementView === 'timeline'
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  <Calendar className="h-4 w-4 mr-2 inline" />
+                  Timeline
                 </button>
                 <button
                   onClick={() => setProjectManagementView('table')}
@@ -1709,6 +1711,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         setIsCreatingTask(true);
                         setShowTaskModal(true);
                       }}
+                      refreshTrigger={refreshTrigger}
                     />
                   )}
                   {projectManagementView === 'table' && (
@@ -2592,15 +2595,38 @@ const Dashboard: React.FC<DashboardProps> = ({
       />
 
       {/* Project Management Modals */}
-      <TaskDetailModal
+      <TaskModal
         isOpen={showTaskModal}
         onClose={() => {
           setShowTaskModal(false);
           setSelectedTask(null);
           setIsCreatingTask(false);
         }}
-        task={selectedTask}
-        isCreating={isCreatingTask}
+        onSave={async (data) => {
+          try {
+            // Import taskAPI dynamically to avoid import issues
+            const { taskAPI: dynamicTaskAPI } = await import('@/lib/api/tasks');
+            
+            if (isCreatingTask) {
+              // Create new task
+              await dynamicTaskAPI.create(data as CreateTaskRequest);
+              alert.success('Task created successfully!');
+            } else if (selectedTask) {
+              // Update existing task
+              await dynamicTaskAPI.update(selectedTask.id, data as UpdateTaskRequest);
+              alert.success('Task updated successfully!');
+            }
+            setShowTaskModal(false);
+            setSelectedTask(null);
+            setIsCreatingTask(false);
+            // Trigger refresh in KanbanView
+            setRefreshTrigger(prev => prev + 1);
+          } catch (error) {
+            console.error('Error saving task:', error);
+            alert.error('Failed to save task');
+          }
+        }}
+        editingTask={isCreatingTask ? null : selectedTask}
       />
 
       {/* Secret Management Modal */}
