@@ -18,7 +18,7 @@ This directory contains the complete setup for integrating Keycloak with the Low
    ```
 
 4. **Configure Google OAuth** (optional):
-   - Go to: http://localhost:9090/admin
+   - Go to: http://localhost:9292/admin
    - Login: admin/admin123
    - Navigate to: Identity Providers → Google
    - Add your Google Client ID and Secret
@@ -28,7 +28,7 @@ This directory contains the complete setup for integrating Keycloak with the Low
 
 ### Docker Setup
 - **docker compose.yml**: Keycloak container with proper configuration
-- **Port**: 9090 (to avoid conflicts with other services)
+- **Port**: 9191 (to avoid conflicts with other services)
 - **Admin**: admin/admin123
 
 ### Keycloak Configuration
@@ -69,7 +69,7 @@ Web Origins: http://localhost:3000
 
 ### Environment Variables
 ```env
-NEXT_PUBLIC_KEYCLOAK_URL=http://localhost:9090
+NEXT_PUBLIC_KEYCLOAK_URL=http://localhost:9191
 NEXT_PUBLIC_KEYCLOAK_REALM=lowcode-platform
 NEXT_PUBLIC_KEYCLOAK_CLIENT_ID=lowcode-portal
 ```
@@ -113,7 +113,7 @@ function MyComponent() {
 
 2. **Configure Redirect URI**:
    ```
-   http://localhost:9090/realms/lowcode-platform/broker/google/endpoint
+   http://localhost:9191/realms/lowcode-platform/broker/google/endpoint
    ```
 
 3. **Add to Keycloak**:
@@ -166,7 +166,7 @@ docker compose restart
 
 ### Frontend Connection Issues
 1. Check environment variables in `.env.local`
-2. Verify Keycloak is running on port 9090
+2. Verify Keycloak is running on port 9191
 3. Check browser console for CORS errors
 4. Ensure realm and client IDs match
 
@@ -178,10 +178,10 @@ docker compose restart
 
 ## URLs
 
-- **Keycloak Admin**: http://localhost:9090/admin
-- **Realm**: http://localhost:9090/realms/lowcode-platform
-- **Auth Endpoint**: http://localhost:9090/realms/lowcode-platform/protocol/openid-connect/auth
-- **Token Endpoint**: http://localhost:9090/realms/lowcode-platform/protocol/openid-connect/token
+- **Keycloak Admin**: http://localhost:9292/admin
+- **Realm**: http://localhost:9191/realms/lowcode-platform
+- **Auth Endpoint**: http://localhost:9191/realms/lowcode-platform/protocol/openid-connect/auth
+- **Token Endpoint**: http://localhost:9191/realms/lowcode-platform/protocol/openid-connect/token
 
 ## Production Considerations
 

@@ -14,6 +14,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { UserGroupData, MyProjectData, User, CreateUserGroupRequest, apiClient } from '@/lib/api';
+import { userGroupAPI } from '@/lib/api/users';
 import { useAuth } from '@/contexts/AuthContext';
 import UserGroupModal from '@/components/modals/UserGroupModal';
 import MemberManagement from '@/components/user-groups/MemberManagement';
@@ -54,7 +55,7 @@ const UserGroups: React.FC = () => {
       setError(null);
 
       const [groupsResponse, projectsResponse, usersResponse] = await Promise.all([
-        apiClient.getUserGroups(),
+        userGroupAPI.getAll(),
         apiClient.getMyProjects(),
         apiClient.getUsers()
       ]);
@@ -93,7 +94,7 @@ const UserGroups: React.FC = () => {
 
   const handleCreateGroup = async (data: CreateUserGroupRequest) => {
     try {
-      await apiClient.createUserGroup(data);
+      await userGroupAPI.create(data);
       await loadData();
       setIsModalOpen(false);
     } catch (err) {
@@ -106,7 +107,16 @@ const UserGroups: React.FC = () => {
     if (!editingGroup) return;
     
     try {
-      await apiClient.updateUserGroup(editingGroup.id!, data);
+      // Convert CreateUserGroupRequest to UpdateUserGroupRequest
+      // Remove fields that shouldn't be updated via this endpoint
+      const { memberIds, ...updateData } = data;
+      
+      await userGroupAPI.update(editingGroup.id!, updateData);
+      
+      // Handle members separately if needed
+      // Note: This simplified version doesn't update members
+      // Members should be updated via separate endpoints if required
+      
       await loadData();
       setIsModalOpen(false);
       setEditingGroup(null);
@@ -122,7 +132,7 @@ const UserGroups: React.FC = () => {
     }
 
     try {
-      await apiClient.deleteUserGroup(groupId);
+      await userGroupAPI.delete(groupId);
       await loadData();
       setOpenDropdown(null);
       if (selectedGroup?.id === groupId) {
@@ -136,7 +146,7 @@ const UserGroups: React.FC = () => {
 
   const handleAddMembers = async (groupId: number, userIds: number[]) => {
     try {
-      await apiClient.addMembersToGroup(groupId, { userIds });
+      await userGroupAPI.addMembers(groupId, { userIds });
       await loadData();
       if (selectedGroup?.id === groupId) {
         const updatedGroup = userGroups.find(g => g.id === groupId);
@@ -150,7 +160,7 @@ const UserGroups: React.FC = () => {
 
   const handleRemoveMembers = async (groupId: number, userIds: number[]) => {
     try {
-      await apiClient.removeMembersFromGroup(groupId, { userIds });
+      await userGroupAPI.removeMembers(groupId, { userIds });
       await loadData();
       if (selectedGroup?.id === groupId) {
         const updatedGroup = userGroups.find(g => g.id === groupId);
@@ -164,7 +174,7 @@ const UserGroups: React.FC = () => {
 
   const handleUpdatePermissions = async (groupId: number, permissions: string[]) => {
     try {
-      await apiClient.updateUserGroup(groupId, { permissions });
+      await userGroupAPI.update(groupId, { permissions });
       await loadData();
       if (selectedGroup?.id === groupId) {
         const updatedGroup = userGroups.find(g => g.id === groupId);

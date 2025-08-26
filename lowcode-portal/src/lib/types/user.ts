@@ -39,19 +39,27 @@ export interface UserGroupData extends BaseEntity {
 
 export interface CreateUserGroupRequest {
   name: string;
-  description: string;
-  type: 'department' | 'project' | 'role' | 'custom';
+  description?: string;
+  status?: string;
   permissions?: string[];
-  parentGroupId?: number;
+  settings?: any;
+  color?: string;
+  icon?: string;
+  isSystem?: boolean;
+  projectId?: number;
+  memberIds?: number[];
 }
 
 export interface UpdateUserGroupRequest {
   name?: string;
   description?: string;
-  type?: 'department' | 'project' | 'role' | 'custom';
+  status?: string;
   permissions?: string[];
-  parentGroupId?: number;
-  isActive?: boolean;
+  settings?: any;
+  color?: string;
+  icon?: string;
+  isSystem?: boolean;
+  projectId?: number;
 }
 
 export interface UserGroupStats {

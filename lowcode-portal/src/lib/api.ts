@@ -1213,8 +1213,9 @@ export interface CreateUserGroupRequest {
   settings?: any;
   color?: string;
   icon?: string;
-  memberIds?: number[];
+  isSystem?: boolean;
   projectId?: number;
+  memberIds?: number[];
 }
 
 export interface UpdateUserGroupRequest {
@@ -1225,6 +1226,7 @@ export interface UpdateUserGroupRequest {
   settings?: any;
   color?: string;
   icon?: string;
+  isSystem?: boolean;
   projectId?: number;
 }
 

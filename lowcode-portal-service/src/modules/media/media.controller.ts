@@ -39,7 +39,7 @@ export class MediaController {
     @Body('folderId') folderId: string,
     @Req() req: any,
   ) {
-    const userId = '16'; // Hardcoded for testing
+    const userId = '1'; // Using existing user ID
     const uploadedFiles: any[] = [];
 
     for (const file of files) {
@@ -59,7 +59,7 @@ export class MediaController {
     @Query('folderId') folderId: string,
     @Req() req: any,
   ) {
-    const userId = '16'; // Hardcoded for testing
+    const userId = '1'; // Using existing user ID
     const files = await this.mediaService.findAllFiles(userId, folderId);
 
     return {
@@ -73,7 +73,7 @@ export class MediaController {
     @Param('id', ParseUUIDPipe) id: string,
     @Req() req: any,
   ) {
-    const userId = '16'; // Hardcoded for testing
+    const userId = '1'; // Using existing user ID
     const file = await this.mediaService.findFileById(id, userId);
 
     return {
@@ -88,7 +88,7 @@ export class MediaController {
     @Body() updateData: UpdateMediaFileDto,
     @Req() req: any,
   ) {
-    const userId = '16'; // Hardcoded for testing
+    const userId = '1'; // Using existing user ID
     const file = await this.mediaService.updateFile(id, userId, updateData);
 
     return {
@@ -103,7 +103,7 @@ export class MediaController {
     @Param('id', ParseUUIDPipe) id: string,
     @Req() req: any,
   ) {
-    const userId = '16'; // Hardcoded for testing
+    const userId = '1'; // Using existing user ID
     await this.mediaService.deleteFile(id, userId);
 
     return {
@@ -117,7 +117,7 @@ export class MediaController {
     @Body('fileIds') fileIds: string[],
     @Req() req: any,
   ) {
-    const userId = '16'; // Hardcoded for testing
+    const userId = '1'; // Using existing user ID
     
     for (const fileId of fileIds) {
       await this.mediaService.deleteFile(fileId, userId);
@@ -134,7 +134,7 @@ export class MediaController {
     @Body() createFolderDto: CreateMediaFolderDto,
     @Req() req: any,
   ) {
-    const userId = '16'; // Hardcoded for testing
+    const userId = '1'; // Using existing user ID
     const folder = await this.mediaService.createFolder(createFolderDto, userId);
 
     return {
@@ -149,7 +149,7 @@ export class MediaController {
     @Query('parentId') parentId: string,
     @Req() req: any,
   ) {
-    const userId = '16'; // Hardcoded for testing
+    const userId = '1'; // Using existing user ID
     const folders = await this.mediaService.findAllFolders(userId, parentId);
 
     return {
@@ -163,7 +163,7 @@ export class MediaController {
     @Param('id', ParseUUIDPipe) id: string,
     @Req() req: any,
   ) {
-    const userId = '16'; // Hardcoded for testing
+    const userId = '1'; // Using existing user ID
     const folder = await this.mediaService.findFolderById(id, userId);
 
     return {
@@ -177,7 +177,7 @@ export class MediaController {
     @Param('id', ParseUUIDPipe) id: string,
     @Req() req: any,
   ) {
-    const userId = '16'; // Hardcoded for testing
+    const userId = '1'; // Using existing user ID
     await this.mediaService.deleteFolder(id, userId);
 
     return {
@@ -192,7 +192,7 @@ export class MediaController {
     @Body('folderId') folderId: string,
     @Req() req: any,
   ) {
-    const userId = '16'; // Hardcoded for testing
+    const userId = '1'; // Using existing user ID
     const file = await this.mediaService.updateFile(id, userId, { folderId });
 
     return {
@@ -208,7 +208,7 @@ export class MediaController {
     @Body('folderId') folderId: string,
     @Req() req: any,
   ) {
-    const userId = '16'; // Hardcoded for testing
+    const userId = '1'; // Using existing user ID
     const movedFiles: any[] = [];
 
     for (const fileId of fileIds) {
@@ -229,7 +229,7 @@ export class MediaController {
     @Body('tags') tags: string[],
     @Req() req: any,
   ) {
-    const userId = '16'; // Hardcoded for testing
+    const userId = '1'; // Using existing user ID
     const file = await this.mediaService.updateFile(id, userId, { tags });
 
     return {
@@ -245,7 +245,7 @@ export class MediaController {
     @Body('name') name: string,
     @Req() req: any,
   ) {
-    const userId = '16'; // Hardcoded for testing
+    const userId = '1'; // Using existing user ID
     const file = await this.mediaService.updateFile(id, userId, { name });
 
     return {

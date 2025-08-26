@@ -50,7 +50,7 @@ services:
       sonarqube-db:
         condition: service_healthy
     ports:
-      - "9000:9000"
+      - "9090:9000"
     volumes:
       - sonarqube_data:/opt/sonarqube/data
       - sonarqube_logs:/opt/sonarqube/logs
@@ -104,9 +104,9 @@ services:
       nofile:
         soft: 262144
         hard: 262144
-    sysctls:
-      - vm.max_map_count=524288
-      - fs.file-max=131072
+    # sysctls:
+      # - vm.max_map_count=524288
+      # - fs.file-max=131072
 
   # SonarQube Scanner CLI (for manual scans)
   sonar-scanner:

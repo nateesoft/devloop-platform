@@ -3,7 +3,7 @@
 # Setup script for Keycloak with Lowcode Platform integration
 set -e
 
-KEYCLOAK_URL=${KEYCLOAK_URL:-"http://localhost:9090"}
+KEYCLOAK_URL=${KEYCLOAK_URL:-"http://localhost:9191"}
 ADMIN_USER=${ADMIN_USER:-"admin"}
 ADMIN_PASS=${ADMIN_PASS:-"admin123"}
 REALM_NAME="lowcode-platform"

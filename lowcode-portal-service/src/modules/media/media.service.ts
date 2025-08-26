@@ -80,7 +80,7 @@ export class MediaService {
         thumbnailPath,
         metadata,
         tags: [],
-        folderId,
+        folderId: folderId && folderId.trim() !== '' ? folderId : undefined,
       };
 
       const mediaFile = this.mediaFileRepository.create({

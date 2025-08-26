@@ -26,7 +26,7 @@ export class SecretKeyController {
     @Body() createSecretKeyDto: CreateSecretKeyDto,
     @Request() req: any,
   ): Promise<SecretKeyResponseDto> {
-    const userId = req.user?.id || 13;
+    const userId = req.user?.id || 1;
     return this.secretKeyService.create(createSecretKeyDto, userId);
   }
 
@@ -38,7 +38,7 @@ export class SecretKeyController {
     @Query('expired') expired?: boolean,
     @Query('expiring_soon') expiringSoon?: boolean,
   ): Promise<SecretKeyListResponseDto[]> {
-    const userId = req.user?.id || 13;
+    const userId = req.user?.id || 1;
 
     if (expired) {
       return this.secretKeyService.findExpired(userId);
@@ -61,7 +61,7 @@ export class SecretKeyController {
 
   @Get('expired')
   async findExpired(@Request() req: any): Promise<SecretKeyListResponseDto[]> {
-    const userId = req.user?.id || 13;
+    const userId = req.user?.id || 1;
     return this.secretKeyService.findExpired(userId);
   }
 
@@ -70,7 +70,7 @@ export class SecretKeyController {
     @Request() req: any,
     @Query('days', new ParseIntPipe({ optional: true })) days?: number,
   ): Promise<SecretKeyListResponseDto[]> {
-    const userId = req.user?.id || 13;
+    const userId = req.user?.id || 1;
     return this.secretKeyService.findExpiringSoon(userId, days);
   }
 
@@ -79,7 +79,7 @@ export class SecretKeyController {
     @Request() req: any,
     @Query('q') query: string,
   ): Promise<SecretKeyListResponseDto[]> {
-    const userId = req.user?.id || 13;
+    const userId = req.user?.id || 1;
     return this.secretKeyService.search(query, userId);
   }
 
@@ -88,7 +88,7 @@ export class SecretKeyController {
     @Request() req: any,
     @Param('type') type: SecretKeyType,
   ): Promise<SecretKeyListResponseDto[]> {
-    const userId = req.user?.id || 13;
+    const userId = req.user?.id || 1;
     return this.secretKeyService.findByType(type, userId);
   }
 
@@ -97,7 +97,7 @@ export class SecretKeyController {
     @Param('id', ParseIntPipe) id: number,
     @Request() req: any,
   ): Promise<SecretKeyResponseDto> {
-    const userId = req.user?.id || 13;
+    const userId = req.user?.id || 1;
     return this.secretKeyService.findOne(id, userId);
   }
 
@@ -107,7 +107,7 @@ export class SecretKeyController {
     @Body() updateSecretKeyDto: UpdateSecretKeyDto,
     @Request() req: any,
   ): Promise<SecretKeyResponseDto> {
-    const userId = req.user?.id || 13;
+    const userId = req.user?.id || 1;
     return this.secretKeyService.update(id, updateSecretKeyDto, userId);
   }
 
@@ -117,7 +117,7 @@ export class SecretKeyController {
     @Param('id', ParseIntPipe) id: number,
     @Request() req: any,
   ): Promise<SecretKeyResponseDto> {
-    const userId = req.user?.id || 13;
+    const userId = req.user?.id || 1;
     return this.secretKeyService.deactivate(id, userId);
   }
 
@@ -127,7 +127,7 @@ export class SecretKeyController {
     @Param('id', ParseIntPipe) id: number,
     @Request() req: any,
   ): Promise<SecretKeyResponseDto> {
-    const userId = req.user?.id || 13;
+    const userId = req.user?.id || 1;
     return this.secretKeyService.activate(id, userId);
   }
 
@@ -137,7 +137,7 @@ export class SecretKeyController {
     @Param('id', ParseIntPipe) id: number,
     @Request() req: any,
   ): Promise<void> {
-    const userId = req.user?.id || 13;
+    const userId = req.user?.id || 1;
     return this.secretKeyService.remove(id, userId);
   }
 }

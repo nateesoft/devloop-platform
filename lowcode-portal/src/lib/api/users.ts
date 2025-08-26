@@ -55,7 +55,7 @@ export const userGroupAPI = {
   },
 
   update: async (id: number, data: UpdateUserGroupRequest) => {
-    const response = await apiClient.put(`/user-groups/${id}`, data);
+    const response = await apiClient.patch(`/user-groups/${id}`, data);
     return response.data;
   },
 
