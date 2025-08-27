@@ -45,7 +45,7 @@ export class AuthService {
 
     const existingUser = await this.usersRepository.findOne({ where: { email } });
     if (existingUser) {
-      throw new ConflictException('Email already exists');
+      throw new ConflictException('มี User อยู่แล้วในระบบ');
     }
 
     const saltRounds = 10;

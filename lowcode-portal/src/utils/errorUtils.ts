@@ -19,6 +19,15 @@ export const extractErrorMessage = (error: any, context?: 'login' | 'session' | 
   if (error?.response?.data) {
     const errorData = error.response.data as ApiErrorResponse;
     
+    // Handle specific HTTP status codes first
+    if (error?.response?.status === 409) {
+      // Handle conflict errors (409) - usually duplicate registrations
+      if (errorData.message && errorData.message.includes('มี User อยู่แล้วในระบบ')) {
+        return 'มี User อยู่แล้วในระบบ กรุณาเข้าสู่ระบบหรือใช้อีเมลอื่น';
+      }
+      return 'มี User อยู่แล้วในระบบ กรุณาเข้าสู่ระบบหรือใช้อีเมลอื่น';
+    }
+    
     // Handle specific error codes
     if (errorData.code) {
       switch (errorData.code) {
