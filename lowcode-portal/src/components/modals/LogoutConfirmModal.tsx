@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { LogOut, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -22,8 +23,8 @@ const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({
     onClose();
   };
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100]">
+  const modalContent = (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10001]" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
       <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-full max-w-md mx-4 animate-in fade-in zoom-in duration-200">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-700">
@@ -79,6 +80,9 @@ const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({
       </div>
     </div>
   );
+
+  // Use portal to render modal at document.body level
+  return typeof window !== 'undefined' ? createPortal(modalContent, document.body) : null;
 };
 
 export default LogoutConfirmModal;

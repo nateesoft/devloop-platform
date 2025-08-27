@@ -416,7 +416,8 @@ const Dashboard: React.FC<DashboardProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+    <>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 relative">
       {/* Mobile Sidebar Backdrop */}
       {mobileSidebarOpen && (
         <div
@@ -1189,14 +1190,18 @@ const Dashboard: React.FC<DashboardProps> = ({
         currentTier={userTier}
       />
 
-      {/* Logout Confirmation Modal */}
+    </div>
+
+    {/* Logout Confirmation Modal - Outside main container for full screen overlay */}
+    {showLogoutModal && (
       <LogoutConfirmModal
         isOpen={showLogoutModal}
         onClose={() => setShowLogoutModal(false)}
         onConfirm={handleLogout}
       />
-    </div>
-  )
+    )}
+    </>
+  );
 };
 
 export default Dashboard;

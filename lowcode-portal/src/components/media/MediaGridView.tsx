@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   MoreVertical, 
   Download, 
@@ -13,9 +13,11 @@ import {
   Video,
   Music,
   File,
-  Archive
+  Archive,
+  RefreshCw
 } from 'lucide-react';
 import { useMedia, MediaFile, MediaFolder } from '@/contexts/MediaContext';
+import { mediaAPI } from '@/lib/api';
 
 interface MediaGridViewProps {
   onPreview: (file: MediaFile) => void;
@@ -30,16 +32,10 @@ const MediaGridView: React.FC<MediaGridViewProps> = ({
 }) => {
   const {
     currentFolder,
-    getFilesByFolder,
-    getFoldersByParent,
     navigateToFolder,
     selectedFiles,
     selectFile,
-    formatFileSize,
-    deleteFiles,
-    copyFiles,
-    renameFile,
-    deleteFolder
+    formatFileSize
   } = useMedia();
 
   const [contextMenu, setContextMenu] = useState<{
@@ -49,8 +45,71 @@ const MediaGridView: React.FC<MediaGridViewProps> = ({
     type: 'file' | 'folder';
   } | null>(null);
 
-  const files = getFilesByFolder(currentFolder?.id);
-  const folders = getFoldersByParent(currentFolder?.id);
+  const [files, setFiles] = useState<MediaFile[]>([]);
+  const [folders, setFolders] = useState<MediaFolder[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch files and folders from API
+  const fetchMediaData = async (folderId?: number) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Fetch files and folders in parallel
+      const [filesResponse, foldersResponse] = await Promise.all([
+        mediaAPI.getFiles(folderId),
+        mediaAPI.getFolders(folderId)
+      ]);
+
+      // Transform API data to component format
+      const transformedFiles: MediaFile[] = filesResponse.data?.map((file: any) => ({
+        id: file.id.toString(),
+        name: file.name,
+        originalName: file.originalName,
+        type: file.type,
+        mimeType: file.mimeType,
+        size: file.size,
+        url: file.url,
+        thumbnailUrl: file.thumbnailUrl,
+        folderId: file.folderId?.toString(),
+        tags: file.tags || [],
+        metadata: file.metadata,
+        uploadedAt: new Date(file.uploadedAt),
+        updatedAt: new Date(file.updatedAt),
+        uploadedBy: file.uploadedBy
+      })) || [];
+
+      const transformedFolders: MediaFolder[] = foldersResponse.data?.map((folder: any) => ({
+        id: folder.id.toString(),
+        name: folder.name,
+        parentId: folder.parentId?.toString(),
+        color: folder.color,
+        icon: folder.icon,
+        createdAt: new Date(folder.createdAt),
+        updatedAt: new Date(folder.updatedAt),
+        createdBy: folder.createdBy,
+        fileCount: folder.fileCount || 0,
+        totalSize: folder.totalSize || 0
+      })) || [];
+
+      setFiles(transformedFiles);
+      setFolders(transformedFolders);
+    } catch (err) {
+      console.error('Error fetching media data:', err);
+      setError('Failed to load media files');
+      setFiles([]);
+      setFolders([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load data on mount and when currentFolder changes
+  useEffect(() => {
+    const folderId = currentFolder?.id ? parseInt(currentFolder.id) : undefined;
+    fetchMediaData(folderId);
+  }, [currentFolder]);
 
   const handleContextMenu = (e: React.MouseEvent, item: MediaFile | MediaFolder, type: 'file' | 'folder') => {
     e.preventDefault();
@@ -134,31 +193,50 @@ const MediaGridView: React.FC<MediaGridViewProps> = ({
 
     const { item, type } = contextMenu;
     
-    switch (action) {
-      case 'preview':
-        if (type === 'file') {
-          onPreview(item as MediaFile);
-        }
-        break;
-      case 'edit':
-        if (type === 'file') {
-          onEditFile(item as MediaFile);
-        } else {
-          onEditFolder(item as MediaFolder);
-        }
-        break;
-      case 'copy':
-        if (type === 'file') {
-          await copyFiles([item.id]);
-        }
-        break;
-      case 'delete':
-        if (type === 'file') {
-          await deleteFiles([item.id]);
-        } else {
-          await deleteFolder(item.id);
-        }
-        break;
+    try {
+      switch (action) {
+        case 'preview':
+          if (type === 'file') {
+            onPreview(item as MediaFile);
+          }
+          break;
+        case 'edit':
+          if (type === 'file') {
+            onEditFile(item as MediaFile);
+          } else {
+            onEditFolder(item as MediaFolder);
+          }
+          break;
+        case 'copy':
+          if (type === 'file') {
+            // API doesn't have copy endpoint, could implement as duplicate
+            console.log('Copy file:', item.id);
+          }
+          break;
+        case 'download':
+          if (type === 'file') {
+            const file = item as MediaFile;
+            const link = document.createElement('a');
+            link.href = file.url;
+            link.download = file.name;
+            link.click();
+          }
+          break;
+        case 'delete':
+          if (confirm(`Are you sure you want to delete ${item.name}?`)) {
+            if (type === 'file') {
+              await mediaAPI.deleteFile(parseInt(item.id));
+              setFiles(prev => prev.filter(f => f.id !== item.id));
+            } else {
+              await mediaAPI.deleteFolder(parseInt(item.id));
+              setFolders(prev => prev.filter(f => f.id !== item.id));
+            }
+          }
+          break;
+      }
+    } catch (error) {
+      console.error(`Error ${action}ing ${type}:`, error);
+      setError(`Failed to ${action} ${type}`);
     }
     
     setContextMenu(null);
@@ -166,8 +244,35 @@ const MediaGridView: React.FC<MediaGridViewProps> = ({
 
   return (
     <div className="p-6" onClick={handleClick}>
+      {/* Error State */}
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+          <div className="flex items-center justify-between">
+            <p className="text-red-800 dark:text-red-200">{error}</p>
+            <button
+              onClick={() => {
+                setError(null);
+                const folderId = currentFolder?.id ? parseInt(currentFolder.id) : undefined;
+                fetchMediaData(folderId);
+              }}
+              className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Loading State */}
+      {loading && (
+        <div className="flex justify-center items-center py-12">
+          <RefreshCw className="h-8 w-8 text-gray-400 animate-spin" />
+          <span className="ml-2 text-gray-600 dark:text-gray-400">Loading media files...</span>
+        </div>
+      )}
+
       {/* Empty State */}
-      {files.length === 0 && folders.length === 0 && (
+      {!loading && files.length === 0 && folders.length === 0 && !error && (
         <div className="text-center py-12">
           <div className="mx-auto h-24 w-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
             <Folder className="h-12 w-12 text-gray-400" />
@@ -336,6 +441,7 @@ const MediaGridView: React.FC<MediaGridViewProps> = ({
                 <span>Copy</span>
               </button>
               <button
+                onClick={() => handleContextMenuAction('download')}
                 className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center space-x-2"
               >
                 <Download className="h-4 w-4" />

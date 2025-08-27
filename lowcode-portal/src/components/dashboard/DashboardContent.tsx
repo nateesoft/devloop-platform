@@ -34,6 +34,7 @@ import { useAlertActions } from '@/hooks/useAlert';
 import { useAlert } from '@/contexts/AlertContext';
 import AlertDemo from '@/components/ui/AlertDemo';
 import UserGroups from '@/components/pages/UserGroups';
+import AccountSettings from '@/components/account/AccountSettings';
 
 interface DashboardContentProps {
   activeView: string;
@@ -686,28 +687,7 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
       case 'settings':
         return (
           <div className="space-y-6">
-            <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
-              <div className="p-4 sm:p-6 border-b border-slate-200 dark:border-slate-700">
-                <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Account Settings</h2>
-              </div>
-              <div className="p-4 sm:p-6 space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Full Name</label>
-                  <input type="text" className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white" defaultValue="John Doe" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Email</label>
-                  <input type="email" className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white" defaultValue="john@example.com" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Company</label>
-                  <input type="text" className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white" defaultValue="Acme Corp" />
-                </div>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                  Save Changes
-                </button>
-              </div>
-            </div>
+            <AccountSettings />
             
             <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
               <div className="p-4 sm:p-6 border-b border-slate-200 dark:border-slate-700">
