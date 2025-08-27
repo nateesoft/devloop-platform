@@ -4,7 +4,7 @@ import {
   Code2, Layers, Settings, Users, LogOut, Home, 
   Shield, Activity, ServerIcon, Component, Database, 
   Images, Calendar, FileText, Key, Cog, FolderOpen, 
-  Wrench, Award, Globe2
+  Wrench, Award, Globe2, GitBranch
 } from 'lucide-react';
 import { UserRole, UserTier, Project } from '@/lib/types';
 import CollapsibleMenuGroup from '@/components/ui/CollapsibleMenuGroup';
@@ -141,6 +141,13 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
               icon: FileText,
               isActive: activeView === 'documentation',
               onClick: () => setActiveView('documentation')
+            },
+            {
+              key: 'data-diagram',
+              label: 'Data Diagram',
+              icon: GitBranch,
+              isActive: activeView === 'data-diagram',
+              onClick: () => setActiveView('data-diagram')
             }
           ]}
         />

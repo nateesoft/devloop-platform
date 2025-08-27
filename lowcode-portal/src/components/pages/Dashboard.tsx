@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
-  Code2, Layers, Settings, Users, LogOut, Bell, Moon, Sun, Home, 
-  Plus, Edit, Eye, Trash2, TrendingUp, Activity, Shield, Award, 
+  Layers, Users, Bell, Moon, Sun, 
+  Plus, Edit, Eye, Trash2, TrendingUp, Activity, Shield, 
   Menu, Check, Zap, Globe, Smartphone, Cpu, Component, ServerIcon, Play,
-  Globe2, MessageCircle, Database, Images, Calendar, Table, FileText, Key, Clock,
-  Wrench, FolderOpen, Cog, History, Filter, Search
-} from 'lucide-react';
+  MessageCircle, Database, Images, Calendar, Table, FileText, Key, Clock,
+  History, Search} from 'lucide-react';
 import { Project, UserRole, UserTier } from '@/lib/types';
 import SiteMap from '@/components/ui/SiteMap';
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
@@ -42,15 +41,15 @@ import TaskModal from '@/components/modals/TaskModal';
 import { 
   DocumentationView 
 } from '@/components/documentation';
+import { DataDiagramView } from '@/components/data-diagram';
 import {
   SecretKeyCard,
   SecretKeyModal
 } from '@/components/secret-management';
 import { useSecretManagement } from '@/contexts/SecretManagementContext';
-import CollapsibleMenuGroup from '@/components/ui/CollapsibleMenuGroup';
 import NotesBoard from '@/components/ui/NotesBoard';
 import { serviceAPI, ServiceResponse, componentAPI, ComponentData, ComponentStats, CreateComponentRequest, pageAPI, PageData, PageStats, CreatePageRequest, myProjectAPI, MyProjectData } from '@/lib/api';
-import { taskAPI, CreateTaskRequest, UpdateTaskRequest, Task } from '@/lib/api/tasks';
+import { CreateTaskRequest, UpdateTaskRequest } from '@/lib/api/tasks';
 import { useAlertActions } from '@/hooks/useAlert';
 import { useAlert } from '@/contexts/AlertContext';
 import AlertDemo from '@/components/ui/AlertDemo';
@@ -62,6 +61,7 @@ import MyProjectModal from '@/components/modals/MyProjectModal';
 import { useAuth } from '@/contexts/AuthContext';
 import UserGroups from '@/components/pages/UserGroups';
 import LogoutConfirmModal from '@/components/modals/LogoutConfirmModal';
+import { DashboardSidebar } from '../dashboard';
 
 interface DashboardProps {
   projects: Project[];
@@ -1347,6 +1347,12 @@ const Dashboard: React.FC<DashboardProps> = ({
             />
           </div>
         );
+      case 'data-diagram':
+        return (
+          <div className="h-[80vh]">
+            <DataDiagramView />
+          </div>
+        );
 
       case 'components':
         const filteredComponents = getFilteredComponents();
@@ -1940,232 +1946,37 @@ const Dashboard: React.FC<DashboardProps> = ({
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
       {/* Mobile Sidebar Backdrop */}
       {mobileSidebarOpen && (
-        <div 
+        <div
           className="lg:hidden fixed inset-0 bg-black/50 z-40"
           onClick={() => setMobileSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-      <div className={`fixed left-0 top-0 h-full w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 z-50 transform transition-transform duration-300 ease-in-out ${
-        mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } lg:translate-x-0`}>
-        <div className="p-2 border-b border-slate-200 dark:border-slate-700">
-          <div className="w-full h-16 flex items-center justify-center">
-            <img 
-              src="/logo.png" 
-              alt="Logo" 
-              className="w-full h-full object-contain"
-            />
-          </div>
-        </div>
-
-        <nav className="p-4 space-y-3 overflow-y-auto max-h-[calc(100vh-300px)]">
-          {/* Main Navigation */}
-          <CollapsibleMenuGroup
-            title="Main"
-            icon={Home}
-            defaultExpanded={true}
-            items={[
-              {
-                key: 'dashboard',
-                label: t('dashboard'),
-                icon: Home,
-                isActive: activeView === 'dashboard',
-                onClick: () => setActiveView('dashboard')
-              }
-            ]}
-          />
-          {/* Development */}
-          <CollapsibleMenuGroup
-            title="Development"
-            icon={Code2}
-            defaultExpanded={true}
-            items={[
-              {
-                key: 'projects',
-                label: t('myProjects'),
-                icon: Layers,
-                isActive: activeView === 'projects',
-                onClick: () => setActiveView('projects'),
-                badge: projects.length > 0 ? projects.length : undefined
-              },
-              {
-                key: 'pages',
-                label: t('pages'),
-                icon: Globe2,
-                isActive: activeView === 'pages',
-                onClick: () => setActiveView('pages')
-              },
-              {
-                key: 'services',
-                label: t('services'),
-                icon: ServerIcon,
-                isActive: activeView === 'services',
-                onClick: () => setActiveView('services')
-              },
-              {
-                key: 'components',
-                label: t('components'),
-                icon: Component,
-                isActive: activeView === 'components',
-                onClick: () => setActiveView('components')
-              }
-            ]}
-          />
-          <div className="border-t border-slate-200 dark:border-slate-700 my-2"></div>
-          {/* Data Management */}
-          <CollapsibleMenuGroup
-            title="Data Management"
-            icon={FolderOpen}
-            defaultExpanded={true}
-            items={[
-              {
-                key: 'database',
-                label: 'Database',
-                icon: Database,
-                isActive: activeView === 'database',
-                onClick: () => setActiveView('database')
-              },
-              {
-                key: 'media',
-                label: 'Media',
-                icon: Images,
-                isActive: activeView === 'media',
-                onClick: () => setActiveView('media')
-              },
-              {
-                key: 'documentation',
-                label: 'Documentation',
-                icon: FileText,
-                isActive: activeView === 'documentation',
-                onClick: () => setActiveView('documentation')
-              }
-            ]}
-          />
-          {/* Project Tools */}
-          <CollapsibleMenuGroup
-            title="Project Tools"
-            icon={Wrench}
-            defaultExpanded={true}
-            items={[
-              {
-                key: 'project-management',
-                label: 'Task Management',
-                icon: Calendar,
-                isActive: activeView === 'project-management',
-                onClick: () => setActiveView('project-management')
-              },
-              {
-                key: 'secret-management',
-                label: 'Secret Keys',
-                icon: Key,
-                isActive: activeView === 'secret-management',
-                onClick: () => setActiveView('secret-management'),
-                badge: secrets.length > 0 ? secrets.length : undefined
-              }
-            ]}
-          />
-          {/* Users */}
-          <CollapsibleMenuGroup
-            title="Users"
-            icon={Users}
-            defaultExpanded={false}
-            items={[
-              {
-                key: 'user-groups',
-                label: 'User Groups',
-                icon: Users,
-                isActive: activeView === 'user-groups',
-                onClick: () => setActiveView('user-groups')
-              }
-            ]}
-          />
-          {/* Settings & Admin */}
-          <CollapsibleMenuGroup
-            title="Settings & Admin"
-            icon={Cog}
-            defaultExpanded={false}
-            items={[
-              {
-                key: 'settings',
-                label: t('settings'),
-                icon: Settings,
-                isActive: activeView === 'settings',
-                onClick: () => setActiveView('settings')
-              },
-              ...(userRole === 'admin' ? [
-                {
-                  key: 'admin-panel',
-                  label: t('adminPanel'),
-                  icon: Shield,
-                  isActive: false,
-                  onClick: () => router.push('/admin')
-                },
-                {
-                  key: 'users',
-                  label: t('users'),
-                  icon: Users,
-                  isActive: activeView === 'users',
-                  onClick: () => setActiveView('users')
-                },
-                {
-                  key: 'analytics',
-                  label: t('analytics'),
-                  icon: Activity,
-                  isActive: activeView === 'analytics',
-                  onClick: () => setActiveView('analytics')
-                }
-              ] : [])
-            ]}
-          />
-        </nav>
-
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-200 dark:border-slate-700">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
-                U
-              </div>
-              <div>
-                <div className="text-sm font-medium text-slate-900 dark:text-white">User Name</div>
-                <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center">
-                  <Award className="h-3 w-3 mr-1" />
-                  {userTier} Plan
-                </div>
-              </div>
-            </div>
-            <button 
-              onClick={() => setShowLogoutModal(true)}
-              className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-              title={t('logout')}
-            >
-              <LogOut className="h-5 w-5" />
-            </button>
-          </div>
-          <button 
-            onClick={() => setShowPlanUpgradeModal(true)}
-            className="w-full py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg text-sm font-medium hover:shadow-lg transition transform hover:scale-105"
-          >
-            {t('upgradePlan')}
-          </button>
-        </div>
-      </div>
+      <DashboardSidebar
+        mobileSidebarOpen={mobileSidebarOpen}
+        activeView={activeView}
+        userTier={userTier}
+        userRole={userRole}
+        projects={projects}
+        setActiveView={setActiveView}
+        setIsAuthenticated={setIsAuthenticated}
+      />
 
       {/* Main Content */}
       <div className="lg:ml-64">
         {/* Mobile Header */}
         <div className="lg:hidden flex items-center justify-between p-4 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
-          <button 
+          <button
             onClick={() => setMobileSidebarOpen(true)}
             className="p-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg"
           >
             <Menu className="h-6 w-6" />
           </button>
           <div className="flex items-center justify-center flex-1 h-full px-2">
-            <img 
-              src="/logo.png" 
-              alt="Logo" 
+            <img
+              src="/logo.png"
+              alt="Logo"
               className="w-full h-full object-contain max-w-[200px] max-h-[40px]"
             />
           </div>
@@ -2175,27 +1986,35 @@ const Dashboard: React.FC<DashboardProps> = ({
             </button>
             <CurrencySwitcher />
             <LanguageSwitcher />
-            <button 
+            <button
               onClick={() => setDarkMode(!darkMode)}
               className="p-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg"
             >
-              {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              {darkMode ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
             </button>
           </div>
         </div>
-        
+
         <div className="p-4 sm:p-8">
           {/* Header - Desktop only */}
           <div className="hidden lg:flex justify-between items-center mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 dark:text-white">{t('welcomeBack')}</h1>
-              <p className="text-slate-600 dark:text-slate-400 mt-1">{t('whatsHappening')}</p>
+              <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
+                {t("welcomeBack")}
+              </h1>
+              <p className="text-slate-600 dark:text-slate-400 mt-1">
+                {t("whatsHappening")}
+              </p>
             </div>
             <div className="flex items-center space-x-4">
               <button className="p-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg">
                 <Bell className="h-5 w-5" />
               </button>
-              <button 
+              <button
                 onClick={openChatbot}
                 className="p-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg"
                 title="เปิด AI Assistant"
@@ -2204,23 +2023,31 @@ const Dashboard: React.FC<DashboardProps> = ({
               </button>
               <CurrencySwitcher />
               <LanguageSwitcher />
-              <button 
+              <button
                 onClick={() => setDarkMode(!darkMode)}
                 className="p-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg"
               >
-                {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                {darkMode ? (
+                  <Sun className="h-5 w-5" />
+                ) : (
+                  <Moon className="h-5 w-5" />
+                )}
               </button>
             </div>
           </div>
-          
+
           {/* Mobile Header */}
           <div className="lg:hidden mb-6">
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{t('welcomeBack')}</h1>
-            <p className="text-slate-600 dark:text-slate-400 mt-1">{t('whatsHappeningMobile')}</p>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+              {t("welcomeBack")}
+            </h1>
+            <p className="text-slate-600 dark:text-slate-400 mt-1">
+              {t("whatsHappeningMobile")}
+            </p>
           </div>
 
           {/* Render content based on active view */}
-          {activeView === 'dashboard' && (
+          {activeView === "dashboard" && (
             <>
               {/* Stats Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
@@ -2234,8 +2061,12 @@ const Dashboard: React.FC<DashboardProps> = ({
                       12%
                     </span>
                   </div>
-                  <div className="text-2xl font-bold text-slate-900 dark:text-white">{stats.totalProjects}</div>
-                  <div className="text-sm text-slate-600 dark:text-slate-400">{t('totalProjects')}</div>
+                  <div className="text-2xl font-bold text-slate-900 dark:text-white">
+                    {stats.totalProjects}
+                  </div>
+                  <div className="text-sm text-slate-600 dark:text-slate-400">
+                    {t("totalProjects")}
+                  </div>
                 </div>
 
                 <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
@@ -2248,8 +2079,12 @@ const Dashboard: React.FC<DashboardProps> = ({
                       8%
                     </span>
                   </div>
-                  <div className="text-2xl font-bold text-slate-900 dark:text-white">{stats.published}</div>
-                  <div className="text-sm text-slate-600 dark:text-slate-400">{t('published')}</div>
+                  <div className="text-2xl font-bold text-slate-900 dark:text-white">
+                    {stats.published}
+                  </div>
+                  <div className="text-sm text-slate-600 dark:text-slate-400">
+                    {t("published")}
+                  </div>
                 </div>
 
                 <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
@@ -2262,8 +2097,12 @@ const Dashboard: React.FC<DashboardProps> = ({
                       24%
                     </span>
                   </div>
-                  <div className="text-2xl font-bold text-slate-900 dark:text-white">{stats.totalTasks}</div>
-                  <div className="text-sm text-slate-600 dark:text-slate-400">{t('totalTasks')}</div>
+                  <div className="text-2xl font-bold text-slate-900 dark:text-white">
+                    {stats.totalTasks}
+                  </div>
+                  <div className="text-sm text-slate-600 dark:text-slate-400">
+                    {t("totalTasks")}
+                  </div>
                 </div>
 
                 <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
@@ -2272,19 +2111,30 @@ const Dashboard: React.FC<DashboardProps> = ({
                       <Activity className="h-6 w-6 text-orange-600 dark:text-orange-400" />
                     </div>
                     <span className="text-sm text-green-600 dark:text-green-400">
-                      {Math.round((stats.completedTasks / stats.totalTasks) * 100)}%
+                      {Math.round(
+                        (stats.completedTasks / stats.totalTasks) * 100
+                      )}
+                      %
                     </span>
                   </div>
-                  <div className="text-2xl font-bold text-slate-900 dark:text-white">{stats.completedTasks}</div>
-                  <div className="text-sm text-slate-600 dark:text-slate-400">{t('completedTasks')}</div>
+                  <div className="text-2xl font-bold text-slate-900 dark:text-white">
+                    {stats.completedTasks}
+                  </div>
+                  <div className="text-sm text-slate-600 dark:text-slate-400">
+                    {t("completedTasks")}
+                  </div>
                 </div>
               </div>
 
               {/* Notes Board */}
               <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 mb-8">
                 <div className="p-4 sm:p-6 border-b border-slate-200 dark:border-slate-700">
-                  <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Quick Notes</h2>
-                  <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Sticky notes from your team</p>
+                  <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
+                    Quick Notes
+                  </h2>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                    Sticky notes from your team
+                  </p>
                 </div>
                 <div className="p-4 sm:p-6">
                   <NotesBoard />
@@ -2294,56 +2144,76 @@ const Dashboard: React.FC<DashboardProps> = ({
               {/* Recent Projects */}
               <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
                 <div className="p-4 sm:p-6 border-b border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                  <h2 className="text-xl font-semibold text-slate-900 dark:text-white">{t('recentProjects')}</h2>
+                  <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
+                    {t("recentProjects")}
+                  </h2>
                   <div className="flex flex-col sm:flex-row gap-2">
-                    <button 
+                    <button
                       onClick={() => setShowCreateModal(true)}
                       className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:shadow-lg transition flex items-center justify-center"
                     >
                       <Plus className="h-4 w-4 mr-2" />
-                      {t('newProjectDemo')}
+                      {t("newProjectDemo")}
                     </button>
                   </div>
                 </div>
                 <div className="p-4 sm:p-6">
                   {/* Mobile Cards View */}
                   <div className="lg:hidden space-y-4">
-                    {projects.map(project => (
-                      <div key={project.id} className="border border-slate-200 dark:border-slate-700 rounded-lg p-4">
+                    {projects.map((project) => (
+                      <div
+                        key={project.id}
+                        className="border border-slate-200 dark:border-slate-700 rounded-lg p-4"
+                      >
                         <div className="flex justify-between items-start mb-3">
                           <div>
-                            <div className="font-medium text-slate-900 dark:text-white">{project.name}</div>
+                            <div className="font-medium text-slate-900 dark:text-white">
+                              {project.name}
+                            </div>
                             <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded text-sm mt-1 inline-block">
                               {project.type}
                             </span>
                           </div>
-                          <span className={`px-2 py-1 rounded text-sm ${
-                            project.status === 'Published' 
-                              ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' 
-                              : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400'
-                          }`}>
+                          <span
+                            className={`px-2 py-1 rounded text-sm ${
+                              project.status === "Published"
+                                ? "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400"
+                                : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400"
+                            }`}
+                          >
                             {project.status}
                           </span>
                         </div>
                         <div className="mb-3">
                           <div className="flex items-center space-x-2 mb-1">
-                            <span className="text-sm text-slate-600 dark:text-slate-400">{t('progress')}:</span>
+                            <span className="text-sm text-slate-600 dark:text-slate-400">
+                              {t("progress")}:
+                            </span>
                             <span className="text-sm text-slate-600 dark:text-slate-400">
                               {project.completed}/{project.tasks}
                             </span>
                           </div>
                           <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
-                            <div 
+                            <div
                               className="bg-gradient-to-r from-blue-600 to-purple-600 h-2 rounded-full"
-                              style={{ width: `${(project.completed / project.tasks) * 100}%` }}
+                              style={{
+                                width: `${
+                                  (project.completed / project.tasks) * 100
+                                }%`
+                              }}
                             />
                           </div>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-sm text-slate-500 dark:text-slate-400">{project.lastModified}</span>
+                          <span className="text-sm text-slate-500 dark:text-slate-400">
+                            {project.lastModified}
+                          </span>
                           <div className="flex items-center space-x-2">
-                            <button 
-                              onClick={() => { setSelectedProject(project); router.push('/builder'); }}
+                            <button
+                              onClick={() => {
+                                setSelectedProject(project)
+                                router.push("/builder")
+                              }}
                               className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded"
                             >
                               <Edit className="h-4 w-4 text-slate-600 dark:text-slate-400" />
@@ -2359,25 +2229,30 @@ const Dashboard: React.FC<DashboardProps> = ({
                       </div>
                     ))}
                   </div>
-                  
+
                   {/* Desktop Table View */}
                   <div className="hidden lg:block overflow-x-auto">
                     <table className="w-full">
                       <thead>
                         <tr className="text-left text-sm text-slate-600 dark:text-slate-400">
-                          <th className="pb-4">{t('projectName')}</th>
-                          <th className="pb-4">{t('type')}</th>
-                          <th className="pb-4">{t('status')}</th>
-                          <th className="pb-4">{t('progress')}</th>
-                          <th className="pb-4">{t('lastModified')}</th>
-                          <th className="pb-4">{t('actions')}</th>
+                          <th className="pb-4">{t("projectName")}</th>
+                          <th className="pb-4">{t("type")}</th>
+                          <th className="pb-4">{t("status")}</th>
+                          <th className="pb-4">{t("progress")}</th>
+                          <th className="pb-4">{t("lastModified")}</th>
+                          <th className="pb-4">{t("actions")}</th>
                         </tr>
                       </thead>
                       <tbody className="space-y-2">
-                        {projects.map(project => (
-                          <tr key={project.id} className="border-t border-slate-100 dark:border-slate-700">
+                        {projects.map((project) => (
+                          <tr
+                            key={project.id}
+                            className="border-t border-slate-100 dark:border-slate-700"
+                          >
                             <td className="py-4">
-                              <div className="font-medium text-slate-900 dark:text-white">{project.name}</div>
+                              <div className="font-medium text-slate-900 dark:text-white">
+                                {project.name}
+                              </div>
                             </td>
                             <td className="py-4">
                               <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded text-sm">
@@ -2385,20 +2260,27 @@ const Dashboard: React.FC<DashboardProps> = ({
                               </span>
                             </td>
                             <td className="py-4">
-                              <span className={`px-2 py-1 rounded text-sm ${
-                                project.status === 'Published' 
-                                  ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' 
-                                  : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400'
-                              }`}>
+                              <span
+                                className={`px-2 py-1 rounded text-sm ${
+                                  project.status === "Published"
+                                    ? "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400"
+                                    : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400"
+                                }`}
+                              >
                                 {project.status}
                               </span>
                             </td>
                             <td className="py-4">
                               <div className="flex items-center space-x-2">
                                 <div className="w-32 bg-slate-200 dark:bg-slate-700 rounded-full h-2">
-                                  <div 
+                                  <div
                                     className="bg-gradient-to-r from-blue-600 to-purple-600 h-2 rounded-full"
-                                    style={{ width: `${(project.completed / project.tasks) * 100}%` }}
+                                    style={{
+                                      width: `${
+                                        (project.completed / project.tasks) *
+                                        100
+                                      }%`
+                                    }}
                                   />
                                 </div>
                                 <span className="text-sm text-slate-600 dark:text-slate-400">
@@ -2411,8 +2293,11 @@ const Dashboard: React.FC<DashboardProps> = ({
                             </td>
                             <td className="py-4">
                               <div className="flex items-center space-x-2">
-                                <button 
-                                  onClick={() => { setSelectedProject(project); router.push('/builder'); }}
+                                <button
+                                  onClick={() => {
+                                    setSelectedProject(project)
+                                    router.push("/builder")
+                                  }}
                                   className="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded"
                                 >
                                   <Edit className="h-4 w-4 text-slate-600 dark:text-slate-400" />
@@ -2434,7 +2319,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               </div>
             </>
           )}
-          
+
           {/* Render other menu content */}
           {renderContent()}
         </div>
@@ -2444,30 +2329,67 @@ const Dashboard: React.FC<DashboardProps> = ({
       {showCreateModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">Create New Project</h2>
-            
+            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">
+              Create New Project
+            </h2>
+
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Project Name</label>
-                <input type="text" className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white" placeholder="My Awesome App" />
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Project Name
+                </label>
+                <input
+                  type="text"
+                  className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white"
+                  placeholder="My Awesome App"
+                />
               </div>
-              
+
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Description</label>
-                <textarea className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white" rows={3} placeholder="Describe your project..."></textarea>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Description
+                </label>
+                <textarea
+                  className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white"
+                  rows={3}
+                  placeholder="Describe your project..."
+                ></textarea>
               </div>
-              
+
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Project Type</label>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Project Type
+                </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {[
-                    { key: 'Full-Stack', label: t('fullStack'), desc: t('fullStackDesc') },
-                    { key: 'Single Web', label: t('singleWeb'), desc: t('singleWebDesc') },
-                    { key: 'Microservice', label: t('microservice'), desc: t('microserviceDesc') },
-                    { key: 'Script Logic', label: t('scriptLogic'), desc: t('scriptLogicDesc') }
-                  ].map(type => (
-                    <button key={type.key} className="p-4 border-2 border-slate-300 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition text-left">
-                      <div className="font-medium text-slate-900 dark:text-white">{type.label}</div>
+                    {
+                      key: "Full-Stack",
+                      label: t("fullStack"),
+                      desc: t("fullStackDesc")
+                    },
+                    {
+                      key: "Single Web",
+                      label: t("singleWeb"),
+                      desc: t("singleWebDesc")
+                    },
+                    {
+                      key: "Microservice",
+                      label: t("microservice"),
+                      desc: t("microserviceDesc")
+                    },
+                    {
+                      key: "Script Logic",
+                      label: t("scriptLogic"),
+                      desc: t("scriptLogicDesc")
+                    }
+                  ].map((type) => (
+                    <button
+                      key={type.key}
+                      className="p-4 border-2 border-slate-300 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition text-left"
+                    >
+                      <div className="font-medium text-slate-900 dark:text-white">
+                        {type.label}
+                      </div>
                       <div className="text-sm text-slate-600 dark:text-slate-400 mt-1">
                         {type.desc}
                       </div>
@@ -2475,9 +2397,11 @@ const Dashboard: React.FC<DashboardProps> = ({
                   ))}
                 </div>
               </div>
-              
+
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Target Platform</label>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Target Platform
+                </label>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <button className="p-3 border-2 border-slate-300 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition flex items-center justify-center">
                     <Globe className="h-5 w-5 mr-2" />
@@ -2494,16 +2418,19 @@ const Dashboard: React.FC<DashboardProps> = ({
                 </div>
               </div>
             </div>
-            
+
             <div className="flex flex-col sm:flex-row justify-end gap-4 mt-8">
-              <button 
+              <button
                 onClick={() => setShowCreateModal(false)}
                 className="px-6 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
               >
                 Cancel
               </button>
-              <button 
-                onClick={() => { setShowCreateModal(false); router.push('/builder'); }}
+              <button
+                onClick={() => {
+                  setShowCreateModal(false)
+                  router.push("/builder")
+                }}
                 className="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:shadow-lg transition"
               >
                 Create Project
@@ -2517,7 +2444,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       {showSiteMap && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <SiteMap 
+            <SiteMap
               userRole={userRole}
               isAuthenticated={true}
               onClose={() => setShowSiteMap(false)}
@@ -2536,10 +2463,10 @@ const Dashboard: React.FC<DashboardProps> = ({
       <ServiceFlowModal
         isOpen={showServiceFlowModal}
         onClose={() => {
-          setShowServiceFlowModal(false);
-          setEditingFlow(null);
-          if (activeView === 'services') {
-            loadServices(); // Refresh services after modal closes
+          setShowServiceFlowModal(false)
+          setEditingFlow(null)
+          if (activeView === "services") {
+            loadServices() // Refresh services after modal closes
           }
         }}
         editingFlow={editingFlow}
@@ -2549,17 +2476,17 @@ const Dashboard: React.FC<DashboardProps> = ({
       <DatabaseConnectionModal
         isOpen={showConnectionModal}
         onClose={() => {
-          setShowConnectionModal(false);
-          setEditingConnection(null);
+          setShowConnectionModal(false)
+          setEditingConnection(null)
         }}
         onSave={async (connectionData) => {
           if (editingConnection) {
-            await updateConnection(editingConnection.id, connectionData);
+            await updateConnection(editingConnection.id, connectionData)
           } else {
-            await addConnection(connectionData);
+            await addConnection(connectionData)
           }
-          setShowConnectionModal(false);
-          setEditingConnection(null);
+          setShowConnectionModal(false)
+          setEditingConnection(null)
         }}
         editingConnection={editingConnection}
         isLoading={dbLoading}
@@ -2569,8 +2496,8 @@ const Dashboard: React.FC<DashboardProps> = ({
       <FolderModal
         isOpen={showFolderModal}
         onClose={() => {
-          setShowFolderModal(false);
-          setEditingFolder(null);
+          setShowFolderModal(false)
+          setEditingFolder(null)
         }}
         folder={editingFolder}
       />
@@ -2578,19 +2505,19 @@ const Dashboard: React.FC<DashboardProps> = ({
       <FilePreviewModal
         isOpen={showPreviewModal}
         onClose={() => {
-          setShowPreviewModal(false);
-          setPreviewFile(null);
+          setShowPreviewModal(false)
+          setPreviewFile(null)
         }}
         file={previewFile}
         onEdit={(file) => {
-          console.log('Edit file:', file);
-          setShowPreviewModal(false);
+          console.log("Edit file:", file)
+          setShowPreviewModal(false)
           // Add file edit modal here if needed
         }}
         onDelete={async () => {
           // Handle file deletion
-          setShowPreviewModal(false);
-          setPreviewFile(null);
+          setShowPreviewModal(false)
+          setPreviewFile(null)
         }}
       />
 
@@ -2598,32 +2525,35 @@ const Dashboard: React.FC<DashboardProps> = ({
       <TaskModal
         isOpen={showTaskModal}
         onClose={() => {
-          setShowTaskModal(false);
-          setSelectedTask(null);
-          setIsCreatingTask(false);
+          setShowTaskModal(false)
+          setSelectedTask(null)
+          setIsCreatingTask(false)
         }}
         onSave={async (data) => {
           try {
             // Import taskAPI dynamically to avoid import issues
-            const { taskAPI: dynamicTaskAPI } = await import('@/lib/api/tasks');
-            
+            const { taskAPI: dynamicTaskAPI } = await import("@/lib/api/tasks")
+
             if (isCreatingTask) {
               // Create new task
-              await dynamicTaskAPI.create(data as CreateTaskRequest);
-              alert.success('Task created successfully!');
+              await dynamicTaskAPI.create(data as CreateTaskRequest)
+              alert.success("Task created successfully!")
             } else if (selectedTask) {
               // Update existing task
-              await dynamicTaskAPI.update(selectedTask.id, data as UpdateTaskRequest);
-              alert.success('Task updated successfully!');
+              await dynamicTaskAPI.update(
+                selectedTask.id,
+                data as UpdateTaskRequest
+              )
+              alert.success("Task updated successfully!")
             }
-            setShowTaskModal(false);
-            setSelectedTask(null);
-            setIsCreatingTask(false);
+            setShowTaskModal(false)
+            setSelectedTask(null)
+            setIsCreatingTask(false)
             // Trigger refresh in KanbanView
-            setRefreshTrigger(prev => prev + 1);
+            setRefreshTrigger((prev) => prev + 1)
           } catch (error) {
-            console.error('Error saving task:', error);
-            alert.error('Failed to save task');
+            console.error("Error saving task:", error)
+            alert.error("Failed to save task")
           }
         }}
         editingTask={isCreatingTask ? null : selectedTask}
@@ -2633,14 +2563,14 @@ const Dashboard: React.FC<DashboardProps> = ({
       <SecretKeyModal
         isOpen={showSecretModal}
         onClose={() => {
-          setShowSecretModal(false);
-          setEditingSecret(null);
+          setShowSecretModal(false)
+          setEditingSecret(null)
         }}
         onSave={async (secretData) => {
           if (editingSecret) {
-            await updateSecret(editingSecret.id, secretData);
+            await updateSecret(editingSecret.id, secretData)
           } else {
-            await addSecret(secretData);
+            await addSecret(secretData)
           }
         }}
         editingSecret={editingSecret}
@@ -2650,8 +2580,8 @@ const Dashboard: React.FC<DashboardProps> = ({
       <ComponentBuilderModal
         isOpen={showComponentModal}
         onClose={() => {
-          setShowComponentModal(false);
-          setEditingComponent(null);
+          setShowComponentModal(false)
+          setEditingComponent(null)
         }}
         onSave={handleSaveComponent}
         editingComponent={editingComponent}
@@ -2661,13 +2591,13 @@ const Dashboard: React.FC<DashboardProps> = ({
       <ComponentHistoryPanel
         isOpen={showComponentHistory}
         onClose={() => {
-          setShowComponentHistory(false);
-          setSelectedComponentForHistory(null);
+          setShowComponentHistory(false)
+          setSelectedComponentForHistory(null)
         }}
         componentId={selectedComponentForHistory?.id || 0}
-        componentName={selectedComponentForHistory?.name || ''}
+        componentName={selectedComponentForHistory?.name || ""}
         onRestore={() => {
-          loadComponents();
+          loadComponents()
         }}
         userId={user?.id || 1}
       />
@@ -2676,8 +2606,8 @@ const Dashboard: React.FC<DashboardProps> = ({
       <PageModal
         isOpen={showPageModal}
         onClose={() => {
-          setShowPageModal(false);
-          setEditingPage(null);
+          setShowPageModal(false)
+          setEditingPage(null)
         }}
         onSave={handleSavePage}
         editingPage={editingPage}
@@ -2687,13 +2617,13 @@ const Dashboard: React.FC<DashboardProps> = ({
       <PageHistoryPanel
         isOpen={showPageHistory}
         onClose={() => {
-          setShowPageHistory(false);
-          setSelectedPageForHistory(null);
+          setShowPageHistory(false)
+          setSelectedPageForHistory(null)
         }}
         pageId={selectedPageForHistory?.id || 0}
-        pageTitle={selectedPageForHistory?.title || ''}
+        pageTitle={selectedPageForHistory?.title || ""}
         onRestore={() => {
-          loadPages();
+          loadPages()
         }}
         userId={user?.id || 1}
       />
@@ -2703,10 +2633,10 @@ const Dashboard: React.FC<DashboardProps> = ({
         isOpen={showMyProjectModal}
         onClose={() => setShowMyProjectModal(false)}
         onProjectCreated={(project) => {
-          console.log('Project created:', project);
-          setMyProjects(prev => [...prev, project]);
+          console.log("Project created:", project)
+          setMyProjects((prev) => [...prev, project])
           // Route to reactflow page with the new project
-          router.push(`/reactflow?projectId=${project.id}`);
+          router.push(`/reactflow?projectId=${project.id}`)
         }}
       />
 
@@ -2724,7 +2654,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         onConfirm={handleLogout}
       />
     </div>
-  );
+  )
 };
 
 export default Dashboard;
