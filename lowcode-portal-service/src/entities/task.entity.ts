@@ -65,14 +65,14 @@ export class Task {
   project?: MyProject;
 
   @Column({ name: 'created_by' })
-  createdBy: number;
+  createdBy: string;
 
   @ManyToOne(() => User, user => user.id)
   @JoinColumn({ name: 'created_by' })
   creator: User;
 
   @Column({ name: 'assigned_to', nullable: true })
-  assignedTo?: number;
+  assignedTo?: string;
 
   @ManyToOne(() => User, user => user.id, { nullable: true })
   @JoinColumn({ name: 'assigned_to' })

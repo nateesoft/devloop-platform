@@ -37,7 +37,7 @@ export class ServicesService {
     return service;
   }
 
-  async findByUser(userId: number): Promise<Service[]> {
+  async findByUser(userId: string): Promise<Service[]> {
     return await this.serviceRepository.find({
       where: { createdBy: userId },
       relations: ['creator'],

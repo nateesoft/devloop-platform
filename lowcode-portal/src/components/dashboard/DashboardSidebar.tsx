@@ -12,6 +12,7 @@ import LogoutConfirmModal from '@/components/modals/LogoutConfirmModal';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSecretManagement } from '@/contexts/SecretManagementContext';
+import { useUser } from '@/contexts/UserContext';
 
 interface DashboardSidebarProps {
   mobileSidebarOpen: boolean;
@@ -36,6 +37,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   const { t } = useTranslation();
   const { logout } = useAuth();
   const { secrets } = useSecretManagement();
+  const { user, loading: userLoading } = useUser();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const handleLogout = () => {
@@ -236,10 +238,12 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
-              U
+              {userLoading ? '...' : (user?.fullName ? user.fullName.charAt(0).toUpperCase() : 'U')}
             </div>
             <div>
-              <div className="text-sm font-medium text-slate-900 dark:text-white">User Name</div>
+              <div className="text-sm font-medium text-slate-900 dark:text-white">
+                {userLoading ? 'Loading...' : (user?.fullName || 'User Name')}
+              </div>
               <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center">
                 <Award className="h-3 w-3 mr-1" />
                 {userTier} Plan

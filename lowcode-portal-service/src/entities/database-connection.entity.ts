@@ -81,7 +81,7 @@ export class DatabaseConnection {
   updatedAt: Date;
 
   @Column()
-  createdBy: number;
+  createdBy: string;
 
   @ManyToOne(() => User, { eager: false })
   @JoinColumn({ name: 'createdBy' })

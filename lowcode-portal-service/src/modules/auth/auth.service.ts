@@ -287,7 +287,7 @@ export class AuthService {
     };
   }
 
-  async logout(userId: number, sessionId: string, tokenId?: string): Promise<{ message: string }> {
+  async logout(userId: string, sessionId: string, tokenId?: string): Promise<{ message: string }> {
     // Terminate session
     await this.redisService.terminateSession(sessionId);
 
@@ -305,7 +305,7 @@ export class AuthService {
     return { message: 'Logout successful' };
   }
 
-  async logoutAllSessions(userId: number): Promise<{ message: string }> {
+  async logoutAllSessions(userId: string): Promise<{ message: string }> {
     // Terminate all user sessions
     await this.redisService.terminateAllUserSessions(userId);
 
@@ -317,11 +317,11 @@ export class AuthService {
     return { message: 'All sessions terminated successfully' };
   }
 
-  async getUserActiveSessions(userId: number): Promise<any[]> {
+  async getUserActiveSessions(userId: string): Promise<any[]> {
     return await this.redisService.getUserActiveSessions(userId);
   }
 
-  async terminateSessionById(userId: number, targetSessionId: string): Promise<{ message: string }> {
+  async terminateSessionById(userId: string, targetSessionId: string): Promise<{ message: string }> {
     const sessions = await this.redisService.getUserActiveSessions(userId);
     const sessionExists = sessions.some(session => session.sessionId === targetSessionId);
 

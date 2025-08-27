@@ -115,7 +115,7 @@ export class MyProjectsService {
     return project;
   }
 
-  async createProject(createProjectDto: CreateMyProjectDto, userId: number): Promise<MyProject> {
+  async createProject(createProjectDto: CreateMyProjectDto, userId: string): Promise<MyProject> {
     // Check if slug already exists
     const existingProject = await this.myProjectRepository.findOne({
       where: { slug: createProjectDto.slug },
@@ -136,7 +136,7 @@ export class MyProjectsService {
   async updateProject(
     id: number,
     updateData: Partial<CreateMyProjectDto>,
-    userId?: number,
+    userId?: string,
   ): Promise<MyProject> {
     const project = await this.findProjectById(id);
 
@@ -253,7 +253,7 @@ export class MyProjectsService {
   async createWorkflow(
     projectId: number,
     createWorkflowDto: CreateWorkFlowDto,
-    userId: number,
+    userId: string,
   ): Promise<WorkFlow> {
     // Verify project exists
     await this.findProjectById(projectId);
@@ -295,7 +295,7 @@ export class MyProjectsService {
   async updateWorkflow(
     id: number,
     updateData: Partial<CreateWorkFlowDto>,
-    userId?: number,
+    userId?: string,
     changeDescription?: string,
   ): Promise<WorkFlow> {
     const workflow = await this.findWorkflowById(id);
@@ -403,7 +403,7 @@ export class MyProjectsService {
   async createWorkflowNode(
     workflowId: number,
     createNodeDto: CreateWorkFlowNodeDto,
-    userId: number,
+    userId: string,
   ): Promise<WorkFlowNode> {
     // Verify workflow exists
     await this.findWorkflowById(workflowId);
@@ -455,7 +455,7 @@ export class MyProjectsService {
   async restoreWorkflowFromHistory(
     workflowId: number,
     version: string,
-    userId: number,
+    userId: string,
   ): Promise<WorkFlow> {
     const historyEntry = await this.workFlowHistoryRepository.findOne({
       where: { workflowId: workflowId, version },
@@ -519,7 +519,7 @@ export class MyProjectsService {
 
   private async createWorkflowHistoryEntry(
     historyData: Partial<WorkFlowHistory>,
-    userId: number,
+    userId: string,
   ): Promise<WorkFlowHistory> {
     const historyEntry = this.workFlowHistoryRepository.create({
       ...historyData,

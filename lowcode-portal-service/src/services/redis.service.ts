@@ -2,7 +2,7 @@ import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { createClient, RedisClientType } from 'redis';
 
 export interface UserSession {
-  userId: number;
+  userId: string;
   sessionId: string;
   deviceInfo?: string;
   ipAddress?: string;
@@ -53,7 +53,7 @@ export class RedisService implements OnModuleDestroy {
   }
 
   // Session Management
-  async createSession(userId: number, sessionData: Partial<UserSession>): Promise<string> {
+  async createSession(userId: string, sessionData: Partial<UserSession>): Promise<string> {
     const sessionId = this.generateSessionId();
     const session: UserSession = {
       userId,
@@ -101,7 +101,7 @@ export class RedisService implements OnModuleDestroy {
     }
   }
 
-  async getUserActiveSessions(userId: number): Promise<UserSession[]> {
+  async getUserActiveSessions(userId: string): Promise<UserSession[]> {
     const sessionIds = await this.client.sMembers(`${this.USER_SESSIONS_PREFIX}${userId}`);
     const sessions: UserSession[] = [];
 
@@ -134,7 +134,7 @@ export class RedisService implements OnModuleDestroy {
     }
   }
 
-  async terminateAllUserSessions(userId: number): Promise<void> {
+  async terminateAllUserSessions(userId: string): Promise<void> {
     const sessionIds = await this.client.sMembers(`${this.USER_SESSIONS_PREFIX}${userId}`);
     
     for (const sessionId of sessionIds) {
@@ -145,7 +145,7 @@ export class RedisService implements OnModuleDestroy {
     await this.client.del(`${this.USER_SESSIONS_PREFIX}${userId}`);
   }
 
-  async terminateOtherSessions(userId: number, currentSessionId: string): Promise<void> {
+  async terminateOtherSessions(userId: string, currentSessionId: string): Promise<void> {
     const sessionIds = await this.client.sMembers(`${this.USER_SESSIONS_PREFIX}${userId}`);
     
     for (const sessionId of sessionIds) {
@@ -185,7 +185,7 @@ export class RedisService implements OnModuleDestroy {
 
   private redisHashToSession(hash: Record<string, string>): UserSession {
     return {
-      userId: parseInt(hash.userId),
+      userId: hash.userId,
       sessionId: hash.sessionId,
       deviceInfo: hash.deviceInfo || 'Unknown',
       ipAddress: hash.ipAddress || 'Unknown',
@@ -216,7 +216,7 @@ export class RedisService implements OnModuleDestroy {
     return activeCount;
   }
 
-  async getUserSessionsCount(userId: number): Promise<number> {
+  async getUserSessionsCount(userId: string): Promise<number> {
     return await this.client.sCard(`${this.USER_SESSIONS_PREFIX}${userId}`);
   }
 }

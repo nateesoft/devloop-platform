@@ -36,7 +36,7 @@ export class MediaService {
       }
 
       // Find user for relation
-      const user = await this.userRepository.findOne({ where: { id: parseInt(userId) } });
+      const user = await this.userRepository.findOne({ where: { id: userId } });
       if (!user) {
         throw new BadRequestException('User not found');
       }
@@ -107,7 +107,7 @@ export class MediaService {
   async findAllFiles(userId: string, folderId?: string): Promise<MediaFile[]> {
     const query = this.mediaFileRepository.createQueryBuilder('file')
       .leftJoinAndSelect('file.uploader', 'uploader')
-      .where('uploader.id = :userId', { userId: parseInt(userId) });
+      .where('uploader.id = :userId', { userId });
 
     if (folderId) {
       query.andWhere('file.folderId = :folderId', { folderId });
@@ -134,7 +134,7 @@ export class MediaService {
     const file = await this.mediaFileRepository.findOne({
       where: { 
         id, 
-        uploader: { id: parseInt(userId) }
+        uploader: { id: userId }
       },
       relations: ['uploader']
     });

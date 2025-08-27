@@ -3,6 +3,10 @@ import { Note } from './types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
+// Track recent successful logins to prevent unnecessary token refresh attempts
+let recentLoginTime: number | null = null;
+const RECENT_LOGIN_THRESHOLD = 5000; // 5 seconds
+
 export const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -17,6 +21,13 @@ api.interceptors.request.use(
     const token = localStorage.getItem('access_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log(`Making API request to ${config.url} with token: ${token.substring(0, 20)}...`);
+    } else {
+      console.log(`Making API request to ${config.url} without token`);
+      // If we're making a request that needs auth but have no token, this is problematic
+      if (config.url && !config.url.includes('/auth/')) {
+        console.warn(`API request to protected endpoint ${config.url} without token - this may fail`);
+      }
     }
     return config;
   },
@@ -38,6 +49,21 @@ api.interceptors.response.use(
 
     if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       originalRequest._retry = true;
+
+      // Check if we just logged in recently - if so, wait a bit before allowing refresh
+      const isRecentLogin = recentLoginTime && (Date.now() - recentLoginTime) < RECENT_LOGIN_THRESHOLD;
+      if (isRecentLogin) {
+        console.log('Recent login detected, waiting before token refresh to prevent race condition');
+        // Wait for a short time, then retry the original request if token exists
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        const currentToken = localStorage.getItem('access_token');
+        if (currentToken) {
+          originalRequest.headers.Authorization = `Bearer ${currentToken}`;
+          console.log('Retrying request with current token after wait');
+          return api(originalRequest);
+        }
+        return Promise.reject(error);
+      }
 
       try {
         console.log('401 error detected, attempting token refresh...');
@@ -62,6 +88,9 @@ api.interceptors.response.use(
             localStorage.setItem('user', JSON.stringify(response.data.user));
           }
           
+          // Update recent login time after successful refresh
+          recentLoginTime = Date.now();
+          
           // Retry original request with new token
           originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
           console.log('Retrying original request with new token...');
@@ -76,6 +105,9 @@ api.interceptors.response.use(
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         localStorage.removeItem('user');
+        
+        // Clear recent login time
+        recentLoginTime = null;
         
         // Only redirect if we're not already on the login page
         if (window.location.pathname !== '/login') {
@@ -193,6 +225,9 @@ export const authAPI = {
     localStorage.setItem('refresh_token', authResponse.tokens.refresh_token);
     localStorage.setItem('user', JSON.stringify(authResponse.user));
     
+    // Mark the login time to prevent unnecessary refresh attempts
+    recentLoginTime = Date.now();
+    
     return authResponse;
   },
 
@@ -204,6 +239,9 @@ export const authAPI = {
     localStorage.setItem('access_token', authResponse.tokens.access_token);
     localStorage.setItem('refresh_token', authResponse.tokens.refresh_token);
     localStorage.setItem('user', JSON.stringify(authResponse.user));
+    
+    // Mark the login time to prevent unnecessary refresh attempts
+    recentLoginTime = Date.now();
     
     return authResponse;
   },
@@ -237,6 +275,9 @@ export const authAPI = {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
     localStorage.removeItem('user');
+    
+    // Clear recent login time
+    recentLoginTime = null;
   },
 
   getStoredUser: (): User | null => {

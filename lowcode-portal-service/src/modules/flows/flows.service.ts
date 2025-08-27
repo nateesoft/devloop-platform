@@ -33,7 +33,7 @@ export class FlowsService {
     return this.flowsRepository.save(newFlow);
   }
 
-  async update(id: number, updateData: Partial<Flow>, userId?: number, changeDescription?: string): Promise<Flow | null> {
+  async update(id: number, updateData: Partial<Flow>, userId?: string, changeDescription?: string): Promise<Flow | null> {
     // Get current flow data before update for history
     const currentFlow = await this.findOne(id);
     if (!currentFlow) {
@@ -136,7 +136,7 @@ export class FlowsService {
     });
   }
 
-  async createHistoryEntry(historyData: CreateFlowHistoryDto, userId: number): Promise<FlowHistory> {
+  async createHistoryEntry(historyData: CreateFlowHistoryDto, userId: string): Promise<FlowHistory> {
     const history = this.flowHistoryRepository.create({
       ...historyData,
       createdBy: userId
@@ -144,7 +144,7 @@ export class FlowsService {
     return this.flowHistoryRepository.save(history);
   }
 
-  async restoreFromHistory(flowId: number, version: string, userId: number): Promise<Flow | null> {
+  async restoreFromHistory(flowId: number, version: string, userId: string): Promise<Flow | null> {
     const historyVersion = await this.getHistoryVersion(flowId, version);
     if (!historyVersion) {
       throw new NotFoundException('History version not found');

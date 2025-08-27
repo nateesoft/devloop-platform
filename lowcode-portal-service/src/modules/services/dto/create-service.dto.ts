@@ -37,5 +37,5 @@ export class CreateServiceDto {
   changeDescription?: string;
 
   @IsNumber()
-  createdBy: number;
+  createdBy: string;
 }

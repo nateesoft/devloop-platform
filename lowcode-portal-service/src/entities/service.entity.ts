@@ -34,7 +34,7 @@ export class Service {
   changeDescription: string;
 
   @Column()
-  createdBy: number;
+  createdBy: string;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'createdBy' })

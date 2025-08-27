@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAlert } from '@/contexts/AlertContext';
+import { useUser } from '@/contexts/UserContext';
 
 interface UserSettings {
   fullName: string;
@@ -20,19 +21,26 @@ const AccountSettings: React.FC = () => {
     email: '',
     company: '',
   });
-  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const { showAlert } = useAlert();
+  const { showError, showSuccess } = useAlert();
+  const { user, loading, updateUser } = useUser();
 
-  // Mock user ID - replace with actual user ID from authentication context
-  const userId = 'user-1';
+  // Get user ID from user context
+  const userId = user?.id || '550e8400-e29b-41d4-a716-446655440002';
 
   useEffect(() => {
-    loadUserSettings();
-  }, []);
+    if (user) {
+      setSettings({
+        fullName: user.fullName,
+        email: user.email,
+        company: user.company || '',
+      });
+    } else {
+      loadUserSettings();
+    }
+  }, [user]);
 
   const loadUserSettings = async () => {
-    setLoading(true);
     try {
       const response = await fetch(`/api/user-settings?userId=${userId}`);
       const data: UserSettingsResponse = await response.json();
@@ -40,24 +48,12 @@ const AccountSettings: React.FC = () => {
       if (data.success && data.data) {
         setSettings(data.data);
       } else {
-        // If no settings found, use default values
-        setSettings({
-          fullName: 'John Doe',
-          email: 'john@example.com',
-          company: 'Acme Corp',
-        });
+        // If no settings found, show error
+        showError(data.error || 'Failed to load user settings');
       }
     } catch (error) {
       console.error('Error loading user settings:', error);
-      showAlert('Failed to load user settings', 'error');
-      // Use default values on error
-      setSettings({
-        fullName: 'John Doe',
-        email: 'john@example.com',
-        company: 'Acme Corp',
-      });
-    } finally {
-      setLoading(false);
+      showError('Failed to load user settings');
     }
   };
 
@@ -70,19 +66,19 @@ const AccountSettings: React.FC = () => {
 
   const handleSaveChanges = async () => {
     if (!settings.fullName.trim()) {
-      showAlert('Full Name is required', 'error');
+      showError('Full Name is required');
       return;
     }
 
     if (!settings.email.trim()) {
-      showAlert('Email is required', 'error');
+      showError('Email is required');
       return;
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(settings.email)) {
-      showAlert('Please enter a valid email address', 'error');
+      showError('Please enter a valid email address');
       return;
     }
 
@@ -102,13 +98,19 @@ const AccountSettings: React.FC = () => {
       const data: UserSettingsResponse = await response.json();
 
       if (data.success) {
-        showAlert(data.message || 'Settings saved successfully!', 'success');
+        showSuccess(data.message || 'Settings saved successfully!');
+        // Update user context with new data
+        updateUser({
+          fullName: settings.fullName,
+          email: settings.email,
+          company: settings.company,
+        });
       } else {
-        showAlert(data.error || 'Failed to save settings', 'error');
+        showError(data.error || 'Failed to save settings');
       }
     } catch (error) {
       console.error('Error saving user settings:', error);
-      showAlert('Failed to save settings. Please try again.', 'error');
+      showError('Failed to save settings. Please try again.');
     } finally {
       setSaving(false);
     }

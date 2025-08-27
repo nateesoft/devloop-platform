@@ -88,7 +88,7 @@ export class DatabaseConnectionResponseDto {
   connectionConfig?: any;
   createdAt: string;
   updatedAt: string;
-  createdBy: number;
+  createdBy: string;
   connectionString: string;
   isConnected: boolean;
   needsReconnection: boolean;

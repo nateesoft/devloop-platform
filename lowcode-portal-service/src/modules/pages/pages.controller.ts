@@ -48,7 +48,7 @@ export class PagesController {
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @Body() updatePageDto: Partial<CreatePageDto> & { userId?: number; changeDescription?: string }
+    @Body() updatePageDto: Partial<CreatePageDto> & { userId?: string; changeDescription?: string }
   ) {
     const { userId, changeDescription, ...updateData } = updatePageDto;
     return this.pagesService.update(+id, updateData, userId, changeDescription);
@@ -74,7 +74,7 @@ export class PagesController {
   createHistoryEntry(
     @Param('id') id: string,
     @Body() historyData: CreatePageHistoryDto,
-    @Query('userId') userId: number
+    @Query('userId') userId: string
   ) {
     return this.pagesService.createHistoryEntry(historyData);
   }
@@ -83,7 +83,7 @@ export class PagesController {
   restoreFromHistory(
     @Param('id') id: string,
     @Param('version') version: string,
-    @Body() body: { userId: number }
+    @Body() body: { userId: string }
   ) {
     return this.pagesService.restoreFromHistory(+id, version, body.userId);
   }

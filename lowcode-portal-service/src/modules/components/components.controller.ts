@@ -36,7 +36,7 @@ export class ComponentsController {
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @Body() updateComponentDto: Partial<CreateComponentDto> & { userId?: number; changeDescription?: string }
+    @Body() updateComponentDto: Partial<CreateComponentDto> & { userId?: string; changeDescription?: string }
   ) {
     const { userId, changeDescription, ...updateData } = updateComponentDto;
     return this.componentsService.update(+id, updateData, userId, changeDescription);
@@ -62,7 +62,7 @@ export class ComponentsController {
   createHistoryEntry(
     @Param('id') id: string,
     @Body() historyData: CreateComponentHistoryDto,
-    @Query('userId') userId: number
+    @Query('userId') userId: string
   ) {
     return this.componentsService.createHistoryEntry(historyData, userId);
   }
@@ -71,7 +71,7 @@ export class ComponentsController {
   restoreFromHistory(
     @Param('id') id: string,
     @Param('version') version: string,
-    @Body() body: { userId: number }
+    @Body() body: { userId: string }
   ) {
     return this.componentsService.restoreFromHistory(+id, version, body.userId);
   }

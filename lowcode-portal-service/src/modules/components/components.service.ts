@@ -87,7 +87,7 @@ export class ComponentsService {
     return savedComponent;
   }
 
-  async update(id: number, updateData: Partial<CreateComponentDto>, userId?: number, changeDescription?: string): Promise<Component | null> {
+  async update(id: number, updateData: Partial<CreateComponentDto>, userId?: string, changeDescription?: string): Promise<Component | null> {
     // Get current component data before update for history
     const currentComponent = await this.findOne(id);
     if (!currentComponent) {
@@ -151,7 +151,7 @@ export class ComponentsService {
     });
   }
 
-  async createHistoryEntry(historyData: CreateComponentHistoryDto, userId: number): Promise<ComponentHistory> {
+  async createHistoryEntry(historyData: CreateComponentHistoryDto, userId: string): Promise<ComponentHistory> {
     const history = this.componentHistoryRepository.create({
       ...historyData,
       createdBy: userId
@@ -159,7 +159,7 @@ export class ComponentsService {
     return this.componentHistoryRepository.save(history);
   }
 
-  async restoreFromHistory(componentId: number, version: string, userId: number): Promise<Component | null> {
+  async restoreFromHistory(componentId: number, version: string, userId: string): Promise<Component | null> {
     const historyVersion = await this.getHistoryVersion(componentId, version);
     if (!historyVersion) {
       throw new NotFoundException('History version not found');

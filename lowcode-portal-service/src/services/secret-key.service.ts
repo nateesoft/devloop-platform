@@ -15,7 +15,7 @@ export class SecretKeyService {
     private vaultService: VaultService,
   ) {}
 
-  async create(createDto: CreateSecretKeyDto, userId: number): Promise<SecretKeyResponseDto> {
+  async create(createDto: CreateSecretKeyDto, userId: string): Promise<SecretKeyResponseDto> {
     // Try to store in Vault first
     const useVault = await this.vaultService.shouldUseVault();
     let vaultPath: string | null = null;
@@ -56,7 +56,7 @@ export class SecretKeyService {
     return this.toResponseDto(saved, useVault);
   }
 
-  async findAll(userId: number): Promise<SecretKeyListResponseDto[]> {
+  async findAll(userId: string): Promise<SecretKeyListResponseDto[]> {
     const secretKeys = await this.secretKeyRepository.find({
       where: { createdBy: userId },
       order: { createdAt: 'DESC' },
@@ -65,7 +65,7 @@ export class SecretKeyService {
     return secretKeys.map(sk => this.toListResponseDto(sk));
   }
 
-  async findOne(id: number, userId: number): Promise<SecretKeyResponseDto> {
+  async findOne(id: number, userId: string): Promise<SecretKeyResponseDto> {
     const secretKey = await this.secretKeyRepository.findOne({
       where: { id, createdBy: userId },
     });
@@ -81,7 +81,7 @@ export class SecretKeyService {
     return this.toResponseDto(secretKey, useVault);
   }
 
-  async update(id: number, updateDto: UpdateSecretKeyDto, userId: number): Promise<SecretKeyResponseDto> {
+  async update(id: number, updateDto: UpdateSecretKeyDto, userId: string): Promise<SecretKeyResponseDto> {
     const secretKey = await this.secretKeyRepository.findOne({
       where: { id, createdBy: userId },
     });
@@ -140,7 +140,7 @@ export class SecretKeyService {
     return this.toResponseDto(updated, useVault);
   }
 
-  async remove(id: number, userId: number): Promise<void> {
+  async remove(id: number, userId: string): Promise<void> {
     const secretKey = await this.secretKeyRepository.findOne({
       where: { id, createdBy: userId },
     });
@@ -167,7 +167,7 @@ export class SecretKeyService {
     await this.secretKeyRepository.remove(secretKey);
   }
 
-  async findByType(type: SecretKeyType, userId: number): Promise<SecretKeyListResponseDto[]> {
+  async findByType(type: SecretKeyType, userId: string): Promise<SecretKeyListResponseDto[]> {
     const secretKeys = await this.secretKeyRepository.find({
       where: { type, createdBy: userId },
       order: { createdAt: 'DESC' },
@@ -176,7 +176,7 @@ export class SecretKeyService {
     return secretKeys.map(sk => this.toListResponseDto(sk));
   }
 
-  async findExpired(userId: number): Promise<SecretKeyListResponseDto[]> {
+  async findExpired(userId: string): Promise<SecretKeyListResponseDto[]> {
     const now = new Date();
     const secretKeys = await this.secretKeyRepository
       .createQueryBuilder('sk')
@@ -189,7 +189,7 @@ export class SecretKeyService {
     return secretKeys.map(sk => this.toListResponseDto(sk));
   }
 
-  async findExpiringSoon(userId: number, days: number = 7): Promise<SecretKeyListResponseDto[]> {
+  async findExpiringSoon(userId: string, days: number = 7): Promise<SecretKeyListResponseDto[]> {
     const now = new Date();
     const futureDate = new Date();
     futureDate.setDate(futureDate.getDate() + days);
@@ -206,7 +206,7 @@ export class SecretKeyService {
     return secretKeys.map(sk => this.toListResponseDto(sk));
   }
 
-  async search(query: string, userId: number): Promise<SecretKeyListResponseDto[]> {
+  async search(query: string, userId: string): Promise<SecretKeyListResponseDto[]> {
     const secretKeys = await this.secretKeyRepository
       .createQueryBuilder('sk')
       .where('sk.createdBy = :userId', { userId })
@@ -220,7 +220,7 @@ export class SecretKeyService {
     return secretKeys.map(sk => this.toListResponseDto(sk));
   }
 
-  async deactivate(id: number, userId: number): Promise<SecretKeyResponseDto> {
+  async deactivate(id: number, userId: string): Promise<SecretKeyResponseDto> {
     const secretKey = await this.secretKeyRepository.findOne({
       where: { id, createdBy: userId },
     });
@@ -235,7 +235,7 @@ export class SecretKeyService {
     return this.toResponseDto(updated, useVault);
   }
 
-  async activate(id: number, userId: number): Promise<SecretKeyResponseDto> {
+  async activate(id: number, userId: string): Promise<SecretKeyResponseDto> {
     const secretKey = await this.secretKeyRepository.findOne({
       where: { id, createdBy: userId },
     });

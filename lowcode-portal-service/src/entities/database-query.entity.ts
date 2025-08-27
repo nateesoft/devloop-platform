@@ -55,7 +55,7 @@ export class DatabaseQuery {
   updatedAt: Date;
 
   @Column()
-  createdBy: number;
+  createdBy: string;
 
   @ManyToOne(() => DatabaseConnection, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'connectionId' })

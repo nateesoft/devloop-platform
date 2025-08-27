@@ -52,7 +52,7 @@ export class CreateComponentDto {
 
   // For history tracking
   @IsOptional()
-  userId?: number;
+  userId?: string;
 
   @IsOptional()
   @IsString()

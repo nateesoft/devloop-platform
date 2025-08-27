@@ -161,7 +161,7 @@ export class MyProject {
   createdBy: User;
 
   @Column({ name: 'created_by' })
-  createdById: number;
+  createdById: string;
 
   @OneToMany(() => WorkFlow, workflow => workflow.project, { cascade: true })
   workflows: WorkFlow[];

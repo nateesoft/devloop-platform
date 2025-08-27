@@ -52,7 +52,7 @@ export class MyProjectsController {
 
   @Post()
   createProject(@Body() createProjectDto: CreateMyProjectDto) {
-    const userId = createProjectDto.createdById || 1; // Default user ID
+    const userId = createProjectDto.createdById || "1"; // Default user ID
     return this.myProjectsService.createProject(createProjectDto, userId);
   }
 
@@ -61,7 +61,7 @@ export class MyProjectsController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updateData: Partial<CreateMyProjectDto>,
   ) {
-    const userId = updateData.createdById || 1;
+    const userId = updateData.createdById || "1";
     return this.myProjectsService.updateProject(id, updateData, userId);
   }
 
@@ -93,7 +93,7 @@ export class MyProjectsController {
     @Param('projectId', ParseIntPipe) projectId: number,
     @Body() createWorkflowDto: CreateWorkFlowDto,
   ) {
-    const userId = createWorkflowDto.createdById || 1;
+    const userId = createWorkflowDto.createdById || "1";
     return this.myProjectsService.createWorkflow(projectId, createWorkflowDto, userId);
   }
 
@@ -103,7 +103,7 @@ export class MyProjectsController {
     @Body() updateData: Partial<CreateWorkFlowDto> & { changeDescription?: string },
   ) {
     const { changeDescription, ...workflowData } = updateData;
-    const userId = workflowData.createdById || 1;
+    const userId = workflowData.createdById || "1";
     return this.myProjectsService.updateWorkflow(id, workflowData, userId, changeDescription);
   }
 
@@ -124,7 +124,7 @@ export class MyProjectsController {
     @Param('workflowId', ParseIntPipe) workflowId: number,
     @Body() createNodeDto: CreateWorkFlowNodeDto,
   ) {
-    const userId = createNodeDto.createdById || 1;
+    const userId = createNodeDto.createdById || "1";
     return this.myProjectsService.createWorkflowNode(workflowId, createNodeDto, userId);
   }
 
@@ -152,7 +152,7 @@ export class MyProjectsController {
   restoreWorkflowFromHistory(
     @Param('workflowId', ParseIntPipe) workflowId: number,
     @Param('version') version: string,
-    @Body() body: { userId: number },
+    @Body() body: { userId: string },
   ) {
     return this.myProjectsService.restoreWorkflowFromHistory(workflowId, version, body.userId);
   }
@@ -167,7 +167,7 @@ export class MyProjectsController {
   @Post(':projectId/duplicate')
   async duplicateProject(
     @Param('projectId', ParseIntPipe) projectId: number,
-    @Body() body: { name: string; slug: string; userId: number },
+    @Body() body: { name: string; slug: string; userId: string },
   ) {
     // Get original project
     const originalProject = await this.myProjectsService.findProjectById(projectId);
@@ -197,7 +197,7 @@ export class MyProjectsController {
   @Post('workflows/:workflowId/execute')
   async executeWorkflow(
     @Param('workflowId', ParseIntPipe) workflowId: number,
-    @Body() body: { parameters?: Record<string, any>; userId: number },
+    @Body() body: { parameters?: Record<string, any>; userId: string },
   ) {
     // This would implement workflow execution logic
     // For now, just return a success response

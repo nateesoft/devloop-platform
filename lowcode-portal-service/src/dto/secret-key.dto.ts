@@ -84,7 +84,7 @@ export class SecretKeyResponseDto {
   accessCount: number;
   createdAt: string;
   updatedAt: string;
-  createdBy: number;
+  createdBy: string;
   isExpired: boolean;
   isExpiringSoon: boolean;
   lastModified: string;
@@ -103,7 +103,7 @@ export class SecretKeyListResponseDto {
   accessCount: number;
   createdAt: string;
   updatedAt: string;
-  createdBy: number;
+  createdBy: string;
   isExpired: boolean;
   isExpiringSoon: boolean;
   lastModified: string;

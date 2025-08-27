@@ -15,7 +15,7 @@ export class Note {
   expiresAt: Date;
 
   @Column({ default: 1 })
-  userId: number;
+  userId: string;
 
   // Removed ManyToOne relationship to avoid foreign key issues
 

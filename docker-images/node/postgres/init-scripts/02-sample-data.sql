@@ -1,7 +1,7 @@
 -- TON Lowcode Platform - Sample Data
 -- This script inserts sample data for development and testing
 
--- Insert sample users
+-- Insert sample users for UUID-based table
 INSERT INTO users (id, username, email, first_name, last_name, status, keycloak_id, preferences) VALUES
     ('550e8400-e29b-41d4-a716-446655440001', 'admin', 'admin@lowcode.com', 'System', 'Administrator', 'active', 'keycloak-admin-001', '{"theme": "dark", "language": "en"}'),
     ('550e8400-e29b-41d4-a716-446655440002', 'john.doe', 'john.doe@example.com', 'John', 'Doe', 'active', 'keycloak-user-001', '{"theme": "light", "language": "en"}'),

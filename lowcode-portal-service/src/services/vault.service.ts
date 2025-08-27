@@ -235,7 +235,7 @@ export class VaultService {
     }
   }
 
-  generateSecretPath(userId: number, secretName: string): string {
+  generateSecretPath(userId: string, secretName: string): string {
     // Create a path structure: users/{userId}/secrets/{secretName}
     return `users/${userId}/secrets/${secretName.replace(/[^a-zA-Z0-9-_]/g, '_')}`;
   }

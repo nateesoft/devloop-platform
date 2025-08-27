@@ -60,8 +60,8 @@ export class CreateTaskDto {
   projectId?: number;
 
   @IsOptional()
-  @IsInt()
-  assignedTo?: number;
+  @IsString()
+  assignedTo?: string;
 }
 
 export class UpdateTaskDto {
@@ -124,8 +124,8 @@ export class UpdateTaskDto {
   projectId?: number;
 
   @IsOptional()
-  @IsInt()
-  assignedTo?: number;
+  @IsString()
+  assignedTo?: string;
 }
 
 export class TaskResponseDto {
@@ -144,8 +144,8 @@ export class TaskResponseDto {
   tags?: string[];
   metadata?: Record<string, any>;
   projectId?: number;
-  createdBy: number;
-  assignedTo?: number;
+  createdBy: string;
+  assignedTo?: string;
   createdAt: string;
   updatedAt: string;
   isOverdue: boolean;
@@ -153,14 +153,14 @@ export class TaskResponseDto {
   
   // Relations
   creator?: {
-    id: number;
+    id: string;
     email: string;
     firstName: string;
     lastName: string;
   };
   
   assignedUser?: {
-    id: number;
+    id: string;
     email: string;
     firstName: string;
     lastName: string;
@@ -184,8 +184,8 @@ export class TaskListResponseDto {
   assignee?: string;
   tags?: string[];
   projectId?: number;
-  createdBy: number;
-  assignedTo?: number;
+  createdBy: string;
+  assignedTo?: string;
   createdAt: string;
   updatedAt: string;
   isOverdue: boolean;

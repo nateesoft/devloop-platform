@@ -13,7 +13,7 @@ export class NotesService {
     private noteRepository: Repository<Note>,
   ) {}
 
-  async create(createNoteDto: CreateNoteDto, userId: number): Promise<Note> {
+  async create(createNoteDto: CreateNoteDto, userId: string): Promise<Note> {
     const note = this.noteRepository.create({
       ...createNoteDto,
       userId,
@@ -21,20 +21,20 @@ export class NotesService {
     return await this.noteRepository.save(note);
   }
 
-  async findAllByUser(userId: number): Promise<Note[]> {
+  async findAllByUser(userId: string): Promise<Note[]> {
     return await this.noteRepository.find({
       where: { userId },
       order: { createdAt: 'DESC' },
     });
   }
 
-  async findOne(id: number, userId: number): Promise<Note | null> {
+  async findOne(id: number, userId: string): Promise<Note | null> {
     return await this.noteRepository.findOne({
       where: { id, userId },
     });
   }
 
-  async update(id: number, updateNoteDto: UpdateNoteDto, userId: number): Promise<Note | null> {
+  async update(id: number, updateNoteDto: UpdateNoteDto, userId: string): Promise<Note | null> {
     const updateResult = await this.noteRepository.update({ id, userId }, updateNoteDto);
     if (updateResult.affected === 0) {
       return null;
@@ -42,7 +42,7 @@ export class NotesService {
     return await this.findOne(id, userId);
   }
 
-  async remove(id: number, userId: number): Promise<void> {
+  async remove(id: number, userId: string): Promise<void> {
     await this.noteRepository.delete({ id, userId });
   }
 

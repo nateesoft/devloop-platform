@@ -19,7 +19,7 @@ export class UserGroupsService {
     private myProjectRepository: Repository<MyProject>,
   ) {}
 
-  async create(createUserGroupDto: CreateUserGroupDto, createdById: number): Promise<UserGroup> {
+  async create(createUserGroupDto: CreateUserGroupDto, createdById: string): Promise<UserGroup> {
     const { memberIds, ...groupData } = createUserGroupDto;
     
     const userGroup = this.userGroupRepository.create({
@@ -37,7 +37,7 @@ export class UserGroupsService {
     return this.findOne(savedGroup.id);
   }
 
-  async findAll(createdById?: number): Promise<UserGroup[]> {
+  async findAll(createdById?: string): Promise<UserGroup[]> {
     const queryBuilder = this.userGroupRepository
       .createQueryBuilder('userGroup')
       .leftJoinAndSelect('userGroup.createdBy', 'createdBy')
@@ -68,7 +68,7 @@ export class UserGroupsService {
     return userGroup;
   }
 
-  async update(id: number, updateUserGroupDto: UpdateUserGroupDto, userId: number): Promise<UserGroup> {
+  async update(id: number, updateUserGroupDto: UpdateUserGroupDto, userId: string): Promise<UserGroup> {
     const userGroup = await this.findOne(id);
 
     // Check if user has permission to update (owner or system admin)
@@ -85,7 +85,7 @@ export class UserGroupsService {
     return this.findOne(id);
   }
 
-  async remove(id: number, userId: number): Promise<void> {
+  async remove(id: number, userId: string): Promise<void> {
     const userGroup = await this.findOne(id);
 
     // Check if user has permission to delete (owner or system admin)
@@ -101,7 +101,7 @@ export class UserGroupsService {
     await this.userGroupRepository.remove(userGroup);
   }
 
-  async addMembers(id: number, addMembersDto: AddMembersDto, userId: number): Promise<UserGroup> {
+  async addMembers(id: number, addMembersDto: AddMembersDto, userId: string): Promise<UserGroup> {
     const userGroup = await this.findOne(id);
 
     // Check if user has permission to add members
@@ -125,7 +125,7 @@ export class UserGroupsService {
     return this.findOne(id);
   }
 
-  async removeMembers(id: number, addMembersDto: AddMembersDto, userId: number): Promise<UserGroup> {
+  async removeMembers(id: number, addMembersDto: AddMembersDto, userId: string): Promise<UserGroup> {
     const userGroup = await this.findOne(id);
 
     // Check if user has permission to remove members
@@ -142,7 +142,7 @@ export class UserGroupsService {
     return this.findOne(id);
   }
 
-  async getUserGroups(userId: number): Promise<UserGroup[]> {
+  async getUserGroups(userId: string): Promise<UserGroup[]> {
     return this.userGroupRepository
       .createQueryBuilder('userGroup')
       .leftJoinAndSelect('userGroup.createdBy', 'createdBy')
@@ -152,7 +152,7 @@ export class UserGroupsService {
       .getMany();
   }
 
-  async getGroupStats(createdById?: number): Promise<any> {
+  async getGroupStats(createdById?: string): Promise<any> {
     const queryBuilder = this.userGroupRepository
       .createQueryBuilder('userGroup')
       .leftJoinAndSelect('userGroup.members', 'members');

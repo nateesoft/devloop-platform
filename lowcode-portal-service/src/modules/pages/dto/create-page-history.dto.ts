@@ -95,5 +95,5 @@ export class CreatePageHistoryDto {
   };
 
   @IsNumber()
-  createdBy: number;
+  createdBy: string;
 }

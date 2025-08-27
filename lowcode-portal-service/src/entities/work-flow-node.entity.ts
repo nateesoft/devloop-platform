@@ -213,7 +213,7 @@ export class WorkFlowNode {
   createdBy: User;
 
   @Column({ name: 'created_by' })
-  createdById: number;
+  createdById: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

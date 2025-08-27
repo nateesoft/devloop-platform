@@ -155,6 +155,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const response = await authAPI.login({ email, password });
       setUser(response.user);
+      
+      // Add a small delay to ensure token is stored properly before setting authenticated
+      await new Promise(resolve => setTimeout(resolve, 50));
       setIsAuthenticated(true);
       
       // Reset auto-logout timeout after successful login

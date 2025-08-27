@@ -75,7 +75,7 @@ export class Page {
   createdBy?: User;
 
   @Column({ name: 'created_by', nullable: true })
-  createdById?: number;
+  createdById?: string;
 
   @OneToMany(() => PageHistory, history => history.page)
   history: PageHistory[];

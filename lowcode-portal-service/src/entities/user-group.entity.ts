@@ -42,7 +42,7 @@ export class UserGroup {
   isSystem: boolean; // กลุ่มระบบที่ไม่สามารถลบได้
 
   @Column()
-  createdById: number;
+  createdById: string;
 
   @Column({ nullable: true })
   projectId: number;

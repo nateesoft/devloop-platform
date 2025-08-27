@@ -54,7 +54,7 @@ export class FlowHistory {
   };
 
   @Column({ name: 'created_by' })
-  createdBy: number;
+  createdBy: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

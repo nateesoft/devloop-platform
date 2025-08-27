@@ -137,5 +137,5 @@ export class CreateMyProjectDto {
 
   @IsOptional()
   @IsNumber()
-  createdById?: number;
+  createdById?: string;
 }

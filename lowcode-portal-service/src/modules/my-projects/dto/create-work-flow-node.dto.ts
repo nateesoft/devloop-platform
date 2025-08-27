@@ -166,5 +166,5 @@ export class CreateWorkFlowNodeDto {
 
   @IsOptional()
   @IsNumber()
-  createdById?: number;
+  createdById?: string;
 }

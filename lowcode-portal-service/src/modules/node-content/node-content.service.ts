@@ -35,7 +35,7 @@ export class NodeContentService {
     nodeType: string;
     metadata?: any;
     changeDescription?: string;
-  }, userId?: number): Promise<NodeContent> {
+  }, userId?: string): Promise<NodeContent> {
     
     // Check if node content already exists
     let nodeContent = await this.findByNodeId(flowId, nodeId);
@@ -102,7 +102,7 @@ export class NodeContentService {
     return count > 0;
   }
 
-  private async saveToHistory(nodeContent: NodeContent, changeDescription: string, userId?: number): Promise<NodeContentHistory> {
+  private async saveToHistory(nodeContent: NodeContent, changeDescription: string, userId?: string): Promise<NodeContentHistory> {
     const history = this.nodeContentHistoryRepository.create({
       content: nodeContent.content,
       language: nodeContent.language,

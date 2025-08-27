@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { mediaAPI, MediaFileData, MediaFolderData, UploadProgressData, CreateMediaFolderRequest } from '@/lib/api';
+import { useAuth } from './AuthContext';
 
 // Use API types directly with proper date handling
 export interface MediaFile {
@@ -124,6 +125,7 @@ interface MediaProviderProps {
 }
 
 export const MediaProvider: React.FC<MediaProviderProps> = ({ children }) => {
+  const { isAuthenticated } = useAuth();
   const [files, setFiles] = useState<MediaFile[]>([]);
   const [folders, setFolders] = useState<MediaFolder[]>([]);
   const [currentFolder, setCurrentFolder] = useState<MediaFolder | null>(null);
@@ -143,9 +145,23 @@ export const MediaProvider: React.FC<MediaProviderProps> = ({ children }) => {
 
   // Load initial data
   useEffect(() => {
-    loadFiles();
-    loadFolders();
-  }, [currentFolder?.id]);
+    if (isAuthenticated) {
+      // Add a small delay to ensure token is properly set after login
+      const loadDataWithDelay = async () => {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        loadFiles();
+        loadFolders();
+      };
+      loadDataWithDelay();
+    } else {
+      // Clear data when not authenticated
+      setFiles([]);
+      setFolders([]);
+      setCurrentFolder(null);
+      setSelectedFiles([]);
+      setError(null);
+    }
+  }, [currentFolder?.id, isAuthenticated]);
 
   const convertApiFileToLocal = (apiFile: MediaFileData): MediaFile => ({
     ...apiFile,
@@ -162,6 +178,8 @@ export const MediaProvider: React.FC<MediaProviderProps> = ({ children }) => {
   });
 
   const loadFiles = async () => {
+    if (!isAuthenticated) return;
+    
     try {
       setIsLoading(true);
       setError(null);
@@ -176,6 +194,8 @@ export const MediaProvider: React.FC<MediaProviderProps> = ({ children }) => {
   };
 
   const loadFolders = async () => {
+    if (!isAuthenticated) return;
+    
     try {
       const response = await mediaAPI.getFolders(currentFolder?.id);
       const convertedFolders = response.data.map(convertApiFolderToLocal);
@@ -505,7 +525,7 @@ export const MediaProvider: React.FC<MediaProviderProps> = ({ children }) => {
   const goBack = () => {
     if (currentFolder?.parentId) {
       const parentFolder = folders.find(f => f.id === currentFolder.parentId);
-      setCurrentFolder(parentFolder || null);
+      setCurrentFolder(parentFolder ?? null);
     } else {
       setCurrentFolder(null);
     }
@@ -608,11 +628,11 @@ export const MediaProvider: React.FC<MediaProviderProps> = ({ children }) => {
   
   const getBreadcrumbs = (): MediaFolder[] => {
     const breadcrumbs: MediaFolder[] = [];
-    let current = currentFolder;
+    let current: MediaFolder | null = currentFolder;
     
     while (current) {
       breadcrumbs.unshift(current);
-      current = current.parentId ? folders.find(f => f.id === current!.parentId) : null;
+      current = current.parentId ? folders.find(f => f.id === current!.parentId) ?? null : null;
     }
     
     return breadcrumbs;
@@ -620,8 +640,10 @@ export const MediaProvider: React.FC<MediaProviderProps> = ({ children }) => {
   
   const generateDemoData = async () => {
     // Refresh data instead of generating demo data
-    await loadFiles();
-    await loadFolders();
+    if (isAuthenticated) {
+      await loadFiles();
+      await loadFolders();
+    }
   };
   
   const value: MediaContextType = {

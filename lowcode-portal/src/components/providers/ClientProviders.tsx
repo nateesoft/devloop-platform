@@ -11,6 +11,7 @@ import { MediaProvider } from "@/contexts/MediaContext";
 import { ProjectManagementProvider } from "@/contexts/ProjectManagementContext";
 import { AlertProvider, setGlobalAlertContext, useAlert } from "@/contexts/AlertContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { UserProvider } from "@/contexts/UserContext";
 import KeycloakProviderWrapper from "@/components/providers/KeycloakProviderWrapper";
 import RouteGuard from "@/components/auth/RouteGuard";
 import ChatbotOverlay from "@/components/ui/ChatbotOverlay";
@@ -47,31 +48,33 @@ export function ClientProviders({ children }: ClientProvidersProps) {
   return (
     <KeycloakProviderWrapper>
       <AuthProvider>
-        <ThemeProvider>
-          <LanguageProvider>
-            <CurrencyProvider>
-              <MediaProvider>
-                <DatabaseProvider>
-                  <ProjectManagementProvider>
-                    <CollaborationProvider>
-                      <ChatbotProvider>
-                        <AlertProvider position="top-right" maxAlerts={5}>
-                          <AlertWrapper>
-                            <RouteGuard>
-                              <ChatbotWrapper>
-                                {children}
-                              </ChatbotWrapper>
-                            </RouteGuard>
-                          </AlertWrapper>
-                        </AlertProvider>
-                      </ChatbotProvider>
-                    </CollaborationProvider>
-                  </ProjectManagementProvider>
-                </DatabaseProvider>
-              </MediaProvider>
-            </CurrencyProvider>
-          </LanguageProvider>
-        </ThemeProvider>
+        <UserProvider>
+          <ThemeProvider>
+            <LanguageProvider>
+              <CurrencyProvider>
+                <MediaProvider>
+                  <DatabaseProvider>
+                    <ProjectManagementProvider>
+                      <CollaborationProvider>
+                        <ChatbotProvider>
+                          <AlertProvider position="top-right" maxAlerts={5}>
+                            <AlertWrapper>
+                              <RouteGuard>
+                                <ChatbotWrapper>
+                                  {children}
+                                </ChatbotWrapper>
+                              </RouteGuard>
+                            </AlertWrapper>
+                          </AlertProvider>
+                        </ChatbotProvider>
+                      </CollaborationProvider>
+                    </ProjectManagementProvider>
+                  </DatabaseProvider>
+                </MediaProvider>
+              </CurrencyProvider>
+            </LanguageProvider>
+          </ThemeProvider>
+        </UserProvider>
       </AuthProvider>
     </KeycloakProviderWrapper>
   );

@@ -37,5 +37,6 @@ export class CreateUserGroupDto {
 
   @IsOptional()
   @IsArray()
-  memberIds?: number[];
+  @IsString({ each: true })
+  memberIds?: string[];
 }

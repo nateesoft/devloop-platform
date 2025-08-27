@@ -91,7 +91,7 @@ export class PageHistory {
   user?: User;
 
   @Column({ name: 'created_by' })
-  createdBy: number;
+  createdBy: string;
 
   @ManyToOne(() => Page, page => page.history, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'page_id' })

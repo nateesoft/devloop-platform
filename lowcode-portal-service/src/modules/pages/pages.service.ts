@@ -120,7 +120,7 @@ export class PagesService {
     return savedPage;
   }
 
-  async update(id: number, updateData: Partial<CreatePageDto>, userId?: number, changeDescription?: string): Promise<Page | null> {
+  async update(id: number, updateData: Partial<CreatePageDto>, userId?: string, changeDescription?: string): Promise<Page | null> {
     // Get current page data before update for history
     const currentPage = await this.findOne(id);
     if (!currentPage) {
@@ -208,7 +208,7 @@ export class PagesService {
     return this.pageHistoryRepository.save(history);
   }
 
-  async restoreFromHistory(pageId: number, version: string, userId: number): Promise<Page | null> {
+  async restoreFromHistory(pageId: number, version: string, userId: string): Promise<Page | null> {
     const historyVersion = await this.getHistoryVersion(pageId, version);
     if (!historyVersion) {
       throw new NotFoundException('History version not found');

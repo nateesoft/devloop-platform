@@ -3,7 +3,7 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateCol
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: string;
 
   @Column({ unique: true })
   email: string;
@@ -37,4 +37,7 @@ export class User {
 
   @Column({ nullable: true })
   lastLoginIp: string;
+
+  @Column({ nullable: true })
+  company: string;
 }

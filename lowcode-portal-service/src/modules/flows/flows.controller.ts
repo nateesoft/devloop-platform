@@ -25,7 +25,7 @@ export class FlowsController {
   @Patch(':id')
   update(
     @Param('id') id: string, 
-    @Body() updateFlowDto: Partial<Flow> & { userId?: number; changeDescription?: string }
+    @Body() updateFlowDto: Partial<Flow> & { userId?: string; changeDescription?: string }
   ) {
     const { userId, changeDescription, ...updateData } = updateFlowDto;
     return this.flowsService.update(+id, updateData, userId, changeDescription);
@@ -56,7 +56,7 @@ export class FlowsController {
   createHistoryEntry(
     @Param('id') id: string,
     @Body() historyData: CreateFlowHistoryDto,
-    @Query('userId') userId: number
+    @Query('userId') userId: string
   ) {
     return this.flowsService.createHistoryEntry(historyData, userId);
   }
@@ -65,7 +65,7 @@ export class FlowsController {
   restoreFromHistory(
     @Param('id') id: string,
     @Param('version') version: string,
-    @Body() body: { userId: number }
+    @Body() body: { userId: string }
   ) {
     return this.flowsService.restoreFromHistory(+id, version, body.userId);
   }

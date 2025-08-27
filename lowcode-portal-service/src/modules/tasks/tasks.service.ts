@@ -17,7 +17,7 @@ export class TasksService {
     private projectRepository: Repository<MyProject>,
   ) {}
 
-  async create(createTaskDto: CreateTaskDto, createdBy: number): Promise<TaskResponseDto> {
+  async create(createTaskDto: CreateTaskDto, createdBy: string): Promise<TaskResponseDto> {
     // Verify creator exists
     const creator = await this.userRepository.findOne({ where: { id: createdBy } });
     if (!creator) {
@@ -67,7 +67,7 @@ export class TasksService {
   }
 
   async findAll(
-    userId: number, 
+    userId: string, 
     projectId?: number, 
     status?: string,
     assignedTo?: number,
@@ -102,7 +102,7 @@ export class TasksService {
     return tasks.map(task => this.toListResponseDto(task));
   }
 
-  async findOne(id: number, userId: number): Promise<TaskResponseDto> {
+  async findOne(id: number, userId: string): Promise<TaskResponseDto> {
     const task = await this.findOneWithRelations(id);
     
     if (!task) {
@@ -117,7 +117,7 @@ export class TasksService {
     return this.toResponseDto(task);
   }
 
-  async update(id: number, updateTaskDto: UpdateTaskDto, userId: number): Promise<TaskResponseDto> {
+  async update(id: number, updateTaskDto: UpdateTaskDto, userId: string): Promise<TaskResponseDto> {
     const task = await this.findOneWithRelations(id);
     
     if (!task) {
@@ -165,7 +165,7 @@ export class TasksService {
     return this.toResponseDto(updatedTask!);
   }
 
-  async remove(id: number, userId: number): Promise<void> {
+  async remove(id: number, userId: string): Promise<void> {
     const task = await this.taskRepository.findOne({ where: { id } });
     
     if (!task) {
@@ -180,7 +180,7 @@ export class TasksService {
     await this.taskRepository.remove(task);
   }
 
-  async getTasksByProject(projectId: number, userId: number): Promise<TaskListResponseDto[]> {
+  async getTasksByProject(projectId: number, userId: string): Promise<TaskListResponseDto[]> {
     // Verify user has access to project
     const project = await this.projectRepository.findOne({ 
       where: { id: projectId },
@@ -198,7 +198,7 @@ export class TasksService {
     return this.findAll(userId, projectId);
   }
 
-  async getTaskStatistics(userId: number, projectId?: number): Promise<any> {
+  async getTaskStatistics(userId: string, projectId?: number): Promise<any> {
     const queryBuilder = this.taskRepository.createQueryBuilder('task')
       .where('task.createdBy = :userId', { userId });
 

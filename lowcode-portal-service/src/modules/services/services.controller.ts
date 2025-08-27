@@ -26,7 +26,7 @@ export class ServicesController {
   @Get()
   findAll(@Query('userId') userId?: string) {
     if (userId) {
-      return this.servicesService.findByUser(parseInt(userId));
+      return this.servicesService.findByUser(userId);
     }
     return this.servicesService.findAll();
   }

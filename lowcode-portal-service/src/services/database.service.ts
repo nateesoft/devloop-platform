@@ -35,7 +35,7 @@ export class DatabaseService {
   ) {}
 
   // Connection Management
-  async createConnection(createDto: CreateDatabaseConnectionDto, userId: number): Promise<DatabaseConnectionResponseDto> {
+  async createConnection(createDto: CreateDatabaseConnectionDto, userId: string): Promise<DatabaseConnectionResponseDto> {
     const encryptedPassword = this.encryptPassword(createDto.password);
 
     const connection = this.connectionRepository.create({
@@ -49,7 +49,7 @@ export class DatabaseService {
     return this.toConnectionResponseDto(saved);
   }
 
-  async updateConnection(id: number, updateDto: UpdateDatabaseConnectionDto, userId: number): Promise<DatabaseConnectionResponseDto> {
+  async updateConnection(id: number, updateDto: UpdateDatabaseConnectionDto, userId: string): Promise<DatabaseConnectionResponseDto> {
     const connection = await this.findConnectionByIdAndUser(id, userId);
 
     if (updateDto.password) {
@@ -65,7 +65,7 @@ export class DatabaseService {
     return this.toConnectionResponseDto(updated);
   }
 
-  async deleteConnection(id: number, userId: number): Promise<void> {
+  async deleteConnection(id: number, userId: string): Promise<void> {
     const connection = await this.findConnectionByIdAndUser(id, userId);
     
     // Close active connection
@@ -78,7 +78,7 @@ export class DatabaseService {
     await this.connectionRepository.remove(connection);
   }
 
-  async testConnection(id: number, userId: number): Promise<boolean> {
+  async testConnection(id: number, userId: string): Promise<boolean> {
     const connection = await this.findConnectionByIdAndUser(id, userId);
     
     try {
@@ -116,7 +116,7 @@ export class DatabaseService {
     }
   }
 
-  async getAllConnections(userId: number): Promise<DatabaseConnectionResponseDto[]> {
+  async getAllConnections(userId: string): Promise<DatabaseConnectionResponseDto[]> {
     const connections = await this.connectionRepository.find({
       where: { createdBy: userId, isActive: true },
       order: { createdAt: 'DESC' },
@@ -125,13 +125,13 @@ export class DatabaseService {
     return connections.map(conn => this.toConnectionResponseDto(conn));
   }
 
-  async getConnection(id: number, userId: number): Promise<DatabaseConnectionResponseDto> {
+  async getConnection(id: number, userId: string): Promise<DatabaseConnectionResponseDto> {
     const connection = await this.findConnectionByIdAndUser(id, userId);
     return this.toConnectionResponseDto(connection);
   }
 
   // Table Management
-  async refreshTables(connectionId: number, userId: number): Promise<DatabaseTableResponseDto[]> {
+  async refreshTables(connectionId: number, userId: string): Promise<DatabaseTableResponseDto[]> {
     const connection = await this.findConnectionByIdAndUser(connectionId, userId);
     
     if (!this.activeConnections.has(connectionId)) {
@@ -172,7 +172,7 @@ export class DatabaseService {
     }
   }
 
-  async getTables(connectionId: number, userId: number): Promise<DatabaseTableResponseDto[]> {
+  async getTables(connectionId: number, userId: string): Promise<DatabaseTableResponseDto[]> {
     await this.findConnectionByIdAndUser(connectionId, userId);
     
     const tables = await this.tableRepository.find({
@@ -184,7 +184,7 @@ export class DatabaseService {
   }
 
   // Query Execution
-  async executeQuery(connectionId: number, executeDto: ExecuteQueryDto, userId: number): Promise<QueryResultDto> {
+  async executeQuery(connectionId: number, executeDto: ExecuteQueryDto, userId: string): Promise<QueryResultDto> {
     const connection = await this.findConnectionByIdAndUser(connectionId, userId);
     
     // Validate query
@@ -232,7 +232,7 @@ export class DatabaseService {
   }
 
   // Query Management
-  async saveQuery(connectionId: number, saveDto: SaveQueryDto, userId: number): Promise<DatabaseQuery> {
+  async saveQuery(connectionId: number, saveDto: SaveQueryDto, userId: string): Promise<DatabaseQuery> {
     await this.findConnectionByIdAndUser(connectionId, userId);
     
     const query = this.queryRepository.create({
@@ -244,7 +244,7 @@ export class DatabaseService {
     return await this.queryRepository.save(query);
   }
 
-  async getSavedQueries(connectionId: number, userId: number): Promise<DatabaseQuery[]> {
+  async getSavedQueries(connectionId: number, userId: string): Promise<DatabaseQuery[]> {
     await this.findConnectionByIdAndUser(connectionId, userId);
     
     return await this.queryRepository.find({
@@ -254,7 +254,7 @@ export class DatabaseService {
   }
 
   // CRUD Generation
-  async generateCRUD(connectionId: number, generateDto: GenerateCRUDDto, userId: number): Promise<CRUDPreviewDto> {
+  async generateCRUD(connectionId: number, generateDto: GenerateCRUDDto, userId: string): Promise<CRUDPreviewDto> {
     const connection = await this.findConnectionByIdAndUser(connectionId, userId);
     
     const table = await this.tableRepository.findOne({
@@ -296,7 +296,7 @@ export class DatabaseService {
   }
 
   // Private Methods
-  private async findConnectionByIdAndUser(id: number, userId: number): Promise<DatabaseConnection> {
+  private async findConnectionByIdAndUser(id: number, userId: string): Promise<DatabaseConnection> {
     const connection = await this.connectionRepository
       .createQueryBuilder('connection')
       .addSelect('connection.encryptedPassword')
