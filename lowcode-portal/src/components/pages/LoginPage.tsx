@@ -102,7 +102,230 @@ const LoginPage: React.FC<LoginPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 pointer-events-none">
+        {/* Grid Pattern */}
+        <div className="absolute inset-0 opacity-20 dark:opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `
+              linear-gradient(rgba(59, 130, 246, 0.3) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(59, 130, 246, 0.3) 1px, transparent 1px)
+            `,
+            backgroundSize: '50px 50px',
+            animation: 'grid-move 20s linear infinite'
+          }}></div>
+        </div>
+        
+        {/* Floating Geometric Shapes */}
+        <div className="absolute top-1/4 left-1/4 w-20 h-20 border-2 border-blue-400/30 dark:border-blue-300/20 rotate-45 animate-pulse"></div>
+        <div className="absolute top-3/4 right-1/4 w-16 h-16 border-2 border-purple-400/30 dark:border-purple-300/20 animate-spin" style={{ animationDuration: '10s' }}></div>
+        <div className="absolute top-1/2 left-1/6 w-12 h-12 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full animate-bounce" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/3 right-1/3 w-8 h-8 bg-gradient-to-br from-purple-400/30 to-blue-400/30 rotate-45 animate-pulse" style={{ animationDelay: '2s' }}></div>
+        
+        {/* Flowing Lines */}
+        <svg className="absolute inset-0 w-full h-full opacity-30 dark:opacity-20" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="line1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.5" />
+              <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.5" />
+            </linearGradient>
+            <linearGradient id="line2" x1="100%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.5" />
+              <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.5" />
+            </linearGradient>
+          </defs>
+          <path
+            d="M0,300 Q400,100 800,300 T1600,300"
+            stroke="url(#line1)"
+            strokeWidth="2"
+            fill="none"
+            className="animate-pulse"
+          />
+          <path
+            d="M0,500 Q400,700 800,500 T1600,500"
+            stroke="url(#line2)"
+            strokeWidth="2"
+            fill="none"
+            className="animate-pulse"
+            style={{ animationDelay: '1s' }}
+          />
+        </svg>
+        
+        {/* Particle Effect */}
+        <div className="absolute top-10 left-10 w-2 h-2 bg-blue-400/60 rounded-full animate-ping"></div>
+        <div className="absolute top-20 right-32 w-1 h-1 bg-purple-400/60 rounded-full animate-ping" style={{ animationDelay: '0.5s' }}></div>
+        <div className="absolute bottom-32 left-20 w-1.5 h-1.5 bg-blue-300/60 rounded-full animate-ping" style={{ animationDelay: '1.5s' }}></div>
+        <div className="absolute bottom-20 right-20 w-2 h-2 bg-purple-300/60 rounded-full animate-ping" style={{ animationDelay: '2s' }}></div>
+        
+        {/* Aurora Borealis Effect */}
+        <div className="absolute inset-0 overflow-hidden opacity-60 dark:opacity-40">
+          <div className="absolute -top-1/2 left-0 w-full h-full">
+            <div 
+              className="absolute inset-0 aurora-wave-1"
+              style={{
+                background: 'linear-gradient(45deg, rgba(34, 197, 94, 0.3), rgba(59, 130, 246, 0.3), rgba(168, 85, 247, 0.3), rgba(236, 72, 153, 0.3))',
+                filter: 'blur(50px)',
+                borderRadius: '50%',
+                animation: 'aurora1 8s ease-in-out infinite alternate'
+              }}
+            ></div>
+            <div 
+              className="absolute inset-0 aurora-wave-2"
+              style={{
+                background: 'linear-gradient(-45deg, rgba(59, 130, 246, 0.4), rgba(168, 85, 247, 0.4), rgba(34, 197, 94, 0.3), rgba(245, 158, 11, 0.3))',
+                filter: 'blur(60px)',
+                borderRadius: '50%',
+                animation: 'aurora2 10s ease-in-out infinite alternate-reverse'
+              }}
+            ></div>
+            <div 
+              className="absolute inset-0 aurora-wave-3"
+              style={{
+                background: 'linear-gradient(90deg, rgba(168, 85, 247, 0.3), rgba(236, 72, 153, 0.3), rgba(59, 130, 246, 0.4), rgba(34, 197, 94, 0.3))',
+                filter: 'blur(40px)',
+                borderRadius: '50%',
+                animation: 'aurora3 12s ease-in-out infinite alternate'
+              }}
+            ></div>
+          </div>
+        </div>
+
+        {/* Shooting Stars */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="shooting-star shooting-star-1"></div>
+          <div className="shooting-star shooting-star-2"></div>
+          <div className="shooting-star shooting-star-3"></div>
+          <div className="shooting-star shooting-star-4"></div>
+          <div className="shooting-star shooting-star-5"></div>
+        </div>
+
+        {/* Hexagon Pattern */}
+        <div className="absolute top-16 right-16 opacity-20 dark:opacity-10">
+          <svg width="60" height="60" viewBox="0 0 60 60" className="animate-spin" style={{ animationDuration: '15s' }}>
+            <polygon
+              points="30,5 50,17.5 50,42.5 30,55 10,42.5 10,17.5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1"
+              className="text-blue-400 dark:text-blue-300"
+            />
+          </svg>
+        </div>
+        <div className="absolute bottom-16 left-16 opacity-20 dark:opacity-10">
+          <svg width="40" height="40" viewBox="0 0 60 60" className="animate-spin" style={{ animationDuration: '12s', animationDirection: 'reverse' }}>
+            <polygon
+              points="30,5 50,17.5 50,42.5 30,55 10,42.5 10,17.5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1"
+              className="text-purple-400 dark:text-purple-300"
+            />
+          </svg>
+        </div>
+      </div>
+      
+      {/* Add custom styles */}
+      <style jsx>{`
+        @keyframes grid-move {
+          0% { transform: translateX(0) translateY(0); }
+          100% { transform: translateX(50px) translateY(50px); }
+        }
+        
+        @keyframes aurora1 {
+          0% { transform: translateX(-100%) translateY(-50%) rotate(0deg) scale(0.8); }
+          50% { transform: translateX(0%) translateY(-30%) rotate(180deg) scale(1.2); }
+          100% { transform: translateX(100%) translateY(-70%) rotate(360deg) scale(0.9); }
+        }
+        
+        @keyframes aurora2 {
+          0% { transform: translateX(100%) translateY(-30%) rotate(0deg) scale(1.1); }
+          50% { transform: translateX(-50%) translateY(-60%) rotate(-180deg) scale(0.8); }
+          100% { transform: translateX(-100%) translateY(-40%) rotate(-360deg) scale(1.3); }
+        }
+        
+        @keyframes aurora3 {
+          0% { transform: translateX(-50%) translateY(-80%) rotate(90deg) scale(0.7); }
+          50% { transform: translateX(50%) translateY(-20%) rotate(-90deg) scale(1.1); }
+          100% { transform: translateX(-30%) translateY(-60%) rotate(270deg) scale(0.9); }
+        }
+        
+        @keyframes shooting {
+          0% {
+            opacity: 0;
+            transform: translateX(-100px) translateY(100px);
+          }
+          10% {
+            opacity: 1;
+          }
+          90% {
+            opacity: 1;
+          }
+          100% {
+            opacity: 0;
+            transform: translateX(100vw) translateY(-100px);
+          }
+        }
+        
+        .shooting-star {
+          position: absolute;
+          width: 2px;
+          height: 2px;
+          background: linear-gradient(45deg, #fff, #a855f7, #3b82f6);
+          border-radius: 50%;
+          box-shadow: 
+            0 0 6px #fff,
+            0 0 12px #a855f7,
+            0 0 18px #3b82f6;
+        }
+        
+        .shooting-star::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100px;
+          height: 2px;
+          background: linear-gradient(to right, rgba(255,255,255,0.8), transparent);
+          transform: translateX(-100px) rotate(-45deg);
+          border-radius: 2px;
+        }
+        
+        .shooting-star-1 {
+          top: 20%;
+          left: 10%;
+          animation: shooting 3s linear infinite;
+          animation-delay: 0s;
+        }
+        
+        .shooting-star-2 {
+          top: 40%;
+          left: 20%;
+          animation: shooting 4s linear infinite;
+          animation-delay: 1s;
+        }
+        
+        .shooting-star-3 {
+          top: 60%;
+          left: 5%;
+          animation: shooting 5s linear infinite;
+          animation-delay: 2s;
+        }
+        
+        .shooting-star-4 {
+          top: 30%;
+          left: 15%;
+          animation: shooting 3.5s linear infinite;
+          animation-delay: 3s;
+        }
+        
+        .shooting-star-5 {
+          top: 70%;
+          left: 25%;
+          animation: shooting 4.5s linear infinite;
+          animation-delay: 4s;
+        }
+      `}</style>
       <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md p-8">
         <div className="flex items-center justify-between mb-8">
           <button
