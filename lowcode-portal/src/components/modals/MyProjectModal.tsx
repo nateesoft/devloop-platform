@@ -161,7 +161,7 @@ const MyProjectModal: React.FC<MyProjectModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [tagInput, setTagInput] = useState('');
   const [activeTab, setActiveTab] = useState<'basic' | 'design'>('basic');
-  const { showAlert } = useAlert();
+  const { showSuccess, showError } = useAlert();
 
   // Generate slug from name
   const generateSlug = (name: string) => {
@@ -200,7 +200,7 @@ const MyProjectModal: React.FC<MyProjectModalProps> = ({
     e.preventDefault();
     
     if (!formData.name.trim()) {
-      showAlert('Please enter a project name', 'error');
+      showError('กรุณากรอกชื่อโปรเจค', 'Please enter a project name');
       return;
     }
 
@@ -215,7 +215,7 @@ const MyProjectModal: React.FC<MyProjectModalProps> = ({
       
       console.log('Creating project with data:', projectData); // Debug logging
       const project = await myProjectAPI.create(projectData);
-      showAlert('Project created successfully!', 'success');
+      showSuccess('สำเร็จ', 'บันทึกเสร็จสมบูรณ์แล้ว');
       onProjectCreated?.(project);
       onClose();
       
@@ -252,7 +252,7 @@ const MyProjectModal: React.FC<MyProjectModalProps> = ({
       const errorMessage = error.response?.data?.message || 
                           error.message || 
                           'Failed to create project';
-      showAlert(errorMessage, 'error');
+      showError('เกิดข้อผิดพลาด', errorMessage);
     } finally {
       setIsLoading(false);
     }
