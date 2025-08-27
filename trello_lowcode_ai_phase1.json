@@ -1,0 +1,113 @@
+{
+  "name": "Lowcode + AI Hybrid Platform - Phase 1",
+  "defaultLists": false,
+  "lists": [
+    {
+      "name": "Backlog"
+    },
+    {
+      "name": "Todo (Sprint)"
+    },
+    {
+      "name": "In Progress"
+    },
+    {
+      "name": "Review/Testing"
+    },
+    {
+      "name": "Done"
+    }
+  ],
+  "cards": [
+    {
+      "name": "Epic 1: Core Lowcode Designer",
+      "desc": "React Flow + JSONForm + Service Node",
+      "idList": "Backlog"
+    },
+    {
+      "name": "Setup React Flow Canvas",
+      "desc": "- Next.js + React Flow\n- Node types (Page, Service)\n- Save/Load JSON",
+      "idList": "Backlog"
+    },
+    {
+      "name": "Page Node → JSONForm integration",
+      "desc": "- Modal editor\n- JSONForm render\n- Schema mapping",
+      "idList": "Backlog"
+    },
+    {
+      "name": "Service Node → Code editor integration",
+      "desc": "- Modal code editor\n- Monaco/CodeMirror\n- Function + validation",
+      "idList": "Backlog"
+    },
+    {
+      "name": "Epic 2: AI Integration",
+      "desc": "Assist not Replace",
+      "idList": "Backlog"
+    },
+    {
+      "name": "AI for JSONForm",
+      "desc": "- Generate Form from DB schema\n- Explain Form",
+      "idList": "Backlog"
+    },
+    {
+      "name": "AI for Service Node",
+      "desc": "- Generate Function\n- Refactor Function",
+      "idList": "Backlog"
+    },
+    {
+      "name": "AI for Flow Suggestion",
+      "desc": "- Auto-map I/O\n- AI error analysis",
+      "idList": "Backlog"
+    },
+    {
+      "name": "Epic 3: Backend & Infra",
+      "desc": "NestJS + PostgreSQL",
+      "idList": "Backlog"
+    },
+    {
+      "name": "Project Backend Setup",
+      "desc": "- NestJS project\n- Prisma ORM\n- Auth (JWT/Keycloak basic)",
+      "idList": "Backlog"
+    },
+    {
+      "name": "CRUD Generator",
+      "desc": "- POST /generate-crud\n- Input schema → CRUD API\n- Deploy CRUD service",
+      "idList": "Backlog"
+    },
+    {
+      "name": "File & Secret Management",
+      "desc": "- MinIO integration\n- Vault integration",
+      "idList": "Backlog"
+    },
+    {
+      "name": "Epic 4: Preview & Publish",
+      "desc": "Preview + Deploy",
+      "idList": "Backlog"
+    },
+    {
+      "name": "Preview Flow",
+      "desc": "- Render flow\n- Mock API call",
+      "idList": "Backlog"
+    },
+    {
+      "name": "Deploy/Publish Flow",
+      "desc": "- Publish button → build+deploy\n- Export project boilerplate",
+      "idList": "Backlog"
+    },
+    {
+      "name": "Epic 5: UX & Governance",
+      "desc": "Review + Collaboration",
+      "idList": "Backlog"
+    },
+    {
+      "name": "Human Review & Approval",
+      "desc": "- Node status (draft/review/approved)\n- Approval workflow",
+      "idList": "Backlog"
+    },
+    {
+      "name": "Collaboration (Basic)",
+      "desc": "- Share project\n- Log node changes",
+      "idList": "Backlog"
+    }
+  ]
+}

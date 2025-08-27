@@ -13,17 +13,22 @@ import {
   Req,
   ParseUUIDPipe,
 } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { MediaService } from './media.service';
 import { CreateMediaFolderDto } from './dto/create-media-folder.dto';
 import { UpdateMediaFileDto } from './dto/update-media-file.dto';
 
+@ApiTags('Media Management')
 @Controller('media')
 // @UseGuards(JwtAuthGuard) // Temporarily disabled for testing
 export class MediaController {
   constructor(private readonly mediaService: MediaService) {}
 
+  @ApiOperation({ summary: 'Upload multiple files' })
+  @ApiResponse({ status: 201, description: 'Files uploaded successfully' })
+  @ApiConsumes('multipart/form-data')
   @Post('upload')
   @UseInterceptors(FilesInterceptor('files', 10, {
     limits: {
@@ -54,6 +59,8 @@ export class MediaController {
     };
   }
 
+  @ApiOperation({ summary: 'Get files by folder' })
+  @ApiResponse({ status: 200, description: 'Files retrieved successfully' })
   @Get('files')
   async getFiles(
     @Query('folderId') folderId: string,
@@ -68,6 +75,9 @@ export class MediaController {
     };
   }
 
+  @ApiOperation({ summary: 'Get file by ID' })
+  @ApiResponse({ status: 200, description: 'File found' })
+  @ApiResponse({ status: 404, description: 'File not found' })
   @Get('files/:id')
   async getFile(
     @Param('id', ParseUUIDPipe) id: string,
@@ -129,6 +139,8 @@ export class MediaController {
     };
   }
 
+  @ApiOperation({ summary: 'Create new folder' })
+  @ApiResponse({ status: 201, description: 'Folder created successfully' })
   @Post('folders')
   async createFolder(
     @Body() createFolderDto: CreateMediaFolderDto,
@@ -144,6 +156,8 @@ export class MediaController {
     };
   }
 
+  @ApiOperation({ summary: 'Get folders by parent' })
+  @ApiResponse({ status: 200, description: 'Folders retrieved successfully' })
   @Get('folders')
   async getFolders(
     @Query('parentId') parentId: string,
