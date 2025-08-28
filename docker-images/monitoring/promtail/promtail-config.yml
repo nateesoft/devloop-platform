@@ -70,3 +70,23 @@ scrape_configs:
           job: lowcode-portal-service
           service: backend
           __path__: /var/log/lowcode-portal-service/*.log
+
+    pipeline_stages:
+      - json:
+          expressions:
+            timestamp:
+            level:
+            message:
+            context:
+            userId:
+            type:
+            service:
+            stack:
+      - timestamp:
+          source: timestamp
+          format: RFC3339
+      - labels:
+          level:
+          service:
+          context:
+          type:

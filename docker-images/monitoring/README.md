@@ -146,7 +146,7 @@ docker compose ps
 | Service | URL | Credentials |
 |---------|-----|------------|
 | Grafana | http://localhost:3001 | admin / admin123 |
-| Prometheus | http://localhost:9090 | - |
+| Prometheus | http://localhost:9292 | - |
 | Loki | http://localhost:3100 | - |
 | cAdvisor | http://localhost:8080 | - |
 
@@ -238,7 +238,7 @@ cp prometheus/ /backup/prometheus/
 docker compose ps
 
 # Check Prometheus targets
-curl http://localhost:9090/api/v1/targets
+curl http://localhost:9292/api/v1/targets
 
 # Check Grafana API
 curl http://admin:admin123@localhost:3001/api/health
