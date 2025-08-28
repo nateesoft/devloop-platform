@@ -32,7 +32,83 @@ interface LandingPageProps {
   setMobileMenuOpen: (open: boolean) => void;
 }
 
-// Custom Node Component with left/right handles and editable label
+// Stick Figure SVG Component for User nodes
+const StickFigure = ({ color = '#3B82F6', size = 60, strokeWidth = 3 }) => (
+  <svg width={size} height={size * 1.2} viewBox="0 0 60 72" className="mx-auto">
+    {/* Head */}
+    <circle 
+      cx="30" 
+      cy="12" 
+      r="8" 
+      fill="none" 
+      stroke={color} 
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+    />
+    {/* Body */}
+    <line 
+      x1="30" 
+      y1="20" 
+      x2="30" 
+      y2="45" 
+      stroke={color} 
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+    />
+    {/* Arms */}
+    <line 
+      x1="30" 
+      y1="28" 
+      x2="20" 
+      y2="35" 
+      stroke={color} 
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+    />
+    <line 
+      x1="30" 
+      y1="28" 
+      x2="40" 
+      y2="35" 
+      stroke={color} 
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+    />
+    {/* Legs */}
+    <line 
+      x1="30" 
+      y1="45" 
+      x2="20" 
+      y2="60" 
+      stroke={color} 
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+    />
+    <line 
+      x1="30" 
+      y1="45" 
+      x2="40" 
+      y2="60" 
+      stroke={color} 
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+    />
+  </svg>
+);
+
+// Diamond shape for Decision nodes (แบบ flowchart มาตรฐาน)
+const Diamond = ({ color = 'red', size = 80 }) => (
+  <svg width={size} height={size} viewBox="0 0 80 80" className="mx-auto">
+    <path 
+      d="M40 5 L75 40 L40 75 L5 40 Z" 
+      fill={color} 
+      stroke={color} 
+      strokeWidth="2"
+    />
+  </svg>
+);
+
+// Custom Node Component with different shapes based on node type
 const CustomNode = ({ data, id }: NodeProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [label, setLabel] = useState(data.label || '');
@@ -73,48 +149,139 @@ const CustomNode = ({ data, id }: NodeProps) => {
     setLabel(e.target.value);
   };
 
+  // Determine node shape based on data.nodeType
+  const renderNodeContent = () => {
+    const nodeType = data.nodeType || 'default';
+    
+    switch (nodeType) {
+      case 'user':
+        return (
+          <div className="flex flex-col items-center justify-center p-2">
+            <StickFigure 
+              color={data.style?.strokeColor || data.style?.background || '#3B82F6'} 
+              size={50} 
+              strokeWidth={4} 
+            />
+            <div 
+              className="mt-1 text-xs font-bold text-center" 
+              style={{ color: data.style?.color || '#333' }}
+            >
+              {renderLabelContent()}
+            </div>
+          </div>
+        );
+      
+      case 'decision':
+        return (
+          <div className="relative flex items-center justify-center" style={{ width: 100, height: 100 }}>
+            <Diamond color={data.style?.background || 'red'} size={90} />
+            <div 
+              className="absolute inset-0 flex items-center justify-center text-xs font-bold text-center px-2"
+              style={{ color: data.style?.color || 'white' }}
+            >
+              {renderLabelContent()}
+            </div>
+          </div>
+        );
+      
+      default:
+        return (
+          <div className="px-3 py-2 text-center" style={data.style}>
+            {renderLabelContent()}
+          </div>
+        );
+    }
+  };
+
+  const renderLabelContent = () => (
+    <div onDoubleClick={handleDoubleClick} className="min-w-0 relative">
+      {isEditing ? (
+        <input
+          ref={inputRef}
+          type="text"
+          value={label}
+          onChange={handleInputChange}
+          onBlur={finishEditing}
+          onKeyDown={handleKeyDown}
+          className="bg-white/20 border border-white/40 rounded px-1 outline-none text-center w-full text-white placeholder-white/70"
+          style={{ fontSize: 'inherit', fontWeight: 'inherit' }}
+          placeholder="Enter label..."
+        />
+      ) : (
+        <div className="cursor-pointer select-none hover:bg-white/10 rounded px-1 py-0.5 transition-colors" title="Double-click to edit">
+          {data.label}
+        </div>
+      )}
+    </div>
+  );
+
+  // Get container styles based on node type
+  const getContainerStyles = () => {
+    const nodeType = data.nodeType || 'default';
+    
+    switch (nodeType) {
+      case 'user':
+        return {
+          background: 'transparent',
+          border: 'none',
+          borderRadius: 0,
+          padding: '8px',
+        };
+      
+      case 'decision':
+        return {
+          background: 'transparent',
+          border: 'none',
+          borderRadius: 0,
+          padding: 0,
+        };
+      
+      default:
+        return data.style;
+    }
+  };
+
+  // Get handle positions based on node type
+  const getHandleStyles = () => {
+    const nodeType = data.nodeType || 'default';
+    
+    switch (nodeType) {
+      case 'decision':
+        return {
+          left: { left: -8, top: '50%', transform: 'translateY(-50%)', background: '#555' },
+          right: { right: -8, top: '50%', transform: 'translateY(-50%)', background: '#555' }
+        };
+      default:
+        return {
+          left: { left: -8, background: '#555' },
+          right: { right: -8, background: '#555' }
+        };
+    }
+  };
+
+  const handleStyles = getHandleStyles();
+
   return (
     <div 
-      className="relative px-3 py-2 text-center transition-all duration-200 hover:shadow-lg" 
-      style={data.style}
+      className="relative transition-all duration-200 hover:shadow-lg" 
+      style={getContainerStyles()}
     >
       {/* Input handle on left */}
       <Handle
         type="target"
         position={Position.Left}
         id="input"
-        style={{ left: -8, background: '#555' }}
+        style={handleStyles.left}
       />
       
-      <div onDoubleClick={handleDoubleClick} className="min-w-0 relative">
-        {isEditing ? (
-          <input
-            ref={inputRef}
-            type="text"
-            value={label}
-            onChange={handleInputChange}
-            onBlur={finishEditing}
-            onKeyDown={handleKeyDown}
-            className="bg-white/20 border border-white/40 rounded px-1 outline-none text-center w-full text-white placeholder-white/70"
-            style={{ fontSize: 'inherit', fontWeight: 'inherit' }}
-            placeholder="Enter label..."
-          />
-        ) : (
-          <div className="cursor-pointer select-none hover:bg-white/10 rounded px-1 py-0.5 transition-colors" title="Double-click to edit">
-            {data.label}
-            <div className="absolute -top-1 -right-1 w-2 h-2 bg-white/30 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-              <div className="w-1 h-1 bg-white rounded-full m-0.5"></div>
-            </div>
-          </div>
-        )}
-      </div>
+      {renderNodeContent()}
       
       {/* Output handle on right */}
       <Handle
         type="source"
         position={Position.Right}
         id="output"
-        style={{ right: -8, background: '#555' }}
+        style={handleStyles.right}
       />
     </div>
   );
@@ -127,11 +294,13 @@ const initialNodes: Node[] = [
     type: 'customNode',
     position: { x: 50, y: 50 },
     data: { 
-      label: '🏠 Homepage',
+      label: 'User',
+      nodeType: 'user',
       style: {
-        background: '#3B82F6',
-        color: 'white',
-        border: '2px solid #1E40AF',
+        background: 'transparent',
+        strokeColor: '#FFFAFA',
+        color: '#FFFAFA',
+        border: 'none',
         borderRadius: '10px',
         fontSize: '14px',
         fontWeight: 'bold',
@@ -145,7 +314,8 @@ const initialNodes: Node[] = [
     type: 'customNode',
     position: { x: 250, y: 20 },
     data: { 
-      label: '📝 Contact Form',
+      label: 'Page',
+      nodeType: 'page',
       style: {
         background: '#10B981',
         color: 'white',
@@ -163,11 +333,12 @@ const initialNodes: Node[] = [
     type: 'customNode',
     position: { x: 250, y: 100 },
     data: { 
-      label: '🖼️ Gallery',
+      label: 'Decision?',
+      nodeType: 'decision',
       style: {
-        background: '#8B5CF6',
+        background: 'red',
         color: 'white',
-        border: '2px solid #6D28D9',
+        border: '2px solid darkred',
         borderRadius: '10px',
         fontSize: '14px',
         fontWeight: 'bold',
@@ -339,6 +510,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
         position,
         data: { 
           label: nodeData.label,
+          nodeType: nodeData.nodeType || 'default',
           style: nodeData.style 
         },
       };
@@ -580,15 +752,18 @@ const LandingPage: React.FC<LandingPageProps> = ({
               <div className="absolute top-4 left-4 bg-white dark:bg-slate-800 rounded-xl p-4 shadow-lg border border-slate-200 dark:border-slate-700 z-10">
                 <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Components</h4>
                 <div className="space-y-2">
+                  {/* User Nodes */}
                   <div 
                     className="flex items-center space-x-2 p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
                     draggable
                     onDragStart={(event) => onDragStart(event, 'user', {
-                      label: '🏛️ User',
+                      label: 'User',
+                      nodeType: 'user',
                       style: {
-                        background: '#3B82F6',
-                        color: 'white',
-                        border: '2px solid #1E40AF',
+                        background: 'transparent',
+                        strokeColor: '#FFFAFA',
+                        color: '#FFFAFA',
+                        border: 'none',
                         borderRadius: '10px',
                         fontSize: '14px',
                         fontWeight: 'bold',
@@ -600,11 +775,14 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     <div className="w-4 h-4 bg-blue-500 rounded"></div>
                     <span className="text-xs text-slate-600 dark:text-slate-400">User</span>
                   </div>
+                  
+                  {/* Page Node */}
                   <div 
                     className="flex items-center space-x-2 p-2 bg-green-50 dark:bg-green-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
                     draggable
                     onDragStart={(event) => onDragStart(event, 'page', {
-                      label: '📝 Page',
+                      label: 'Page',
+                      nodeType: 'page',
                       style: {
                         background: '#10B981',
                         color: 'white',
@@ -620,15 +798,18 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     <div className="w-4 h-4 bg-green-500 rounded"></div>
                     <span className="text-xs text-slate-600 dark:text-slate-400">Page</span>
                   </div>
+
+                  {/* Decision Node */}
                   <div 
                     className="flex items-center space-x-2 p-2 bg-red-50 dark:bg-red-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
                     draggable
                     onDragStart={(event) => onDragStart(event, 'decision', {
-                      label: '🖼️ Decision',
+                      label: 'Decision?',
+                      nodeType: 'decision',
                       style: {
                         background: 'red',
                         color: 'white',
-                        border: '2px solid red',
+                        border: '2px solid darkred',
                         borderRadius: '10px',
                         fontSize: '14px',
                         fontWeight: 'bold',
@@ -640,11 +821,14 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     <div className="w-4 h-4 bg-red-500 rounded"></div>
                     <span className="text-xs text-slate-600 dark:text-slate-400">Decision</span>
                   </div>
+
+                  {/* Services Node */}
                   <div 
                     className="flex items-center space-x-2 p-2 bg-purple-50 dark:bg-purple-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
                     draggable
                     onDragStart={(event) => onDragStart(event, 'services', {
-                      label: '🖼️ Services',
+                      label: 'Services',
+                      nodeType: 'services',
                       style: {
                         background: '#8B5CF6',
                         color: 'white',
