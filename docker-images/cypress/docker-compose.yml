@@ -1,0 +1,219 @@
+version: '3.8'
+
+networks:
+  lowcode-network:
+    external: true
+
+volumes:
+  cypress_cache:
+  cypress_screenshots:
+  cypress_videos:
+  cypress_downloads:
+
+services:
+  # Cypress E2E Testing Service
+  cypress-e2e:
+    build:
+      context: ../../lowcode-portal
+      dockerfile: ../docker-images/cypress/Dockerfile
+    container_name: lowcode-cypress-e2e
+    working_dir: /app
+    volumes:
+      - ../../lowcode-portal:/app:cached
+      - cypress_cache:/root/.cache/Cypress
+      - cypress_screenshots:/app/cypress/screenshots
+      - cypress_videos:/app/cypress/videos
+      - cypress_downloads:/app/cypress/downloads
+      - /app/node_modules  # Prevent host node_modules from overriding
+    networks:
+      - lowcode-network
+    environment:
+      # Cypress Configuration
+      - CYPRESS_baseUrl=http://lowcode-portal-dev:3000
+      - CYPRESS_apiUrl=http://lowcode-portal-service-dev:8080
+      - CYPRESS_keycloakUrl=http://keycloak:8080
+      
+      # Test Environment
+      - NODE_ENV=test
+      - CI=true
+      - CYPRESS_CACHE_FOLDER=/root/.cache/Cypress
+      
+      # Browser Configuration
+      - DISPLAY=:99
+      - CYPRESS_CRASH_REPORTS=0
+      - CYPRESS_RECORD_KEY=${CYPRESS_RECORD_KEY:-}
+      
+      # Test Data
+      - CYPRESS_testUsername=testuser@lowcode.com
+      - CYPRESS_testPassword=testpassword123
+      - CYPRESS_testProjectName=Cypress Test Project
+      - CYPRESS_testServiceName=Cypress Test Service
+      
+      # Feature Flags
+      - CYPRESS_enableAuth=true
+      - CYPRESS_enablePayments=false
+      - CYPRESS_enableCollaboration=true
+      
+      # Performance
+      - CYPRESS_numTestsKeptInMemory=0
+      - CYPRESS_defaultCommandTimeout=10000
+      - CYPRESS_requestTimeout=10000
+      - CYPRESS_responseTimeout=30000
+      
+    depends_on:
+      - lowcode-portal-dev
+      - lowcode-portal-service-dev
+    command: npx cypress run --headless --browser chrome
+    profiles:
+      - testing
+    healthcheck:
+      test: ["CMD", "npx", "cypress", "verify"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+
+  # Cypress Interactive Mode (for development)
+  cypress-interactive:
+    build:
+      context: ../../lowcode-portal
+      dockerfile: ../docker-images/cypress/Dockerfile
+    container_name: lowcode-cypress-interactive
+    working_dir: /app
+    volumes:
+      - ../../lowcode-portal:/app:cached
+      - cypress_cache:/root/.cache/Cypress
+      - cypress_screenshots:/app/cypress/screenshots
+      - cypress_videos:/app/cypress/videos
+      - cypress_downloads:/app/cypress/downloads
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    networks:
+      - lowcode-network
+    environment:
+      # Same as e2e service but with display for GUI
+      - CYPRESS_baseUrl=http://lowcode-portal-dev:3000
+      - CYPRESS_apiUrl=http://lowcode-portal-service-dev:8080
+      - CYPRESS_keycloakUrl=http://keycloak:8080
+      - NODE_ENV=test
+      - DISPLAY=${DISPLAY:-:0}
+      - CYPRESS_CACHE_FOLDER=/root/.cache/Cypress
+    depends_on:
+      - lowcode-portal-dev
+      - lowcode-portal-service-dev
+    command: tail -f /dev/null  # Keep container running
+    profiles:
+      - cypress-gui
+    ports:
+      - "6007:6007"  # Cypress GUI port
+
+  # Cypress Component Testing
+  cypress-component:
+    build:
+      context: ../../lowcode-portal
+      dockerfile: ../docker-images/cypress/Dockerfile
+    container_name: lowcode-cypress-component
+    working_dir: /app
+    volumes:
+      - ../../lowcode-portal:/app:cached
+      - cypress_cache:/root/.cache/Cypress
+      - cypress_screenshots:/app/cypress/screenshots
+      - cypress_videos:/app/cypress/videos
+      - /app/node_modules
+    networks:
+      - lowcode-network
+    environment:
+      - NODE_ENV=test
+      - CI=true
+      - CYPRESS_CACHE_FOLDER=/root/.cache/Cypress
+      - DISPLAY=:99
+    command: npx cypress run --component
+    profiles:
+      - component-testing
+    healthcheck:
+      test: ["CMD", "npx", "cypress", "verify"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Cypress Dashboard/Reporting Service
+  cypress-dashboard:
+    image: nginx:alpine
+    container_name: lowcode-cypress-dashboard
+    ports:
+      - "8090:80"
+    volumes:
+      - cypress_screenshots:/usr/share/nginx/html/screenshots:ro
+      - cypress_videos:/usr/share/nginx/html/videos:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - lowcode-network
+    profiles:
+      - dashboard
+    depends_on:
+      - cypress-e2e
+
+  # Test Database (for E2E test data)
+  cypress-test-db:
+    image: postgres:15-alpine
+    container_name: lowcode-cypress-test-db
+    environment:
+      POSTGRES_DB: lowcode_test_db
+      POSTGRES_USER: lowcode_test
+      POSTGRES_PASSWORD: lowcode_test_password_2024
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    volumes:
+      - ./init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql:ro
+    networks:
+      - lowcode-network
+    ports:
+      - "5434:5432"
+    profiles:
+      - test-db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lowcode_test -d lowcode_test_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Mock Services for Testing
+  cypress-mock-services:
+    image: wiremock/wiremock:latest
+    container_name: lowcode-cypress-mocks
+    ports:
+      - "8089:8080"
+    volumes:
+      - ./wiremock:/home/wiremock
+    networks:
+      - lowcode-network
+    command: ["--global-response-templating", "--verbose"]
+    profiles:
+      - mocks
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8080/__admin || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+# External services that Cypress tests depend on
+  lowcode-portal-dev:
+    extends:
+      file: ../node/docker-compose.yml
+      service: lowcode-portal-dev
+    profiles:
+      - testing
+      - cypress-gui
+
+  lowcode-portal-service-dev:
+    extends:
+      file: ../node/docker-compose.yml
+      service: lowcode-portal-service-dev
+    profiles:
+      - testing
+      - cypress-gui

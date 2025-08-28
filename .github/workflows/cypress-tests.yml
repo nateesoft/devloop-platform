@@ -1,0 +1,495 @@
+name: Cypress E2E Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'lowcode-portal/**'
+      - 'lowcode-portal-service/**'
+      - '.github/workflows/cypress-tests.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'lowcode-portal/**'
+      - 'lowcode-portal-service/**'
+      - '.github/workflows/cypress-tests.yml'
+  schedule:
+    # Run tests daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Type of tests to run'
+        required: true
+        default: 'e2e'
+        type: choice
+        options:
+          - 'e2e'
+          - 'component'
+          - 'smoke'
+          - 'all'
+      browser:
+        description: 'Browser to run tests on'
+        required: true
+        default: 'chrome'
+        type: choice
+        options:
+          - 'chrome'
+          - 'firefox'
+          - 'edge'
+          - 'electron'
+      record:
+        description: 'Record tests to Cypress Dashboard'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  # Node.js version
+  NODE_VERSION: '20'
+  
+  # Cypress configuration
+  CYPRESS_CACHE_FOLDER: ~/.cache/Cypress
+  CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+  
+  # Application URLs
+  CYPRESS_baseUrl: http://localhost:3000
+  CYPRESS_apiUrl: http://localhost:8080
+  
+  # Test data
+  CYPRESS_testUsername: testuser@lowcode.com
+  CYPRESS_testPassword: ${{ secrets.CYPRESS_TEST_PASSWORD }}
+  
+  # Database
+  DATABASE_URL: postgresql://lowcode:lowcode_password_2024@localhost:5432/lowcode_test_db
+  
+  # Services
+  REDIS_URL: redis://localhost:6379
+
+jobs:
+  # Install and cache dependencies
+  install:
+    runs-on: ubuntu-latest
+    outputs:
+      cypress-cache-key: ${{ steps.cypress-cache.outputs.cache-primary-key }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: |
+            lowcode-portal/package-lock.json
+            lowcode-portal-service/package-lock.json
+
+      - name: Get Cypress cache key
+        id: cypress-cache
+        run: |
+          echo "cache-primary-key=cypress-${{ runner.os }}-${{ hashFiles('lowcode-portal/package-lock.json') }}" >> $GITHUB_OUTPUT
+
+      - name: Cache Cypress binary
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/Cypress
+          key: ${{ steps.cypress-cache.outputs.cache-primary-key }}
+          restore-keys: |
+            cypress-${{ runner.os }}-
+
+      - name: Install frontend dependencies
+        working-directory: lowcode-portal
+        run: npm ci
+
+      - name: Install backend dependencies
+        working-directory: lowcode-portal-service
+        run: npm ci
+
+      - name: Verify Cypress installation
+        working-directory: lowcode-portal
+        run: npx cypress verify
+
+  # Run E2E tests
+  cypress-e2e:
+    needs: install
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name != 'workflow_dispatch' ||
+      inputs.test_type == 'e2e' ||
+      inputs.test_type == 'all'
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: 
+          - ${{ github.event_name == 'workflow_dispatch' && inputs.browser || 'chrome' }}
+        containers: [1, 2, 3, 4]  # Parallel execution
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: lowcode_test_db
+          POSTGRES_USER: lowcode
+          POSTGRES_PASSWORD: lowcode_password_2024
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: |
+            lowcode-portal/package-lock.json
+            lowcode-portal-service/package-lock.json
+
+      - name: Restore Cypress cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/Cypress
+          key: ${{ needs.install.outputs.cypress-cache-key }}
+
+      - name: Install dependencies
+        run: |
+          cd lowcode-portal && npm ci
+          cd ../lowcode-portal-service && npm ci
+
+      - name: Setup test database
+        run: |
+          cd lowcode-portal-service
+          npm run db:migrate:test || true
+          npm run db:seed:test || true
+
+      - name: Start backend service
+        run: |
+          cd lowcode-portal-service
+          npm run start:test &
+          sleep 30
+          curl --retry 10 --retry-delay 5 --retry-connrefused http://localhost:8080/health
+
+      - name: Build frontend
+        working-directory: lowcode-portal
+        run: npm run build
+
+      - name: Start frontend application
+        working-directory: lowcode-portal
+        run: |
+          npm run start &
+          sleep 30
+          curl --retry 10 --retry-delay 5 --retry-connrefused http://localhost:3000
+
+      - name: Run Cypress E2E tests
+        uses: cypress-io/github-action@v6
+        with:
+          working-directory: lowcode-portal
+          install: false
+          wait-on: 'http://localhost:3000, http://localhost:8080/health'
+          wait-on-timeout: 120
+          browser: ${{ matrix.browser }}
+          record: ${{ github.event_name == 'workflow_dispatch' && inputs.record || false }}
+          parallel: true
+          group: 'E2E Tests - ${{ matrix.browser }}'
+          tag: ${{ github.event_name }}
+          spec: |
+            ${{ 
+              github.event_name == 'workflow_dispatch' && inputs.test_type == 'smoke' && 
+              'cypress/e2e/01-basic/**/*.cy.ts' || 
+              'cypress/e2e/**/*.cy.ts' 
+            }}
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload screenshots on failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-screenshots-e2e-${{ matrix.browser }}-${{ matrix.containers }}
+          path: lowcode-portal/cypress/screenshots
+          retention-days: 7
+
+      - name: Upload videos
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cypress-videos-e2e-${{ matrix.browser }}-${{ matrix.containers }}
+          path: lowcode-portal/cypress/videos
+          retention-days: 7
+
+  # Run component tests
+  cypress-component:
+    needs: install
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name != 'workflow_dispatch' ||
+      inputs.test_type == 'component' ||
+      inputs.test_type == 'all'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: lowcode-portal/package-lock.json
+
+      - name: Restore Cypress cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/Cypress
+          key: ${{ needs.install.outputs.cypress-cache-key }}
+
+      - name: Install dependencies
+        working-directory: lowcode-portal
+        run: npm ci
+
+      - name: Run Cypress component tests
+        uses: cypress-io/github-action@v6
+        with:
+          working-directory: lowcode-portal
+          install: false
+          component: true
+          record: ${{ github.event_name == 'workflow_dispatch' && inputs.record || false }}
+          group: 'Component Tests'
+          tag: ${{ github.event_name }}
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload screenshots on failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-screenshots-component
+          path: lowcode-portal/cypress/screenshots
+          retention-days: 7
+
+  # Visual regression testing
+  cypress-visual:
+    needs: install
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'pull_request' ||
+      github.event_name == 'workflow_dispatch'
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: lowcode_test_db
+          POSTGRES_USER: lowcode
+          POSTGRES_PASSWORD: lowcode_password_2024
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: |
+            lowcode-portal/package-lock.json
+            lowcode-portal-service/package-lock.json
+
+      - name: Restore Cypress cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/Cypress
+          key: ${{ needs.install.outputs.cypress-cache-key }}
+
+      - name: Install dependencies
+        run: |
+          cd lowcode-portal && npm ci
+          cd ../lowcode-portal-service && npm ci
+
+      - name: Start services and run visual tests
+        run: |
+          # Start backend
+          cd lowcode-portal-service
+          npm run start:test &
+          sleep 30
+          
+          # Start frontend  
+          cd ../lowcode-portal
+          npm run build && npm run start &
+          sleep 30
+          
+          # Run visual regression tests
+          npx cypress run --spec "cypress/e2e/**/visual-*.cy.ts" --browser chrome
+        env:
+          CYPRESS_baseUrl: http://localhost:3000
+          CYPRESS_apiUrl: http://localhost:8080
+
+      - name: Upload visual diff artifacts
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: visual-regression-diffs
+          path: lowcode-portal/cypress/screenshots
+          retention-days: 30
+
+  # Performance testing
+  cypress-performance:
+    needs: install
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: lowcode_test_db
+          POSTGRES_USER: lowcode  
+          POSTGRES_PASSWORD: lowcode_password_2024
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: |
+            lowcode-portal/package-lock.json
+            lowcode-portal-service/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd lowcode-portal && npm ci
+          cd ../lowcode-portal-service && npm ci
+
+      - name: Run performance tests
+        run: |
+          # Start services
+          cd lowcode-portal-service && npm run start:test &
+          cd ../lowcode-portal && npm run build && npm run start &
+          sleep 60
+          
+          # Run performance-focused tests
+          npx cypress run --spec "cypress/e2e/**/performance-*.cy.ts" --browser chrome
+          
+        env:
+          CYPRESS_baseUrl: http://localhost:3000
+          CYPRESS_apiUrl: http://localhost:8080
+
+      - name: Upload performance reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-reports
+          path: lowcode-portal/cypress/reports
+          retention-days: 30
+
+  # Test result summary
+  test-summary:
+    needs: [cypress-e2e, cypress-component]
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Download test artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: cypress-*
+          merge-multiple: true
+
+      - name: Generate test summary
+        run: |
+          echo "## 🧪 Cypress Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ needs.cypress-e2e.result }}" == "success" ]; then
+            echo "✅ **E2E Tests**: PASSED" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **E2E Tests**: FAILED" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ "${{ needs.cypress-component.result }}" == "success" ]; then
+            echo "✅ **Component Tests**: PASSED" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Component Tests**: FAILED" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📊 Artifacts Generated:" >> $GITHUB_STEP_SUMMARY
+          echo "- Screenshots (on failure)" >> $GITHUB_STEP_SUMMARY
+          echo "- Test videos" >> $GITHUB_STEP_SUMMARY
+          echo "- Test reports" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "$CYPRESS_RECORD_KEY" != "" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### 🎯 Cypress Dashboard" >> $GITHUB_STEP_SUMMARY
+            echo "View detailed results at: [Cypress Dashboard](https://dashboard.cypress.io)" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const e2eResult = '${{ needs.cypress-e2e.result }}';
+            const componentResult = '${{ needs.cypress-component.result }}';
+            
+            const e2eStatus = e2eResult === 'success' ? '✅ PASSED' : '❌ FAILED';
+            const componentStatus = componentResult === 'success' ? '✅ PASSED' : '❌ FAILED';
+            
+            const body = `## 🧪 Cypress Test Results
+            
+            | Test Type | Status |
+            |-----------|--------|
+            | E2E Tests | ${e2eStatus} |
+            | Component Tests | ${componentStatus} |
+            
+            ${e2eResult !== 'success' || componentResult !== 'success' ? 
+              '⚠️ Some tests failed. Check the workflow logs for details.' : 
+              '🎉 All tests passed successfully!'
+            }
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });

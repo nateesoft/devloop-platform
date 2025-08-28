@@ -1,0 +1,78 @@
+{
+  "user": {
+    "id": 1,
+    "email": "testuser@lowcode.com",
+    "name": "Test User",
+    "role": "developer",
+    "permissions": ["read", "write", "admin"],
+    "avatar": "/images/avatar-default.png",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+  
+  "projects": [
+    {
+      "id": 1,
+      "name": "Sample Project 1",
+      "description": "A sample project for testing",
+      "status": "active",
+      "type": "web_app",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": 2,
+      "name": "Sample Project 2",
+      "description": "Another sample project",
+      "status": "draft",
+      "type": "mobile_app",
+      "createdAt": "2024-01-02T00:00:00Z",
+      "updatedAt": "2024-01-02T00:00:00Z"
+    }
+  ],
+  
+  "services": [
+    {
+      "id": 1,
+      "name": "User Service",
+      "description": "Handles user management",
+      "type": "rest_api",
+      "status": "active",
+      "endpoint": "https://api.example.com/users"
+    },
+    {
+      "id": 2,
+      "name": "Payment Service",
+      "description": "Handles payment processing",
+      "type": "graphql",
+      "status": "active", 
+      "endpoint": "https://api.example.com/graphql"
+    }
+  ],
+  
+  "dashboardStats": {
+    "totalProjects": 12,
+    "activeProjects": 8,
+    "totalServices": 24,
+    "activeServices": 18,
+    "totalUsers": 156,
+    "activeUsers": 89
+  },
+  
+  "components": [
+    {
+      "id": 1,
+      "name": "Header Component",
+      "type": "layout",
+      "status": "published",
+      "version": "1.0.0"
+    },
+    {
+      "id": 2,
+      "name": "Button Component",
+      "type": "ui",
+      "status": "draft",
+      "version": "0.1.0"
+    }
+  ]
+}
