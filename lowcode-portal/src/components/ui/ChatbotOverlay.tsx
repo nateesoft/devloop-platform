@@ -98,7 +98,7 @@ const ChatbotOverlay: React.FC<ChatbotOverlayProps> = ({ isOpen, onToggle }) => 
     return (
       <button
         onClick={onToggle}
-        className="fixed bottom-6 right-6 z-50 bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
+        className="fixed right-6 top-1/2 -translate-y-1/2 z-50 bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
       >
         <MessageCircle className="h-6 w-6" />
       </button>
@@ -106,7 +106,7 @@ const ChatbotOverlay: React.FC<ChatbotOverlayProps> = ({ isOpen, onToggle }) => 
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 w-80 h-96 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 flex flex-col">
+    <div className="fixed right-6 top-1/2 -translate-y-1/2 z-50 w-80 h-96 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-t-2xl">
         <div className="flex items-center space-x-2">
