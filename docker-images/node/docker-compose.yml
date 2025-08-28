@@ -113,9 +113,15 @@ services:
       - VAULT_ENABLED=true
       - VAULT_ENDPOINT=http://vault:8200
       - VAULT_TOKEN=root
+      # SonarQube configuration
+      - SONAR_HOST_URL=http://lowcode-sonarqube:9000
+      - SONAR_LOGIN=admin
+      - SONAR_PASSWORD=admin
     command: npm run start:debug
     depends_on:
       - lowcode-postgres
+    external_links:
+      - lowcode-sonarqube:lowcode-sonarqube
     profiles:
       - backend-dev
     healthcheck:
