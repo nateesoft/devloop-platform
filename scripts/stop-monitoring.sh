@@ -21,22 +21,22 @@ print_warning() {
 print_status "Stopping TON Lowcode Platform with Monitoring..."
 
 # Stop and remove containers
-if docker-compose -f docker-compose.monitoring.yml down; then
+if docker compose -f docker-compose.monitoring.yml down; then
     print_status "All services stopped successfully!"
     
     # Optional: Remove volumes (uncomment if you want to clean everything)
     # print_warning "Removing all data volumes..."
-    # docker-compose -f docker-compose.monitoring.yml down -v
+    # docker compose -f docker-compose.monitoring.yml down -v
     
     print_status "=== Cleanup completed ==="
     echo -e "${YELLOW}To remove all data volumes, run:${NC}"
-    echo -e "${RED}docker-compose -f docker-compose.monitoring.yml down -v${NC}"
+    echo -e "${RED}docker compose -f docker-compose.monitoring.yml down -v${NC}"
     
     echo -e "${YELLOW}To remove unused Docker resources, run:${NC}"
     echo -e "${RED}docker system prune${NC}"
     
 else
     print_error "Failed to stop services. Check if they are running:"
-    echo -e "${RED}docker-compose -f docker-compose.monitoring.yml ps${NC}"
+    echo -e "${RED}docker compose -f docker-compose.monitoring.yml ps${NC}"
     exit 1
 fi

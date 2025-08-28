@@ -172,7 +172,7 @@ if [ "$choice" != "1" ]; then
             
             print_status "Starting backend development server..."
             $COMPOSE_CMD --profile backend-dev up -d lowcode-portal-service-dev
-            wait_for_service "Backend Dev Server" "curl -f http://localhost:8080/health" 120
+            wait_for_service "Backend Dev Server" "curl -f http://localhost:8888/health" 120
             
             print_status "Starting frontend development server..."
             $COMPOSE_CMD --profile frontend-dev up -d lowcode-portal-dev
@@ -215,7 +215,7 @@ DATABASE_SCHEMA=public
 
 # Application Configuration
 NODE_ENV=development
-PORT=8080
+PORT=8888
 JWT_SECRET=your_jwt_secret_key_here
 
 # Redis Configuration
@@ -239,7 +239,7 @@ VAULT_TOKEN=root
 VAULT_MOUNT=secret
 
 # Keycloak Configuration
-KEYCLOAK_URL=http://localhost:8080
+KEYCLOAK_URL=http://localhost:8888
 KEYCLOAK_REALM=lowcode
 KEYCLOAK_CLIENT_ID=lowcode-client
 EOF
@@ -253,7 +253,7 @@ if [ ! -f "../../lowcode-portal/.env.local" ]; then
     print_status "Creating frontend .env.local file..."
     cat > ../../lowcode-portal/.env.local << EOF
 # API Configuration
-NEXT_PUBLIC_API_URL=http://localhost:8080
+NEXT_PUBLIC_API_URL=http://localhost:8888
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 # Feature Flags
@@ -261,7 +261,7 @@ NEXT_PUBLIC_ENABLE_ANALYTICS=true
 NEXT_PUBLIC_ENABLE_REALTIME=true
 
 # Keycloak Configuration
-NEXT_PUBLIC_KEYCLOAK_URL=http://localhost:8080
+NEXT_PUBLIC_KEYCLOAK_URL=http://localhost:8888
 NEXT_PUBLIC_KEYCLOAK_REALM=lowcode
 NEXT_PUBLIC_KEYCLOAK_CLIENT_ID=lowcode-client
 
@@ -407,7 +407,7 @@ echo "  PgAdmin:       http://localhost:5050 (if started)"
 
 case $choice in
     2)
-        echo "  Backend Dev:   http://localhost:8080"
+        echo "  Backend Dev:   http://localhost:8888"
         echo "  Frontend Dev:  http://localhost:3000"
         echo "  Backend Debug: localhost:9229 (Node.js debugger)"
         ;;

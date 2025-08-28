@@ -67,7 +67,7 @@ Cypress.on('fail', (error, runnable) => {
       
       Please ensure that:
       1. The frontend server is running on http://localhost:3000
-      2. The backend server is running on http://localhost:8080
+      2. The backend server is running on http://localhost:8888
       3. All required services are up and running
       
       Original error: ${error.message}

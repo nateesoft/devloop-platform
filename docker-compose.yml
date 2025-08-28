@@ -26,7 +26,7 @@ services:
     container_name: lowcode-postgres
     restart: unless-stopped
     ports:
-      - "5432:5432"
+      - "5434:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./docker-images/node/postgres/init-scripts:/docker-entrypoint-initdb.d:ro
@@ -154,8 +154,8 @@ services:
   # Backend Development Server with SonarQube Integration
   lowcode-portal-service-dev:
     build:
-      context: ./docker-images/node
-      dockerfile: Dockerfile.backend
+      context: .
+      dockerfile: ./docker-images/node/Dockerfile.backend
       target: development
     container_name: lowcode-portal-service-dev
     working_dir: /app
@@ -165,13 +165,13 @@ services:
       - npm_cache:/home/node/.npm
       - /app/node_modules
     ports:
-      - "8080:8080"
+      - "8888:8080"
       - "9229:9229"
     networks:
       - lowcode-network
     environment:
       - NODE_ENV=development
-      - PORT=8080
+      - PORT=8888
       - DATABASE_HOST=lowcode-postgres
       - DATABASE_PORT=5432
       - DATABASE_USERNAME=lowcode
@@ -192,7 +192,7 @@ services:
       - lowcode-redis
       - lowcode-sonarqube
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8888/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -201,8 +201,8 @@ services:
   # Frontend Development Server
   lowcode-portal-dev:
     build:
-      context: ./docker-images/node
-      dockerfile: Dockerfile.frontend
+      context: .
+      dockerfile: ./docker-images/node/Dockerfile.frontend
       target: development
     container_name: lowcode-portal-dev
     working_dir: /app

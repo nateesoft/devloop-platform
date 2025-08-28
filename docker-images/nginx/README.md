@@ -15,7 +15,7 @@ NGINX reverse proxy สำหรับ TON Lowcode Platform ที่ให้�
 ```
 Internet → NGINX (Port 80/443) → {
     /          → Frontend (Next.js :3000)
-    /api/      → Backend (NestJS :8080)
+    /api/      → Backend (NestJS :8888)
     /auth/     → Backend Auth Routes
     /health    → Health Checks
     /metrics   → Prometheus Metrics
@@ -206,9 +206,9 @@ docker exec lowcode-nginx netstat -an | grep :80
 ### Load Balancing (Multiple Backends)
 ```nginx
 upstream lowcode_backend {
-    server lowcode-portal-service-1:8080 weight=3;
-    server lowcode-portal-service-2:8080 weight=2;
-    server lowcode-portal-service-3:8080 backup;
+    server lowcode-portal-service-1:8888 weight=3;
+    server lowcode-portal-service-2:8888 weight=2;
+    server lowcode-portal-service-3:8888 backup;
     
     keepalive 32;
     keepalive_requests 100;
@@ -261,7 +261,7 @@ docker network inspect lowcode-network
 docker exec lowcode-nginx nginx -T | grep upstream
 
 # ตรวจสอบ backend health
-curl http://lowcode-portal-service:8080/health
+curl http://lowcode-portal-service:8888/health
 ```
 
 #### SSL Certificate Issues

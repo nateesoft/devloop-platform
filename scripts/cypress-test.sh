@@ -148,7 +148,7 @@ if [ "$USE_DOCKER" = "true" ]; then
     
     # Start required services
     print_status "Starting required services..."
-    docker compose up -d lowcode-postgres lowcode-redis lowcode-sonarqube
+    docker-compose up -d lowcode-postgres lowcode-redis lowcode-sonarqube
     
     # Wait for services to be ready
     check_service "PostgreSQL" "localhost:5432" 60
@@ -156,10 +156,10 @@ if [ "$USE_DOCKER" = "true" ]; then
     
     # Start application services
     print_status "Starting application services..."
-    docker compose up -d lowcode-portal-service-dev lowcode-portal-dev
+    docker-compose up -d lowcode-portal-service-dev lowcode-portal-dev
     
     # Wait for applications to be ready
-    check_service "Backend Service" "http://localhost:8080/health" 120
+    check_service "Backend Service" "http://localhost:8888/health" 120
     check_service "Frontend Application" "http://localhost:3000" 120
     
     # Run Cypress tests in Docker
@@ -167,14 +167,14 @@ if [ "$USE_DOCKER" = "true" ]; then
     
     case $TEST_TYPE in
         "e2e")
-            docker compose --profile testing up --exit-code-from cypress-e2e cypress-e2e
+            docker-compose --profile testing up --exit-code-from cypress-e2e cypress-e2e
             ;;
         "component")
-            docker compose --profile component-testing up --exit-code-from cypress-component cypress-component
+            docker-compose --profile component-testing up --exit-code-from cypress-component cypress-component
             ;;
         "all")
-            docker compose --profile testing up --exit-code-from cypress-e2e cypress-e2e
-            docker compose --profile component-testing up --exit-code-from cypress-component cypress-component
+            docker-compose --profile testing up --exit-code-from cypress-e2e cypress-e2e
+            docker-compose --profile component-testing up --exit-code-from cypress-component cypress-component
             ;;
         *)
             print_error "Unknown test type: $TEST_TYPE"
@@ -196,7 +196,7 @@ else
     
     # Start backend service (assume it's running or start it)
     print_status "Checking backend service..."
-    if ! check_service "Backend Service" "http://localhost:8080/health" 5; then
+    if ! check_service "Backend Service" "http://localhost:8888/health" 5; then
         print_warning "Backend service not running. Please start it manually."
         print_status "You can start it with: cd lowcode-portal-service && npm run start:dev"
         exit 1

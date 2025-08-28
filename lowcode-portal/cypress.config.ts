@@ -45,7 +45,7 @@ export default defineConfig({
     // Environment variables
     env: {
       // Backend API URL
-      apiUrl: 'http://localhost:8080',
+      apiUrl: 'http://localhost:8888',
       
       // Test user credentials
       testUsername: 'testuser@lowcode.com',

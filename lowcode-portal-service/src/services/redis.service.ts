@@ -20,14 +20,21 @@ export class RedisService implements OnModuleDestroy {
   private readonly TOKEN_BLACKLIST_PREFIX = 'blacklist:';
 
   constructor() {
-    this.client = createClient({
+    const redisPassword = process.env.REDIS_PASSWORD;
+    const clientConfig: any = {
       socket: {
         host: process.env.REDIS_HOST || 'localhost',
         port: parseInt(process.env.REDIS_PORT || '6379'),
       },
-      password: process.env.REDIS_PASSWORD || 'lowcode_redis_2024',
       database: parseInt(process.env.REDIS_DATABASE || '0'),
-    });
+    };
+
+    // Only add password if it's not empty
+    if (redisPassword && redisPassword.trim() !== '') {
+      clientConfig.password = redisPassword;
+    }
+
+    this.client = createClient(clientConfig);
 
     this.client.on('error', (err) => {
       console.error('Redis Client Error:', err);

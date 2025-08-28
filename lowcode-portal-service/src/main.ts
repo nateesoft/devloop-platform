@@ -1,3 +1,4 @@
+import './polyfill';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -40,6 +41,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api-docs', app, document);
   
-  await app.listen(process.env.PORT ?? 8080);
+  await app.listen(process.env.PORT ?? 8888);
 }
 bootstrap();

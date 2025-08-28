@@ -85,13 +85,13 @@ services:
       - npm_cache:/home/node/.npm
       - /app/node_modules  # Prevent host node_modules from overriding
     ports:
-      - "8080:8080"
+      - "8888:8080"
       - "9229:9229"  # Debug port
     networks:
       - lowcode-network
     environment:
       - NODE_ENV=development
-      - PORT=8080
+      - PORT=8888
       - DATABASE_HOST=lowcode-postgres
       - DATABASE_PORT=5432
       - DATABASE_USERNAME=lowcode
@@ -125,7 +125,7 @@ services:
     profiles:
       - backend-dev
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8888/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -174,7 +174,7 @@ services:
       - lowcode-network
     environment:
       - NODE_ENV=production
-      - PORT=8080
+      - PORT=8888
       - DATABASE_HOST=lowcode-postgres
       - DATABASE_PORT=5432
       - DATABASE_USERNAME=lowcode
@@ -186,7 +186,7 @@ services:
     profiles:
       - backend-prod
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8888/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3

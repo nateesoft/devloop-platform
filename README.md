@@ -105,7 +105,7 @@ TON Lowcode Platform เป็นแพลตฟอร์มสำหรับ�
 ## 🐳 Docker Infrastructure
 
 ### Keycloak (Authentication)
-- **Port**: 8080
+- **Port**: 8888
 - **Purpose**: Identity & Access Management
 - **Features**: SSO, User Management, Role-based Access
 
@@ -160,7 +160,7 @@ npm run dev
 
 ### 4. เข้าถึงระบบ
 - **Frontend**: http://localhost:3000
-- **Keycloak**: http://localhost:8080
+- **Keycloak**: http://localhost:8888
 - **MinIO Console**: http://localhost:9090
 - **Vault UI**: http://localhost:8200/ui
 
@@ -191,7 +191,7 @@ VAULT_TOKEN=s.xxxxxxxxx
 VAULT_MOUNT=secret
 
 # Keycloak
-KEYCLOAK_URL=http://localhost:8080
+KEYCLOAK_URL=http://localhost:8888
 KEYCLOAK_REALM=lowcode
 KEYCLOAK_CLIENT_ID=lowcode-client
 ```

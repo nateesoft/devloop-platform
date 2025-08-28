@@ -1,6 +1,6 @@
 import { Injectable, LoggerService } from '@nestjs/common';
 import { createLogger, transports, format, Logger } from 'winston';
-import LokiTransport from 'winston-loki';
+const LokiTransport = require('winston-loki');
 
 @Injectable()
 export class CustomLoggerService implements LoggerService {

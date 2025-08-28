@@ -30,8 +30,8 @@ services:
     environment:
       # Cypress Configuration
       - CYPRESS_baseUrl=http://lowcode-portal-dev:3000
-      - CYPRESS_apiUrl=http://lowcode-portal-service-dev:8080
-      - CYPRESS_keycloakUrl=http://keycloak:8080
+      - CYPRESS_apiUrl=http://lowcode-portal-service-dev:8888
+      - CYPRESS_keycloakUrl=http://keycloak:8888
       
       # Test Environment
       - NODE_ENV=test
@@ -99,8 +99,8 @@ services:
     environment:
       # Same as e2e service but with display for GUI
       - CYPRESS_baseUrl=http://lowcode-portal-dev:3000
-      - CYPRESS_apiUrl=http://lowcode-portal-service-dev:8080
-      - CYPRESS_keycloakUrl=http://keycloak:8080
+      - CYPRESS_apiUrl=http://lowcode-portal-service-dev:8888
+      - CYPRESS_keycloakUrl=http://keycloak:8888
       - NODE_ENV=test
       - DISPLAY=${DISPLAY:-:0}
       - CYPRESS_CACHE_FOLDER=/root/.cache/Cypress

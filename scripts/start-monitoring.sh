@@ -31,8 +31,8 @@ if ! docker info > /dev/null 2>&1; then
 fi
 
 # Check if Docker Compose is installed
-if ! command -v docker-compose &> /dev/null; then
-    print_error "Docker Compose is not installed. Please install it first."
+if ! docker compose version &> /dev/null; then
+    print_error "Docker Compose is not available. Please make sure Docker is up to date."
     exit 1
 fi
 
@@ -51,19 +51,19 @@ chmod 755 lowcode-portal-service/logs
 print_status "Building and starting services..."
 
 # Start the stack
-if docker-compose -f docker-compose.monitoring.yml up -d; then
+if docker compose -f docker-compose.monitoring.yml up -d; then
     print_status "Services started successfully!"
     
     print_info "Waiting for services to be healthy..."
     sleep 30
     
     print_status "=== Service Status ==="
-    docker-compose -f docker-compose.monitoring.yml ps
+    docker compose -f docker-compose.monitoring.yml ps
     
     print_status "=== Access URLs ==="
-    echo -e "${BLUE}Backend Service:${NC} http://localhost:8080"
-    echo -e "${BLUE}API Documentation:${NC} http://localhost:8080/api-docs"
-    echo -e "${BLUE}Metrics Endpoint:${NC} http://localhost:8080/metrics"
+    echo -e "${BLUE}Backend Service:${NC} http://localhost:8888"
+    echo -e "${BLUE}API Documentation:${NC} http://localhost:8888/api-docs"
+    echo -e "${BLUE}Metrics Endpoint:${NC} http://localhost:8888/metrics"
     echo -e "${BLUE}Grafana Dashboard:${NC} http://localhost:3001 (admin/admin123)"
     echo -e "${BLUE}Prometheus:${NC} http://localhost:9292"
     echo -e "${BLUE}Loki:${NC} http://localhost:3100"
@@ -75,17 +75,17 @@ if docker-compose -f docker-compose.monitoring.yml up -d; then
     echo -e "${BLUE}Detailed Metrics:${NC} http://localhost:3001/d/lowcode-platform-detailed"
     
     print_status "=== Useful Commands ==="
-    echo -e "${YELLOW}View logs:${NC} docker-compose -f docker-compose.monitoring.yml logs -f [service-name]"
-    echo -e "${YELLOW}Stop services:${NC} docker-compose -f docker-compose.monitoring.yml down"
-    echo -e "${YELLOW}Restart service:${NC} docker-compose -f docker-compose.monitoring.yml restart [service-name]"
-    echo -e "${YELLOW}View service status:${NC} docker-compose -f docker-compose.monitoring.yml ps"
+    echo -e "${YELLOW}View logs:${NC} docker compose -f docker-compose.monitoring.yml logs -f [service-name]"
+    echo -e "${YELLOW}Stop services:${NC} docker compose -f docker-compose.monitoring.yml down"
+    echo -e "${YELLOW}Restart service:${NC} docker compose -f docker-compose.monitoring.yml restart [service-name]"
+    echo -e "${YELLOW}View service status:${NC} docker compose -f docker-compose.monitoring.yml ps"
     
     print_warning "Note: If this is the first run, it may take a few minutes for all metrics to appear in Grafana."
     print_info "You can monitor the startup process by running:"
-    echo -e "${BLUE}docker-compose -f docker-compose.monitoring.yml logs -f${NC}"
+    echo -e "${BLUE}docker compose -f docker-compose.monitoring.yml logs -f${NC}"
     
 else
     print_error "Failed to start services. Check the logs for more details:"
-    echo -e "${RED}docker-compose -f docker-compose.monitoring.yml logs${NC}"
+    echo -e "${RED}docker compose -f docker-compose.monitoring.yml logs${NC}"
     exit 1
 fi

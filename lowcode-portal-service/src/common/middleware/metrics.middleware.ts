@@ -12,13 +12,14 @@ export class MetricsMiddleware implements NestMiddleware {
     // Track request start
     const originalSend = res.send;
     
+    const metricsService = this.metricsService;
     res.send = function(body) {
       const duration = Date.now() - start;
       const route = req.route?.path || req.path;
       
       // Record HTTP metrics
-      if (this.metricsService) {
-        this.metricsService.recordHttpRequest(
+      if (metricsService) {
+        metricsService.recordHttpRequest(
           req.method,
           route,
           res.statusCode,
@@ -27,7 +28,7 @@ export class MetricsMiddleware implements NestMiddleware {
       }
       
       return originalSend.call(this, body);
-    }.bind({ metricsService: this.metricsService });
+    };
     
     next();
   }

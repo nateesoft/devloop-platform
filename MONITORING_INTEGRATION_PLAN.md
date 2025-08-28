@@ -11,7 +11,7 @@
 ### 🏗️ Service Architecture
 - **Framework**: NestJS 11.0.1 with TypeScript
 - **Database**: PostgreSQL with TypeORM
-- **Port**: 8080 (configurable via PORT env)
+- **Port**: 8888 (configurable via PORT env)
 - **Modules**: 11 core modules (Auth, Users, Flows, Pages, etc.)
 - **External Services**: Keycloak, MinIO, Vault
 

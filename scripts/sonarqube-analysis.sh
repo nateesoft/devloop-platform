@@ -42,7 +42,7 @@ if ! curl -s ${SONAR_HOST_URL}/api/system/status | grep -q "UP"; then
     print_error "SonarQube server is not running on ${SONAR_HOST_URL}"
     print_status "Starting SonarQube services..."
     cd "$(dirname "$0")/.."
-    docker compose up -d lowcode-sonarqube
+    docker-compose up -d lowcode-sonarqube
     
     print_status "Waiting for SonarQube to be ready (this may take 2-3 minutes)..."
     timeout=180

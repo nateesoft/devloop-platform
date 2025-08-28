@@ -39,18 +39,18 @@
     "reactflow": "^11.11.4"
   },
   "devDependencies": {
+    "@cypress/webpack-preprocessor": "^6.0.2",
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "cypress": "^13.17.0",
-    "@cypress/webpack-preprocessor": "^6.0.2",
-    "cypress-real-events": "^1.12.0",
     "cypress-axe": "^1.5.0",
-    "start-server-and-test": "^2.0.4",
+    "cypress-real-events": "^1.12.0",
     "eslint": "^9",
     "eslint-config-next": "15.4.6",
+    "start-server-and-test": "^2.0.13",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

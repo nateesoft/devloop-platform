@@ -378,7 +378,7 @@ curl -X POST "http://localhost:9000/api/permissions/add_user" \
 # Configure webhook for CI/CD
 curl -X POST "http://localhost:9000/api/webhooks/create" \
   -u admin:admin \
-  -d "name=Jenkins&url=http://jenkins:8080/sonarqube-webhook/"
+  -d "name=Jenkins&url=http://jenkins:8888/sonarqube-webhook/"
 ```
 
 ## 📊 Custom Dashboards & Reporting

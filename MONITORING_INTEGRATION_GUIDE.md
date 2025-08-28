@@ -43,13 +43,13 @@
 
 ```bash
 # 1. Build และ start services
-docker-compose -f docker-compose.monitoring.yml up -d
+docker compose -f docker-compose.monitoring.yml up -d
 
 # 2. ตรวจสอบสถานะ services
-docker-compose -f docker-compose.monitoring.yml ps
+docker compose -f docker-compose.monitoring.yml ps
 
 # 3. ดู logs
-docker-compose -f docker-compose.monitoring.yml logs -f [service-name]
+docker compose -f docker-compose.monitoring.yml logs -f [service-name]
 ```
 
 ## 📈 Metrics ที่ถูก Track
@@ -269,7 +269,7 @@ schema_config:
 
 | Service | Port | Description |
 |---------|------|-------------|
-| Backend Service | 8080 | API และ Swagger |
+| Backend Service | 8888 | API และ Swagger |
 | Grafana | 3001 | Dashboard |
 | Prometheus | 9292 | Metrics query |
 | Loki | 3100 | Log query |
@@ -312,22 +312,22 @@ table_manager:
 #### 1. Grafana Permission Denied
 ```bash
 sudo chown -R 472:472 docker-images/monitoring/grafana/
-docker-compose restart grafana
+docker compose restart grafana
 ```
 
 #### 2. Backend Service Can't Connect to Loki
 ```bash
 # ตรวจสอบ network connectivity
-docker-compose exec lowcode-portal-service ping loki
+docker compose exec lowcode-portal-service ping loki
 
 # ตรวจสอบ Loki logs
-docker-compose logs loki
+docker compose logs loki
 ```
 
 #### 3. Prometheus Can't Scrape Metrics
 ```bash
 # ตรวจสอบ metrics endpoint
-curl http://localhost:8080/metrics
+curl http://localhost:8888/metrics
 
 # ตรวจสอบ Prometheus targets
 curl http://localhost:9292/api/v1/targets
@@ -336,20 +336,20 @@ curl http://localhost:9292/api/v1/targets
 #### 4. No Logs in Loki
 ```bash
 # ตรวจสอบ Promtail configuration
-docker-compose exec promtail promtail -config.file=/etc/promtail/config.yml -dry-run
+docker compose exec promtail promtail -config.file=/etc/promtail/config.yml -dry-run
 
 # ตรวจสอบ log files
-docker-compose exec lowcode-portal-service ls -la logs/
+docker compose exec lowcode-portal-service ls -la logs/
 ```
 
 ### Health Checks
 
 ```bash
 # ตรวจสอบสถานะ services
-docker-compose ps
+docker compose ps
 
 # ตรวจสอบ health endpoints
-curl http://localhost:8080/api-docs  # Backend health
+curl http://localhost:8888/api-docs  # Backend health
 curl http://localhost:3001/api/health  # Grafana health
 curl http://localhost:9292/-/healthy  # Prometheus health
 curl http://localhost:3100/ready  # Loki health
@@ -388,7 +388,7 @@ curl http://localhost:3100/ready  # Loki health
 
 หากพบปัญหาในการใช้งาน monitoring system สามารถ:
 
-1. ตรวจสอบ logs: `docker-compose logs [service-name]`
+1. ตรวจสอบ logs: `docker compose logs [service-name]`
 2. ดู dashboard status ใน Grafana
 3. ตรวจสอบ Prometheus targets
 4. ใช้ Loki queries เพื่อ debug logs

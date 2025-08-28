@@ -6,6 +6,7 @@ import { MetricsService } from './metrics.service';
 @Module({
   imports: [
     PrometheusModule.register({
+      path: '/prometheus', // Use different path to avoid conflict
       defaultMetrics: {
         enabled: true,
         config: {
