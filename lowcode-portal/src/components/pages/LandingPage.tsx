@@ -8,6 +8,7 @@ import CurrencySwitcher from '@/components/ui/CurrencySwitcher';
 import ScrollToTopButton from '@/components/ui/ScrollToTopButton';
 import AnimatedBackground from '@/components/ui/AnimatedBackground';
 import VideoModal from '@/components/VideoModal';
+import InteractiveBook from '@/components/ui/InteractiveBook';
 import { useTranslation } from 'react-i18next';
 import { useScrollToSection } from '@/hooks/useScrollToSection';
 
@@ -146,6 +147,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-slate-900 dark:text-white mb-6">
             Build Apps <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">10x Faster</span>
+            <InteractiveBook className="inline-block ml-4 -mt-2 align-middle" />
           </h1>
           <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-300 mb-8 max-w-3xl mx-auto px-4">
             The AI-powered low-code platform that transforms your ideas into production-ready applications with visual workflows and intelligent automation.
