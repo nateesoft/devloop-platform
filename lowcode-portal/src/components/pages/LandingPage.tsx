@@ -11,7 +11,9 @@ import AnimatedBackground from '@/components/ui/AnimatedBackground';
 import VideoModal from '@/components/VideoModal';
 import InteractiveBook from '@/components/ui/InteractiveBook';
 import { useScrollToSection } from '@/hooks/useScrollToSection';
+
 import WorkflowWebBuilder from '@/components/wow-section/WorkflowWebBuilder';
+import WorkflowServiceBuilder from '@/components/wow-section/WorkflowServiceBuilder';
 
 interface LandingPageProps {
   mobileMenuOpen: boolean;
@@ -231,6 +233,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
       {/* Wow Section - Sandbox */}
       <WorkflowWebBuilder />
+      <WorkflowServiceBuilder />
 
       {/* Features Section */}
       <section id="features" className="py-20 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm">

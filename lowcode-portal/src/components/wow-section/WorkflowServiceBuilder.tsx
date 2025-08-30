@@ -1281,7 +1281,7 @@ const nodeTypes = {
 };
 
 // LocalStorage functions
-const FLOW_KEY = 'reactflow-sandbox-data';
+const FLOW_KEY = 'reactflow-sandbox-service-data';
 
 const saveFlowToLocalStorage = (nodes: Node[], edges: Edge[]) => {
   try {
@@ -1316,7 +1316,7 @@ const loadFlowFromLocalStorage = () => {
   return null;
 };
 
-const WorkflowWebBuilder: React.FC = () => {
+const WorkflowServiceBuilder: React.FC = () => {
 
   // State for collapsible groups
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({
@@ -1482,7 +1482,7 @@ const WorkflowWebBuilder: React.FC = () => {
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6">
               Sandbox - 
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> (Web Builder Workflow)</span>
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> (Service Builder Workflow)</span>
             </h2>
           </div>
 
@@ -1494,7 +1494,7 @@ const WorkflowWebBuilder: React.FC = () => {
               
               {/* Draggable Components Palette */}
               <div className="absolute top-4 left-4 bottom-4 bg-white dark:bg-slate-800 rounded-xl p-4 shadow-lg border border-slate-200 dark:border-slate-700 z-10 overflow-y-auto">
-                <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Web Tools</h4>
+                <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Tools</h4>
                 <div className="space-y-3">
                   
                   {/* User Group */}
@@ -1994,4 +1994,4 @@ const WorkflowWebBuilder: React.FC = () => {
   );
 };
 
-export default WorkflowWebBuilder;
+export default WorkflowServiceBuilder;
