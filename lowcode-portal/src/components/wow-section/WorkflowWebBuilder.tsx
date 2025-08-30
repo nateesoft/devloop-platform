@@ -1318,6 +1318,20 @@ const loadFlowFromLocalStorage = () => {
 
 const WorkflowWebBuilder: React.FC = () => {
 
+  // State for collapsible groups
+  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({
+    'User': false,
+    'Page': false,
+    'Components': false
+  });
+
+  const toggleGroup = (groupName: string) => {
+    setCollapsedGroups(prev => ({
+      ...prev,
+      [groupName]: !prev[groupName]
+    }));
+  };
+
   // Initialize with saved data or defaults
     const getInitialFlow = () => {
       if (typeof window !== 'undefined') {
@@ -1459,287 +1473,361 @@ const WorkflowWebBuilder: React.FC = () => {
               <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5"></div>
               
               {/* Draggable Components Palette */}
-              <div className="absolute top-4 left-4 bg-white dark:bg-slate-800 rounded-xl p-4 shadow-lg border border-slate-200 dark:border-slate-700 z-10">
+              <div className="absolute top-4 left-4 bottom-4 bg-white dark:bg-slate-800 rounded-xl p-4 shadow-lg border border-slate-200 dark:border-slate-700 z-10 overflow-y-auto">
                 <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Tools</h4>
-                <div className="space-y-2">
-                  {/* Actor - Public User Nodes */}
-                  <div 
-                    className="flex items-center space-x-2 p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
-                    draggable
-                    onDragStart={(event) => onDragStart(event, 'user', {
-                      label: 'User',
-                      nodeType: 'actor',
-                      style: {
-                        background: 'transparent',
-                        strokeColor: '#FFFAFA',
-                        color: '#FFFAFA',
-                        border: 'none',
-                        borderRadius: '10px',
-                        fontSize: '14px',
-                        fontWeight: 'bold',
-                        width: 140,
-                        textAlign: 'center',
-                      }
-                    })}
-                  >
-                    <div className="w-4 h-4 bg-blue-500 rounded"></div>
-                    <span className="text-xs text-slate-600 dark:text-slate-400">User</span>
-                  </div>
-
-                  {/* Actor - Login User Nodes */}
-                  <div 
-                    className="flex items-center space-x-2 p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
-                    draggable
-                    onDragStart={(event) => onDragStart(event, 'user', {
-                      label: 'User-Login',
-                      nodeType: 'actor',
-                      style: {
-                        background: 'transparent',
-                        strokeColor: 'green',
-                        color: '#FFFAFA',
-                        border: 'none',
-                        borderRadius: '10px',
-                        fontSize: '14px',
-                        fontWeight: 'bold',
-                        width: 140,
-                        textAlign: 'center',
-                      }
-                    })}
-                  >
-                    <div className="w-4 h-4 bg-blue-500 rounded"></div>
-                    <span className="text-xs text-slate-600 dark:text-slate-400">User-Login</span>
-                  </div>
-
-                  {/* Actor - Admin User Nodes */}
-                  <div 
-                    className="flex items-center space-x-2 p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
-                    draggable
-                    onDragStart={(event) => onDragStart(event, 'user', {
-                      label: 'User-Admin',
-                      nodeType: 'actor',
-                      style: {
-                        background: 'transparent',
-                        strokeColor: 'brown',
-                        color: '#FFFAFA',
-                        border: 'none',
-                        borderRadius: '10px',
-                        fontSize: '14px',
-                        fontWeight: 'bold',
-                        width: 140,
-                        textAlign: 'center',
-                      }
-                    })}
-                  >
-                    <div className="w-4 h-4 bg-blue-500 rounded"></div>
-                    <span className="text-xs text-slate-600 dark:text-slate-400">User-Admin</span>
-                  </div>
+                <div className="space-y-3">
                   
-                  {/* Login Node */}
-                  <div 
-                    className="flex items-center space-x-2 p-2 bg-green-50 dark:bg-green-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
-                    draggable
-                    onDragStart={(event) => onDragStart(event, 'login', {
-                      label: 'Login',
-                      nodeType: 'login',
-                      style: {
-                        background: '#10B981',
-                        color: 'white',
-                        border: '2px solid #047857',
-                        borderRadius: '10px',
-                        fontSize: '14px',
-                        fontWeight: 'bold',
-                        width: 140,
-                        textAlign: 'center',
-                      }
-                    })}
-                  >
-                    <div className="w-4 h-4 bg-green-500 rounded"></div>
-                    <span className="text-xs text-slate-600 dark:text-slate-400">Login</span>
+                  {/* User Group */}
+                  <div>
+                    <button 
+                      onClick={() => toggleGroup('User')}
+                      className="flex items-center justify-between w-full text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
+                    >
+                      <span className="flex items-center">
+                        <div className="w-3 h-3 bg-blue-500 rounded mr-2"></div>
+                        User
+                      </span>
+                      <svg 
+                        className={`w-4 h-4 transition-transform ${collapsedGroups['User'] ? 'rotate-0' : 'rotate-90'}`} 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                    {!collapsedGroups['User'] && (
+                      <div className="mt-2 ml-5 space-y-2">
+                        {/* Actor - Public User Nodes */}
+                        <div 
+                          className="flex items-center space-x-2 p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
+                          draggable
+                          onDragStart={(event) => onDragStart(event, 'user', {
+                            label: 'User',
+                            nodeType: 'actor',
+                            style: {
+                              background: 'transparent',
+                              strokeColor: '#FFFAFA',
+                              color: '#FFFAFA',
+                              border: 'none',
+                              borderRadius: '10px',
+                              fontSize: '14px',
+                              fontWeight: 'bold',
+                              width: 140,
+                              textAlign: 'center',
+                            }
+                          })}
+                        >
+                          <div className="w-4 h-4 bg-blue-500 rounded"></div>
+                          <span className="text-xs text-slate-600 dark:text-slate-400">User</span>
+                        </div>
+
+                        {/* Actor - Login User Nodes */}
+                        <div 
+                          className="flex items-center space-x-2 p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
+                          draggable
+                          onDragStart={(event) => onDragStart(event, 'user', {
+                            label: 'User-Login',
+                            nodeType: 'actor',
+                            style: {
+                              background: 'transparent',
+                              strokeColor: 'green',
+                              color: '#FFFAFA',
+                              border: 'none',
+                              borderRadius: '10px',
+                              fontSize: '14px',
+                              fontWeight: 'bold',
+                              width: 140,
+                              textAlign: 'center',
+                            }
+                          })}
+                        >
+                          <div className="w-4 h-4 bg-green-500 rounded"></div>
+                          <span className="text-xs text-slate-600 dark:text-slate-400">User-Login</span>
+                        </div>
+
+                        {/* Actor - Admin User Nodes */}
+                        <div 
+                          className="flex items-center space-x-2 p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
+                          draggable
+                          onDragStart={(event) => onDragStart(event, 'user', {
+                            label: 'User-Admin',
+                            nodeType: 'actor',
+                            style: {
+                              background: 'transparent',
+                              strokeColor: 'brown',
+                              color: '#FFFAFA',
+                              border: 'none',
+                              borderRadius: '10px',
+                              fontSize: '14px',
+                              fontWeight: 'bold',
+                              width: 140,
+                              textAlign: 'center',
+                            }
+                          })}
+                        >
+                          <div className="w-4 h-4 bg-amber-600 rounded"></div>
+                          <span className="text-xs text-slate-600 dark:text-slate-400">User-Admin</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Landing Page Node */}
-                  <div 
-                    className="flex items-center space-x-2 p-2 bg-green-50 dark:bg-green-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
-                    draggable
-                    onDragStart={(event) => onDragStart(event, 'page', {
-                      label: 'Landing',
-                      nodeType: 'page',
-                      style: {
-                        background: '#10B981',
-                        color: 'white',
-                        border: '2px solid #047857',
-                        borderRadius: '10px',
-                        fontSize: '14px',
-                        fontWeight: 'bold',
-                        width: 140,
-                        textAlign: 'center',
-                      }
-                    })}
-                  >
-                    <div className="w-4 h-4 bg-green-500 rounded"></div>
-                    <span className="text-xs text-slate-600 dark:text-slate-400">Landing-Page</span>
+                  {/* Page Group */}
+                  <div>
+                    <button 
+                      onClick={() => toggleGroup('Page')}
+                      className="flex items-center justify-between w-full text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
+                    >
+                      <span className="flex items-center">
+                        <div className="w-3 h-3 bg-green-500 rounded mr-2"></div>
+                        Page
+                      </span>
+                      <svg 
+                        className={`w-4 h-4 transition-transform ${collapsedGroups['Page'] ? 'rotate-0' : 'rotate-90'}`} 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                    {!collapsedGroups['Page'] && (
+                      <div className="mt-2 ml-5 space-y-2">
+                        {/* Login Node */}
+                        <div 
+                          className="flex items-center space-x-2 p-2 bg-green-50 dark:bg-green-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
+                          draggable
+                          onDragStart={(event) => onDragStart(event, 'login', {
+                            label: 'Login',
+                            nodeType: 'login',
+                            style: {
+                              background: '#10B981',
+                              color: 'white',
+                              border: '2px solid #047857',
+                              borderRadius: '10px',
+                              fontSize: '14px',
+                              fontWeight: 'bold',
+                              width: 140,
+                              textAlign: 'center',
+                            }
+                          })}
+                        >
+                          <div className="w-4 h-4 bg-green-500 rounded"></div>
+                          <span className="text-xs text-slate-600 dark:text-slate-400">Login</span>
+                        </div>
+
+                        {/* Landing Page Node */}
+                        <div 
+                          className="flex items-center space-x-2 p-2 bg-green-50 dark:bg-green-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
+                          draggable
+                          onDragStart={(event) => onDragStart(event, 'page', {
+                            label: 'Landing',
+                            nodeType: 'page',
+                            style: {
+                              background: '#10B981',
+                              color: 'white',
+                              border: '2px solid #047857',
+                              borderRadius: '10px',
+                              fontSize: '14px',
+                              fontWeight: 'bold',
+                              width: 140,
+                              textAlign: 'center',
+                            }
+                          })}
+                        >
+                          <div className="w-4 h-4 bg-green-500 rounded"></div>
+                          <span className="text-xs text-slate-600 dark:text-slate-400">Landing-Page</span>
+                        </div>
+
+                        {/* User Home Node */}
+                        <div 
+                          className="flex items-center space-x-2 p-2 bg-green-50 dark:bg-green-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
+                          draggable
+                          onDragStart={(event) => onDragStart(event, 'page', {
+                            label: 'Home-User',
+                            nodeType: 'page',
+                            style: {
+                              background: '#10B981',
+                              color: 'white',
+                              border: '2px solid #047857',
+                              borderRadius: '10px',
+                              fontSize: '14px',
+                              fontWeight: 'bold',
+                              width: 140,
+                              textAlign: 'center',
+                            }
+                          })}
+                        >
+                          <div className="w-4 h-4 bg-green-500 rounded"></div>
+                          <span className="text-xs text-slate-600 dark:text-slate-400">Home-User</span>
+                        </div>
+
+                        {/* Admin Home Node */}
+                        <div 
+                          className="flex items-center space-x-2 p-2 bg-green-50 dark:bg-green-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
+                          draggable
+                          onDragStart={(event) => onDragStart(event, 'page', {
+                            label: 'Home-Admin',
+                            nodeType: 'page',
+                            style: {
+                              background: '#10B981',
+                              color: 'white',
+                              border: '2px solid #047857',
+                              borderRadius: '10px',
+                              fontSize: '14px',
+                              fontWeight: 'bold',
+                              width: 140,
+                              textAlign: 'center',
+                            }
+                          })}
+                        >
+                          <div className="w-4 h-4 bg-green-500 rounded"></div>
+                          <span className="text-xs text-slate-600 dark:text-slate-400">Home-Admin</span>
+                        </div>
+
+                        {/* Route Node */}
+                        <div 
+                          className="flex items-center space-x-2 p-2 bg-red-50 dark:bg-red-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
+                          draggable
+                          onDragStart={(event) => onDragStart(event, 'route', {
+                            label: 'Route?',
+                            nodeType: 'route',
+                            style: {
+                              background: 'red',
+                              color: 'white',
+                              border: '2px solid darkred',
+                              borderRadius: '10px',
+                              fontSize: '14px',
+                              fontWeight: 'bold',
+                              width: 140,
+                              textAlign: 'center',
+                            }
+                          })}
+                        >
+                          <div className="w-4 h-4 bg-red-500 rounded"></div>
+                          <span className="text-xs text-slate-600 dark:text-slate-400">Route</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
-                  {/* User Home Node */}
-                  <div 
-                    className="flex items-center space-x-2 p-2 bg-green-50 dark:bg-green-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
-                    draggable
-                    onDragStart={(event) => onDragStart(event, 'page', {
-                      label: 'Home-User',
-                      nodeType: 'page',
-                      style: {
-                        background: '#10B981',
-                        color: 'white',
-                        border: '2px solid #047857',
-                        borderRadius: '10px',
-                        fontSize: '14px',
-                        fontWeight: 'bold',
-                        width: 140,
-                        textAlign: 'center',
-                      }
-                    })}
-                  >
-                    <div className="w-4 h-4 bg-green-500 rounded"></div>
-                    <span className="text-xs text-slate-600 dark:text-slate-400">Home-User</span>
-                  </div>
-                  
-                  {/* Admin Home Node */}
-                  <div 
-                    className="flex items-center space-x-2 p-2 bg-green-50 dark:bg-green-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
-                    draggable
-                    onDragStart={(event) => onDragStart(event, 'page', {
-                      label: 'Home-Admin',
-                      nodeType: 'page',
-                      style: {
-                        background: '#10B981',
-                        color: 'white',
-                        border: '2px solid #047857',
-                        borderRadius: '10px',
-                        fontSize: '14px',
-                        fontWeight: 'bold',
-                        width: 140,
-                        textAlign: 'center',
-                      }
-                    })}
-                  >
-                    <div className="w-4 h-4 bg-green-500 rounded"></div>
-                    <span className="text-xs text-slate-600 dark:text-slate-400">Home-Admin</span>
+                  {/* Components Group */}
+                  <div>
+                    <button 
+                      onClick={() => toggleGroup('Components')}
+                      className="flex items-center justify-between w-full text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
+                    >
+                      <span className="flex items-center">
+                        <div className="w-3 h-3 bg-purple-500 rounded mr-2"></div>
+                        Components
+                      </span>
+                      <svg 
+                        className={`w-4 h-4 transition-transform ${collapsedGroups['Components'] ? 'rotate-0' : 'rotate-90'}`} 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                    {!collapsedGroups['Components'] && (
+                      <div className="mt-2 ml-5 space-y-2">
+                        {/* Components - CRUD Node */}
+                        <div 
+                          className="flex items-center space-x-2 p-2 bg-purple-50 dark:bg-purple-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
+                          draggable
+                          onDragStart={(event) => onDragStart(event, 'page', {
+                            label: 'CRUD Component',
+                            nodeType: 'crud-component',
+                            style: {
+                              background: '#8B5CF6',
+                              color: 'white',
+                              border: '2px solid #6D28D9',
+                              borderRadius: '10px',
+                              fontSize: '14px',
+                              fontWeight: 'bold',
+                              width: 140,
+                              textAlign: 'center',
+                            }
+                          })}
+                        >
+                          <div className="w-4 h-4 bg-purple-500 rounded"></div>
+                          <span className="text-xs text-slate-600 dark:text-slate-400">c-CRUD</span>
+                        </div>
+
+                        {/* Components - Tabs Node */}
+                        <div 
+                          className="flex items-center space-x-2 p-2 bg-purple-50 dark:bg-purple-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
+                          draggable
+                          onDragStart={(event) => onDragStart(event, 'page', {
+                            label: 'Tabs Component',
+                            nodeType: 'tabs-component',
+                            style: {
+                              background: '#8B5CF6',
+                              color: 'white',
+                              border: '2px solid #6D28D9',
+                              borderRadius: '10px',
+                              fontSize: '14px',
+                              fontWeight: 'bold',
+                              width: 140,
+                              textAlign: 'center',
+                            }
+                          })}
+                        >
+                          <div className="w-4 h-4 bg-purple-500 rounded"></div>
+                          <span className="text-xs text-slate-600 dark:text-slate-400">c-Tabs</span>
+                        </div>
+
+                        {/* Components - Dashboard Node */}
+                        <div 
+                          className="flex items-center space-x-2 p-2 bg-purple-50 dark:bg-purple-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
+                          draggable
+                          onDragStart={(event) => onDragStart(event, 'page', {
+                            label: 'Dashboard Component',
+                            nodeType: 'dashboard-component',
+                            style: {
+                              background: '#8B5CF6',
+                              color: 'white',
+                              border: '2px solid #6D28D9',
+                              borderRadius: '10px',
+                              fontSize: '14px',
+                              fontWeight: 'bold',
+                              width: 140,
+                              textAlign: 'center',
+                            }
+                          })}
+                        >
+                          <div className="w-4 h-4 bg-purple-500 rounded"></div>
+                          <span className="text-xs text-slate-600 dark:text-slate-400">c-Dashboard</span>
+                        </div>
+
+                        {/* Components - Settings Node */}
+                        <div 
+                          className="flex items-center space-x-2 p-2 bg-purple-50 dark:bg-purple-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
+                          draggable
+                          onDragStart={(event) => onDragStart(event, 'page', {
+                            label: 'Settings Component',
+                            nodeType: 'settings-component',
+                            style: {
+                              background: '#8B5CF6',
+                              color: 'white',
+                              border: '2px solid #6D28D9',
+                              borderRadius: '10px',
+                              fontSize: '14px',
+                              fontWeight: 'bold',
+                              width: 140,
+                              textAlign: 'center',
+                            }
+                          })}
+                        >
+                          <div className="w-4 h-4 bg-purple-500 rounded"></div>
+                          <span className="text-xs text-slate-600 dark:text-slate-400">c-Settings</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Route Node */}
-                  <div 
-                    className="flex items-center space-x-2 p-2 bg-red-50 dark:bg-red-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
-                    draggable
-                    onDragStart={(event) => onDragStart(event, 'route', {
-                      label: 'Route?',
-                      nodeType: 'route',
-                      style: {
-                        background: 'red',
-                        color: 'white',
-                        border: '2px solid darkred',
-                        borderRadius: '10px',
-                        fontSize: '14px',
-                        fontWeight: 'bold',
-                        width: 140,
-                        textAlign: 'center',
-                      }
-                    })}
-                  >
-                    <div className="w-4 h-4 bg-red-500 rounded"></div>
-                    <span className="text-xs text-slate-600 dark:text-slate-400">Route</span>
-                  </div>
-
-                  {/* Components - CRUD Node */}
-                  <div 
-                    className="flex items-center space-x-2 p-2 bg-purple-50 dark:bg-purple-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
-                    draggable
-                    onDragStart={(event) => onDragStart(event, 'page', {
-                      label: 'CRUD Component',
-                      nodeType: 'crud-component',
-                      style: {
-                        background: '#8B5CF6',
-                        color: 'white',
-                        border: '2px solid #6D28D9',
-                        borderRadius: '10px',
-                        fontSize: '14px',
-                        fontWeight: 'bold',
-                        width: 140,
-                        textAlign: 'center',
-                      }
-                    })}
-                  >
-                    <div className="w-4 h-4 bg-purple-500 rounded"></div>
-                    <span className="text-xs text-slate-600 dark:text-slate-400">c-CRUD</span>
-                  </div>
-
-                  {/* Components - Tabs Node */}
-                  <div 
-                    className="flex items-center space-x-2 p-2 bg-purple-50 dark:bg-purple-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
-                    draggable
-                    onDragStart={(event) => onDragStart(event, 'page', {
-                      label: 'Tabs Component',
-                      nodeType: 'tabs-component',
-                      style: {
-                        background: '#8B5CF6',
-                        color: 'white',
-                        border: '2px solid #6D28D9',
-                        borderRadius: '10px',
-                        fontSize: '14px',
-                        fontWeight: 'bold',
-                        width: 140,
-                        textAlign: 'center',
-                      }
-                    })}
-                  >
-                    <div className="w-4 h-4 bg-purple-500 rounded"></div>
-                    <span className="text-xs text-slate-600 dark:text-slate-400">c-Tabs</span>
-                  </div>
-
-                  {/* Components - Dasbhoard Node */}
-                  <div 
-                    className="flex items-center space-x-2 p-2 bg-purple-50 dark:bg-purple-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
-                    draggable
-                    onDragStart={(event) => onDragStart(event, 'page', {
-                      label: 'Dashboard Component',
-                      nodeType: 'dashboard-component',
-                      style: {
-                        background: '#8B5CF6',
-                        color: 'white',
-                        border: '2px solid #6D28D9',
-                        borderRadius: '10px',
-                        fontSize: '14px',
-                        fontWeight: 'bold',
-                        width: 140,
-                        textAlign: 'center',
-                      }
-                    })}
-                  >
-                    <div className="w-4 h-4 bg-purple-500 rounded"></div>
-                    <span className="text-xs text-slate-600 dark:text-slate-400">c-Dashboard</span>
-                  </div>
-
-                  {/* Components - Settings Node */}
-                  <div 
-                    className="flex items-center space-x-2 p-2 bg-purple-50 dark:bg-purple-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
-                    draggable
-                    onDragStart={(event) => onDragStart(event, 'page', {
-                      label: 'Settings Component',
-                      nodeType: 'settings-component',
-                      style: {
-                        background: '#8B5CF6',
-                        color: 'white',
-                        border: '2px solid #6D28D9',
-                        borderRadius: '10px',
-                        fontSize: '14px',
-                        fontWeight: 'bold',
-                        width: 140,
-                        textAlign: 'center',
-                      }
-                    })}
-                  >
-                    <div className="w-4 h-4 bg-purple-500 rounded"></div>
-                    <span className="text-xs text-slate-600 dark:text-slate-400">c-Settings</span>
-                  </div>
                 </div>
               </div>
 
