@@ -82,15 +82,84 @@ const StickFigure = ({ color = '#3B82F6', size = 60, strokeWidth = 3 }) => (
   </svg>
 );
 
-// Diamond shape for Decision nodes (แบบ flowchart มาตรฐาน)
-const Diamond = ({ color = 'red', size = 80 }) => (
+// Enhanced diamond shape for Route/Decision nodes with detailed routing visual
+const EnhancedDiamond = ({ color = 'red', size = 80 }) => (
   <svg width={size} height={size} viewBox="0 0 80 80" className="mx-auto">
+    {/* Main diamond shape with gradient */}
+    <defs>
+      <linearGradient id={`gradient-${color}`} x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style={{ stopColor: color, stopOpacity: 1 }} />
+        <stop offset="100%" style={{ stopColor: color, stopOpacity: 0.7 }} />
+      </linearGradient>
+      <filter id={`shadow-${color}`}>
+        <feDropShadow dx="2" dy="2" stdDeviation="2" floodOpacity="0.3"/>
+      </filter>
+    </defs>
+    
+    {/* Diamond background with gradient and shadow */}
     <path 
       d="M40 5 L75 40 L40 75 L5 40 Z" 
-      fill={color} 
+      fill={`url(#gradient-${color})`}
       stroke={color} 
       strokeWidth="2"
+      filter={`url(#shadow-${color})`}
     />
+    
+    {/* Inner diamond for depth */}
+    <path 
+      d="M40 15 L65 40 L40 65 L15 40 Z" 
+      fill="none" 
+      stroke="white" 
+      strokeWidth="1.5"
+      opacity="0.4"
+    />
+    
+    {/* Question mark symbol */}
+    <g transform="translate(40, 40)">
+      <circle r="12" fill="white" opacity="0.9"/>
+      <text 
+        x="0" 
+        y="6" 
+        fill={color} 
+        fontSize="18" 
+        fontWeight="bold" 
+        textAnchor="middle"
+        fontFamily="Arial, sans-serif"
+      >
+        ?
+      </text>
+    </g>
+    
+    {/* Route direction indicators */}
+    {/* Top arrow */}
+    <g transform="translate(40, 12)">
+      <path d="M-3,-2 L0,-5 L3,-2" fill="white" opacity="0.8"/>
+      <line x1="0" y1="-2" x2="0" y2="3" stroke="white" strokeWidth="1.5" opacity="0.8"/>
+    </g>
+    
+    {/* Right arrow */}
+    <g transform="translate(68, 40)">
+      <path d="M2,-3 L5,0 L2,3" fill="white" opacity="0.8"/>
+      <line x1="-3" y1="0" x2="2" y2="0" stroke="white" strokeWidth="1.5" opacity="0.8"/>
+    </g>
+    
+    {/* Bottom arrow */}
+    <g transform="translate(40, 68)">
+      <path d="M-3,2 L0,5 L3,2" fill="white" opacity="0.8"/>
+      <line x1="0" y1="-3" x2="0" y2="2" stroke="white" strokeWidth="1.5" opacity="0.8"/>
+    </g>
+    
+    {/* Left arrow */}
+    <g transform="translate(12, 40)">
+      <path d="M-2,-3 L-5,0 L-2,3" fill="white" opacity="0.8"/>
+      <line x1="3" y1="0" x2="-2" y2="0" stroke="white" strokeWidth="1.5" opacity="0.8"/>
+    </g>
+    
+    {/* Corner decorative dots */}
+    <circle cx="40" cy="8" r="1.5" fill="white" opacity="0.7"/>
+    <circle cx="72" cy="40" r="1.5" fill="white" opacity="0.7"/>
+    <circle cx="40" cy="72" r="1.5" fill="white" opacity="0.7"/>
+    <circle cx="8" cy="40" r="1.5" fill="white" opacity="0.7"/>
   </svg>
 );
 
@@ -161,6 +230,585 @@ const LoginForm = ({ color = '#10B981', size = 60 }) => (
   </svg>
 );
 
+// Tabs component icon for tabs-component nodes
+const TabsComponent = ({ color = '#8B5CF6', size = 60 }) => (
+  <svg width={size} height={size * 0.8} viewBox="0 0 60 48" className="mx-auto">
+    {/* Container background */}
+    <rect 
+      x="2" 
+      y="12" 
+      width="56" 
+      height="32" 
+      fill="white" 
+      stroke={color} 
+      strokeWidth="2"
+      rx="4"
+    />
+    {/* Tab 1 - Active */}
+    <rect 
+      x="5" 
+      y="5" 
+      width="16" 
+      height="12" 
+      fill={color} 
+      stroke={color} 
+      strokeWidth="1"
+      rx="3"
+    />
+    <text 
+      x="13" 
+      y="13" 
+      fill="white" 
+      fontSize="6" 
+      textAnchor="middle"
+      fontWeight="bold"
+    >
+      Tab1
+    </text>
+    {/* Tab 2 - Inactive */}
+    <rect 
+      x="22" 
+      y="5" 
+      width="16" 
+      height="12" 
+      fill="white" 
+      stroke={color} 
+      strokeWidth="1"
+      rx="3"
+    />
+    <text 
+      x="30" 
+      y="13" 
+      fill={color} 
+      fontSize="6" 
+      textAnchor="middle"
+      fontWeight="bold"
+    >
+      Tab2
+    </text>
+    {/* Tab 3 - Inactive */}
+    <rect 
+      x="39" 
+      y="5" 
+      width="16" 
+      height="12" 
+      fill="white" 
+      stroke={color} 
+      strokeWidth="1"
+      rx="3"
+    />
+    <text 
+      x="47" 
+      y="13" 
+      fill={color} 
+      fontSize="6" 
+      textAnchor="middle"
+      fontWeight="bold"
+    >
+      Tab3
+    </text>
+    {/* Content area with sample content */}
+    <rect 
+      x="7" 
+      y="18" 
+      width="46" 
+      height="4" 
+      fill={color} 
+      opacity="0.3"
+      rx="1"
+    />
+    <rect 
+      x="7" 
+      y="25" 
+      width="35" 
+      height="3" 
+      fill={color} 
+      opacity="0.2"
+      rx="1"
+    />
+    <rect 
+      x="7" 
+      y="31" 
+      width="42" 
+      height="3" 
+      fill={color} 
+      opacity="0.2"
+      rx="1"
+    />
+    <rect 
+      x="7" 
+      y="37" 
+      width="28" 
+      height="3" 
+      fill={color} 
+      opacity="0.2"
+      rx="1"
+    />
+  </svg>
+);
+
+// CRUD component icon for crud-component nodes
+const CRUDComponent = ({ color = '#8B5CF6', size = 60 }) => (
+  <svg width={size} height={size * 0.8} viewBox="0 0 60 48" className="mx-auto">
+    {/* Main container */}
+    <rect 
+      x="2" 
+      y="4" 
+      width="56" 
+      height="40" 
+      fill="white" 
+      stroke={color} 
+      strokeWidth="2"
+      rx="4"
+    />
+    
+    {/* Header with action buttons */}
+    <rect 
+      x="2" 
+      y="4" 
+      width="56" 
+      height="10" 
+      fill={color} 
+      rx="4"
+    />
+    {/* Create button */}
+    <rect 
+      x="45" 
+      y="6" 
+      width="10" 
+      height="6" 
+      fill="white" 
+      rx="2"
+    />
+    <text 
+      x="50" 
+      y="10.5" 
+      fill={color} 
+      fontSize="4" 
+      textAnchor="middle"
+      fontWeight="bold"
+    >
+      +
+    </text>
+    
+    {/* Table header */}
+    <rect 
+      x="5" 
+      y="16" 
+      width="50" 
+      height="6" 
+      fill={color} 
+      opacity="0.2"
+      rx="1"
+    />
+    
+    {/* Data rows */}
+    <rect 
+      x="5" 
+      y="24" 
+      width="50" 
+      height="4" 
+      fill={color} 
+      opacity="0.1"
+      rx="1"
+    />
+    <rect 
+      x="5" 
+      y="30" 
+      width="50" 
+      height="4" 
+      fill={color} 
+      opacity="0.1"
+      rx="1"
+    />
+    <rect 
+      x="5" 
+      y="36" 
+      width="50" 
+      height="4" 
+      fill={color} 
+      opacity="0.1"
+      rx="1"
+    />
+    
+    {/* Action icons for each row */}
+    {/* Row 1 actions */}
+    <circle cx="47" cy="26" r="1.5" fill={color} opacity="0.6"/>
+    <circle cx="51" cy="26" r="1.5" fill="red" opacity="0.6"/>
+    
+    {/* Row 2 actions */}
+    <circle cx="47" cy="32" r="1.5" fill={color} opacity="0.6"/>
+    <circle cx="51" cy="32" r="1.5" fill="red" opacity="0.6"/>
+    
+    {/* Row 3 actions */}
+    <circle cx="47" cy="38" r="1.5" fill={color} opacity="0.6"/>
+    <circle cx="51" cy="38" r="1.5" fill="red" opacity="0.6"/>
+    
+    {/* CRUD icons overlay */}
+    {/* Create icon (plus) - already done above */}
+    
+    {/* Read icon (eye) */}
+    <ellipse cx="10" cy="26" rx="2" ry="1" fill={color} opacity="0.7"/>
+    <circle cx="10" cy="26" r="1" fill="white"/>
+    
+    {/* Update icon (pencil) */}
+    <line x1="8" y1="34" x2="12" y2="30" stroke={color} strokeWidth="1" opacity="0.7"/>
+    <circle cx="12" cy="30" r="1" fill={color} opacity="0.7"/>
+    
+    {/* Delete icon (trash) */}
+    <rect x="8" y="36" width="4" height="4" fill="none" stroke="red" strokeWidth="1" opacity="0.7"/>
+    <line x1="9" y1="36" x2="9" y2="40" stroke="red" strokeWidth="0.5" opacity="0.7"/>
+    <line x1="11" y1="36" x2="11" y2="40" stroke="red" strokeWidth="0.5" opacity="0.7"/>
+  </svg>
+);
+
+// Dashboard component icon for dashboard-component nodes
+const DashboardComponent = ({ color = '#8B5CF6', size = 60 }) => (
+  <svg width={size} height={size * 0.8} viewBox="0 0 60 48" className="mx-auto">
+    {/* Main container */}
+    <rect 
+      x="2" 
+      y="2" 
+      width="56" 
+      height="44" 
+      fill="white" 
+      stroke={color} 
+      strokeWidth="2"
+      rx="4"
+    />
+    
+    {/* Top header bar */}
+    <rect 
+      x="2" 
+      y="2" 
+      width="56" 
+      height="8" 
+      fill={color} 
+      rx="4"
+    />
+    
+    {/* Dashboard title */}
+    <rect 
+      x="6" 
+      y="4" 
+      width="20" 
+      height="4" 
+      fill="white" 
+      opacity="0.9"
+      rx="1"
+    />
+    
+    {/* Navigation menu items */}
+    <circle cx="50" cy="6" r="1.5" fill="white" opacity="0.8"/>
+    <circle cx="54" cy="6" r="1.5" fill="white" opacity="0.8"/>
+    
+    {/* Widget 1 - Chart/Graph */}
+    <rect 
+      x="5" 
+      y="13" 
+      width="24" 
+      height="15" 
+      fill={color} 
+      opacity="0.1"
+      rx="2"
+    />
+    {/* Chart bars */}
+    <rect x="8" y="23" width="2" height="3" fill={color} opacity="0.6"/>
+    <rect x="11" y="20" width="2" height="6" fill={color} opacity="0.6"/>
+    <rect x="14" y="18" width="2" height="8" fill={color} opacity="0.6"/>
+    <rect x="17" y="21" width="2" height="5" fill={color} opacity="0.6"/>
+    <rect x="20" y="19" width="2" height="7" fill={color} opacity="0.6"/>
+    <rect x="23" y="22" width="2" height="4" fill={color} opacity="0.6"/>
+    
+    {/* Widget 2 - Stats card */}
+    <rect 
+      x="31" 
+      y="13" 
+      width="24" 
+      height="15" 
+      fill={color} 
+      opacity="0.1"
+      rx="2"
+    />
+    {/* Stats number */}
+    <rect x="34" y="16" width="8" height="3" fill={color} opacity="0.6" rx="1"/>
+    <rect x="34" y="20" width="6" height="2" fill={color} opacity="0.4" rx="1"/>
+    <rect x="44" y="16" width="8" height="3" fill={color} opacity="0.6" rx="1"/>
+    <rect x="44" y="20" width="6" height="2" fill={color} opacity="0.4" rx="1"/>
+    
+    {/* Widget 3 - Pie chart */}
+    <rect 
+      x="5" 
+      y="30" 
+      width="24" 
+      height="13" 
+      fill={color} 
+      opacity="0.1"
+      rx="2"
+    />
+    {/* Pie chart circle */}
+    <circle cx="17" cy="36.5" r="4" fill="none" stroke={color} strokeWidth="1.5" opacity="0.6"/>
+    <path d="M17 32.5 A4 4 0 0 1 20 35.5 L17 36.5 Z" fill={color} opacity="0.8"/>
+    <path d="M20 35.5 A4 4 0 0 1 17 40.5 L17 36.5 Z" fill={color} opacity="0.5"/>
+    
+    {/* Widget 4 - List/Table */}
+    <rect 
+      x="31" 
+      y="30" 
+      width="24" 
+      height="13" 
+      fill={color} 
+      opacity="0.1"
+      rx="2"
+    />
+    {/* List items */}
+    <rect x="34" y="32" width="18" height="2" fill={color} opacity="0.4" rx="1"/>
+    <rect x="34" y="35" width="15" height="2" fill={color} opacity="0.3" rx="1"/>
+    <rect x="34" y="38" width="16" height="2" fill={color} opacity="0.3" rx="1"/>
+    <rect x="34" y="41" width="14" height="2" fill={color} opacity="0.3" rx="1"/>
+    
+    {/* Dashboard icons */}
+    <circle cx="12" cy="16" r="1" fill={color} opacity="0.7"/>
+    <rect x="38" y="32" width="2" height="2" fill={color} opacity="0.7" rx="0.5"/>
+  </svg>
+);
+
+// Settings component icon for settings-component nodes
+const SettingsComponent = ({ color = '#8B5CF6', size = 60 }) => (
+  <svg width={size} height={size * 0.8} viewBox="0 0 60 48" className="mx-auto">
+    {/* Main container */}
+    <rect 
+      x="2" 
+      y="2" 
+      width="56" 
+      height="44" 
+      fill="white" 
+      stroke={color} 
+      strokeWidth="2"
+      rx="4"
+    />
+    
+    {/* Header */}
+    <rect 
+      x="2" 
+      y="2" 
+      width="56" 
+      height="8" 
+      fill={color} 
+      rx="4"
+    />
+    
+    {/* Settings title */}
+    <rect 
+      x="6" 
+      y="4" 
+      width="18" 
+      height="4" 
+      fill="white" 
+      opacity="0.9"
+      rx="1"
+    />
+    
+    {/* Gear icon in header */}
+    <g transform="translate(50, 6)">
+      <circle r="3" fill="white" opacity="0.8"/>
+      <circle r="2" fill={color}/>
+      <rect x="-0.5" y="-4" width="1" height="2" fill="white"/>
+      <rect x="-0.5" y="2" width="1" height="2" fill="white"/>
+      <rect x="-4" y="-0.5" width="2" height="1" fill="white"/>
+      <rect x="2" y="-0.5" width="2" height="1" fill="white"/>
+    </g>
+    
+    {/* Settings sections */}
+    
+    {/* Section 1 - General Settings */}
+    <rect 
+      x="5" 
+      y="13" 
+      width="50" 
+      height="6" 
+      fill={color} 
+      opacity="0.1"
+      rx="2"
+    />
+    <rect x="8" y="15" width="12" height="2" fill={color} opacity="0.5" rx="1"/>
+    
+    {/* Toggle switches */}
+    <rect x="45" y="15" width="8" height="2" fill={color} opacity="0.3" rx="1"/>
+    <circle cx="48" cy="16" r="1.5" fill={color} opacity="0.8"/>
+    
+    {/* Section 2 - Privacy Settings */}
+    <rect 
+      x="5" 
+      y="21" 
+      width="50" 
+      height="6" 
+      fill={color} 
+      opacity="0.1"
+      rx="2"
+    />
+    <rect x="8" y="23" width="15" height="2" fill={color} opacity="0.5" rx="1"/>
+    
+    {/* Checkbox */}
+    <rect x="45" y="23" width="2" height="2" fill="none" stroke={color} strokeWidth="0.5"/>
+    <polyline points="45.5,24 46,24.5 47.5,23" fill="none" stroke={color} strokeWidth="0.5"/>
+    
+    {/* Section 3 - Notification Settings */}
+    <rect 
+      x="5" 
+      y="29" 
+      width="50" 
+      height="6" 
+      fill={color} 
+      opacity="0.1"
+      rx="2"
+    />
+    <rect x="8" y="31" width="18" height="2" fill={color} opacity="0.5" rx="1"/>
+    
+    {/* Radio button */}
+    <circle cx="46" cy="32" r="1.5" fill="none" stroke={color} strokeWidth="0.5"/>
+    <circle cx="46" cy="32" r="0.8" fill={color} opacity="0.6"/>
+    
+    {/* Section 4 - Account Settings */}
+    <rect 
+      x="5" 
+      y="37" 
+      width="50" 
+      height="6" 
+      fill={color} 
+      opacity="0.1"
+      rx="2"
+    />
+    <rect x="8" y="39" width="14" height="2" fill={color} opacity="0.5" rx="1"/>
+    
+    {/* Dropdown arrow */}
+    <polygon points="47,39.5 49,39.5 48,41" fill={color} opacity="0.6"/>
+    
+    {/* Setting icons */}
+    <circle cx="22" cy="16" r="1" fill={color} opacity="0.6"/>
+    <rect x="25" y="23" width="2" height="2" fill={color} opacity="0.6" rx="0.5"/>
+    <circle cx="30" cy="32" r="1" fill={color} opacity="0.6"/>
+    <rect x="25" y="39" width="2" height="2" fill={color} opacity="0.6" rx="1"/>
+  </svg>
+);
+
+// Page layout component icon for page nodes
+const PageLayout = ({ color = '#10B981', size = 60 }) => (
+  <svg width={size} height={size * 0.8} viewBox="0 0 60 48" className="mx-auto">
+    {/* Main container */}
+    <rect 
+      x="2" 
+      y="2" 
+      width="56" 
+      height="44" 
+      fill="white" 
+      stroke={color} 
+      strokeWidth="2"
+      rx="3"
+    />
+    
+    {/* Header */}
+    <rect 
+      x="2" 
+      y="2" 
+      width="56" 
+      height="8" 
+      fill={color} 
+      rx="3"
+    />
+    
+    {/* Logo/Brand area */}
+    <rect 
+      x="5" 
+      y="4" 
+      width="8" 
+      height="4" 
+      fill="white" 
+      opacity="0.9"
+      rx="1"
+    />
+    
+    {/* Navigation menu items */}
+    <rect x="18" y="5" width="6" height="2" fill="white" opacity="0.8" rx="1"/>
+    <rect x="26" y="5" width="6" height="2" fill="white" opacity="0.8" rx="1"/>
+    <rect x="34" y="5" width="6" height="2" fill="white" opacity="0.8" rx="1"/>
+    
+    {/* User menu */}
+    <circle cx="52" cy="6" r="2" fill="white" opacity="0.8"/>
+    
+    {/* Sidebar */}
+    <rect 
+      x="2" 
+      y="10" 
+      width="12" 
+      height="32" 
+      fill={color} 
+      opacity="0.1"
+      rx="0"
+    />
+    
+    {/* Sidebar menu items */}
+    <rect x="4" y="12" width="8" height="2" fill={color} opacity="0.6" rx="1"/>
+    <rect x="4" y="16" width="6" height="2" fill={color} opacity="0.4" rx="1"/>
+    <rect x="4" y="20" width="7" height="2" fill={color} opacity="0.4" rx="1"/>
+    <rect x="4" y="24" width="5" height="2" fill={color} opacity="0.4" rx="1"/>
+    <rect x="4" y="28" width="8" height="2" fill={color} opacity="0.4" rx="1"/>
+    
+    {/* Sidebar icons */}
+    <circle cx="5.5" cy="13" r="0.8" fill={color} opacity="0.8"/>
+    <rect x="5" y="16.5" width="1" height="1" fill={color} opacity="0.6" rx="0.2"/>
+    <circle cx="5.5" cy="21" r="0.8" fill={color} opacity="0.6"/>
+    <rect x="5" y="24.5" width="1" height="1" fill={color} opacity="0.6" rx="0.2"/>
+    <circle cx="5.5" cy="29" r="0.8" fill={color} opacity="0.6"/>
+    
+    {/* Main content area */}
+    <rect 
+      x="16" 
+      y="12" 
+      width="40" 
+      height="26" 
+      fill="white" 
+      stroke={color} 
+      strokeWidth="1" 
+      strokeOpacity="0.2"
+      rx="2"
+    />
+    
+    {/* Content blocks */}
+    <rect x="18" y="14" width="36" height="3" fill={color} opacity="0.3" rx="1"/>
+    <rect x="18" y="19" width="28" height="2" fill={color} opacity="0.2" rx="1"/>
+    <rect x="18" y="23" width="32" height="2" fill={color} opacity="0.2" rx="1"/>
+    
+    {/* Content widgets/cards */}
+    <rect x="18" y="27" width="16" height="8" fill={color} opacity="0.1" rx="1"/>
+    <rect x="36" y="27" width="18" height="8" fill={color} opacity="0.1" rx="1"/>
+    
+    {/* Widget content */}
+    <rect x="19" y="28" width="12" height="1.5" fill={color} opacity="0.4" rx="0.5"/>
+    <rect x="19" y="30" width="8" height="1" fill={color} opacity="0.3" rx="0.5"/>
+    <rect x="19" y="32" width="10" height="1" fill={color} opacity="0.3" rx="0.5"/>
+    
+    <rect x="37" y="28" width="14" height="1.5" fill={color} opacity="0.4" rx="0.5"/>
+    <rect x="37" y="30" width="10" height="1" fill={color} opacity="0.3" rx="0.5"/>
+    <rect x="37" y="32" width="12" height="1" fill={color} opacity="0.3" rx="0.5"/>
+    
+    {/* Footer */}
+    <rect 
+      x="2" 
+      y="42" 
+      width="56" 
+      height="4" 
+      fill={color} 
+      opacity="0.2"
+      rx="0"
+    />
+    
+    {/* Footer content */}
+    <rect x="5" y="43.5" width="8" height="1" fill={color} opacity="0.6" rx="0.5"/>
+    <rect x="48" y="43.5" width="8" height="1" fill={color} opacity="0.6" rx="0.5"/>
+  </svg>
+);
+
 // Custom Node Component with different shapes based on node type
 const CustomNode = ({ data, id }: NodeProps) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -227,9 +875,9 @@ const CustomNode = ({ data, id }: NodeProps) => {
       case 'route':
         return (
           <div className="relative flex items-center justify-center" style={{ width: 100, height: 100 }}>
-            <Diamond color={data.style?.background || 'red'} size={90} />
+            <EnhancedDiamond color={data.style?.background || 'red'} size={90} />
             <div 
-              className="absolute inset-0 flex items-center justify-center text-xs font-bold text-center px-2"
+              className="absolute inset-0 flex items-center justify-center text-xs font-bold text-center px-2 mt-12"
               style={{ color: data.style?.color || 'white' }}
             >
               {renderLabelContent()}
@@ -241,6 +889,86 @@ const CustomNode = ({ data, id }: NodeProps) => {
         return (
           <div className="flex flex-col items-center justify-center p-2">
             <LoginForm 
+              color={data.style?.strokeColor || data.style?.background || '#10B981'} 
+              size={100} 
+            />
+            <div 
+              className="mt-1 text-xs font-bold text-center" 
+              style={{ color: data.style?.color || '#333' }}
+            >
+              {renderLabelContent()}
+            </div>
+          </div>
+        );
+      
+      case 'tabs-component':
+        return (
+          <div className="flex flex-col items-center justify-center p-2">
+            <TabsComponent 
+              color={data.style?.strokeColor || data.style?.background || '#8B5CF6'} 
+              size={100} 
+            />
+            <div 
+              className="mt-1 text-xs font-bold text-center" 
+              style={{ color: data.style?.color || '#333' }}
+            >
+              {renderLabelContent()}
+            </div>
+          </div>
+        );
+      
+      case 'crud-component':
+        return (
+          <div className="flex flex-col items-center justify-center p-2">
+            <CRUDComponent 
+              color={data.style?.strokeColor || data.style?.background || '#8B5CF6'} 
+              size={100} 
+            />
+            <div 
+              className="mt-1 text-xs font-bold text-center" 
+              style={{ color: data.style?.color || '#333' }}
+            >
+              {renderLabelContent()}
+            </div>
+          </div>
+        );
+      
+      case 'dashboard-component':
+        return (
+          <div className="flex flex-col items-center justify-center p-2">
+            <DashboardComponent 
+              color={data.style?.strokeColor || data.style?.background || '#8B5CF6'} 
+              size={100} 
+            />
+            <div 
+              className="mt-1 text-xs font-bold text-center" 
+              style={{ color: data.style?.color || '#333' }}
+            >
+              {renderLabelContent()}
+            </div>
+          </div>
+        );
+      
+      case 'settings-component':
+        return (
+          <div className="flex flex-col items-center justify-center p-2">
+            <SettingsComponent 
+              color={data.style?.strokeColor || data.style?.background || '#8B5CF6'} 
+              size={100} 
+            />
+            <div 
+              className="mt-1 text-xs font-bold text-center" 
+              style={{ color: data.style?.color || '#333' }}
+            >
+              {renderLabelContent()}
+            </div>
+          </div>
+        );
+      
+      case 'page':
+        return (
+          <div className="flex flex-col items-center justify-center p-2">
+            <PageLayout 
               color={data.style?.strokeColor || data.style?.background || '#10B981'} 
               size={100} 
             />
@@ -306,6 +1034,46 @@ const CustomNode = ({ data, id }: NodeProps) => {
         };
       
       case 'login':
+        return {
+          background: 'transparent',
+          border: 'none',
+          borderRadius: 0,
+          padding: '8px',
+        };
+      
+      case 'tabs-component':
+        return {
+          background: 'transparent',
+          border: 'none',
+          borderRadius: 0,
+          padding: '8px',
+        };
+      
+      case 'crud-component':
+        return {
+          background: 'transparent',
+          border: 'none',
+          borderRadius: 0,
+          padding: '8px',
+        };
+      
+      case 'dashboard-component':
+        return {
+          background: 'transparent',
+          border: 'none',
+          borderRadius: 0,
+          padding: '8px',
+        };
+      
+      case 'settings-component':
+        return {
+          background: 'transparent',
+          border: 'none',
+          borderRadius: 0,
+          padding: '8px',
+        };
+      
+      case 'page':
         return {
           background: 'transparent',
           border: 'none',
@@ -810,7 +1578,7 @@ const WorkflowWebBuilder: React.FC = () => {
                     draggable
                     onDragStart={(event) => onDragStart(event, 'page', {
                       label: 'CRUD Component',
-                      nodeType: 'component',
+                      nodeType: 'crud-component',
                       style: {
                         background: '#8B5CF6',
                         color: 'white',
@@ -856,7 +1624,7 @@ const WorkflowWebBuilder: React.FC = () => {
                     draggable
                     onDragStart={(event) => onDragStart(event, 'page', {
                       label: 'Dashboard Component',
-                      nodeType: 'component',
+                      nodeType: 'dashboard-component',
                       style: {
                         background: '#8B5CF6',
                         color: 'white',
@@ -879,7 +1647,7 @@ const WorkflowWebBuilder: React.FC = () => {
                     draggable
                     onDragStart={(event) => onDragStart(event, 'page', {
                       label: 'Settings Component',
-                      nodeType: 'component',
+                      nodeType: 'settings-component',
                       style: {
                         background: '#8B5CF6',
                         color: 'white',
