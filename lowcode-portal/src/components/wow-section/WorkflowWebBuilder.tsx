@@ -18,67 +18,144 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
-// Stick Figure SVG Component for User nodes
-const StickFigure = ({ color = '#3B82F6', size = 60, strokeWidth = 3 }) => (
+// Enhanced Stick Figure for Actor nodes - keeping original shape but with modern styling
+const EnhancedStickFigure = ({ color = '#3B82F6', size = 60, strokeWidth = 3 }) => (
   <svg width={size} height={size * 1.2} viewBox="0 0 60 72" className="mx-auto">
-    {/* Head */}
+    {/* Define gradients and filters for enhancement */}
+    <defs>
+      <linearGradient id={`stick-gradient-${color}`} x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style={{ stopColor: color, stopOpacity: 1 }} />
+        <stop offset="100%" style={{ stopColor: color, stopOpacity: 0.8 }} />
+      </linearGradient>
+      <filter id={`stick-glow-${color}`}>
+        <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+        <feMerge> 
+          <feMergeNode in="coloredBlur"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+      <filter id={`stick-shadow-${color}`}>
+        <feDropShadow dx="1" dy="1" stdDeviation="1" floodOpacity="0.3"/>
+      </filter>
+    </defs>
+    
+    {/* Background glow effect */}
+    <circle 
+      cx="30" 
+      cy="36" 
+      r="25" 
+      fill={color}
+      opacity="0.05"
+      filter={`url(#stick-shadow-${color})`}
+    />
+    
+    {/* Head with enhanced styling */}
     <circle 
       cx="30" 
       cy="12" 
       r="8" 
       fill="none" 
-      stroke={color} 
+      stroke={`url(#stick-gradient-${color})`}
       strokeWidth={strokeWidth}
       strokeLinecap="round"
+      filter={`url(#stick-glow-${color})`}
     />
-    {/* Body */}
+    
+    {/* Inner head circle for depth */}
+    <circle 
+      cx="30" 
+      cy="12" 
+      r="6" 
+      fill="none" 
+      stroke={color}
+      strokeWidth="1"
+      opacity="0.3"
+    />
+    
+    {/* Body with gradient stroke */}
     <line 
       x1="30" 
       y1="20" 
       x2="30" 
       y2="45" 
-      stroke={color} 
+      stroke={`url(#stick-gradient-${color})`}
       strokeWidth={strokeWidth}
       strokeLinecap="round"
+      filter={`url(#stick-glow-${color})`}
     />
-    {/* Arms */}
+    
+    {/* Left arm with enhanced styling */}
     <line 
       x1="30" 
       y1="28" 
       x2="20" 
       y2="35" 
-      stroke={color} 
+      stroke={`url(#stick-gradient-${color})`}
       strokeWidth={strokeWidth}
       strokeLinecap="round"
+      filter={`url(#stick-glow-${color})`}
     />
+    
+    {/* Right arm with enhanced styling */}
     <line 
       x1="30" 
       y1="28" 
       x2="40" 
       y2="35" 
-      stroke={color} 
+      stroke={`url(#stick-gradient-${color})`}
       strokeWidth={strokeWidth}
       strokeLinecap="round"
+      filter={`url(#stick-glow-${color})`}
     />
-    {/* Legs */}
+    
+    {/* Left leg with enhanced styling */}
     <line 
       x1="30" 
       y1="45" 
       x2="20" 
       y2="60" 
-      stroke={color} 
+      stroke={`url(#stick-gradient-${color})`}
       strokeWidth={strokeWidth}
       strokeLinecap="round"
+      filter={`url(#stick-glow-${color})`}
     />
+    
+    {/* Right leg with enhanced styling */}
     <line 
       x1="30" 
       y1="45" 
       x2="40" 
       y2="60" 
-      stroke={color} 
+      stroke={`url(#stick-gradient-${color})`}
       strokeWidth={strokeWidth}
       strokeLinecap="round"
+      filter={`url(#stick-glow-${color})`}
     />
+    
+    {/* Joint dots for modern touch */}
+    <circle cx="30" cy="28" r="1.5" fill={color} opacity="0.6"/> {/* Shoulder */}
+    <circle cx="30" cy="45" r="1.5" fill={color} opacity="0.6"/> {/* Hip */}
+    <circle cx="20" cy="35" r="1" fill={color} opacity="0.5"/> {/* Left hand */}
+    <circle cx="40" cy="35" r="1" fill={color} opacity="0.5"/> {/* Right hand */}
+    <circle cx="20" cy="60" r="1" fill={color} opacity="0.5"/> {/* Left foot */}
+    <circle cx="40" cy="60" r="1" fill={color} opacity="0.5"/> {/* Right foot */}
+    
+    {/* Simple face elements */}
+    <g opacity="0.7">
+      <circle cx="27" cy="10" r="0.8" fill={color}/>  {/* Left eye */}
+      <circle cx="33" cy="10" r="0.8" fill={color}/>  {/* Right eye */}
+      <path 
+        d="M27 14 Q30 16 33 14" 
+        fill="none" 
+        stroke={color} 
+        strokeWidth="1"
+        strokeLinecap="round"
+      />  {/* Smile */}
+    </g>
+    
+    {/* Connection indicators */}
+    <circle cx="5" cy="36" r="1.5" fill={color} opacity="0.3"/>
+    <circle cx="55" cy="36" r="1.5" fill={color} opacity="0.3"/>
   </svg>
 );
 
@@ -858,10 +935,10 @@ const CustomNode = ({ data, id }: NodeProps) => {
       case 'actor':
         return (
           <div className="flex flex-col items-center justify-center p-2">
-            <StickFigure 
+            <EnhancedStickFigure 
               color={data.style?.strokeColor || data.style?.background || '#3B82F6'} 
-              size={50} 
-              strokeWidth={4} 
+              size={60} 
+              strokeWidth={3} 
             />
             <div 
               className="mt-1 text-xs font-bold text-center" 
