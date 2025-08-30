@@ -1332,6 +1332,26 @@ const WorkflowWebBuilder: React.FC = () => {
     }));
   };
 
+  // State for option panel
+  const [showOptionPanel, setShowOptionPanel] = useState(false);
+  const [selectedTheme, setSelectedTheme] = useState('blue');
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>(['thai', 'english']);
+  const [selectedAlertType, setSelectedAlertType] = useState('modal');
+
+  const toggleOptionPanel = () => {
+    setShowOptionPanel(!showOptionPanel);
+  };
+
+  const handleLanguageChange = (language: string) => {
+    setSelectedLanguages(prev => {
+      if (prev.includes(language)) {
+        return prev.filter(lang => lang !== language);
+      } else {
+        return [...prev, language];
+      }
+    });
+  };
+
   // Initialize with saved data or defaults
     const getInitialFlow = () => {
       if (typeof window !== 'undefined') {
@@ -1871,6 +1891,94 @@ const WorkflowWebBuilder: React.FC = () => {
                     </ReactFlow>
                   </div>
                   
+                  {/* Option Panel Button - Left side */}
+                  <div className="absolute top-4 left-4 z-20">
+                    <button 
+                      onClick={toggleOptionPanel}
+                      className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-lg transition-all duration-200 transform hover:scale-105 border border-purple-600"
+                    >
+                      Options
+                    </button>
+                  </div>
+
+                  {/* Option Panel Overlay */}
+                  {showOptionPanel && (
+                    <div className="absolute top-16 left-4 bg-white dark:bg-slate-800 rounded-xl p-4 shadow-xl border border-slate-200 dark:border-slate-700 z-20 w-80">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">Options</h3>
+                        <button 
+                          onClick={toggleOptionPanel}
+                          className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+
+                      {/* Options Panel Content - Single Row */}
+                      <div className="flex items-center space-x-4">
+                        
+                        {/* Theme Selector */}
+                        <div className="flex-1">
+                          <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                            Theme
+                          </label>
+                          <select 
+                            value={selectedTheme} 
+                            onChange={(e) => setSelectedTheme(e.target.value)}
+                            className="w-full text-xs border border-slate-300 dark:border-slate-600 rounded px-2 py-1 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200"
+                          >
+                            <option value="blue">Blue</option>
+                            <option value="green">Green</option>
+                            <option value="purple">Purple</option>
+                            <option value="red">Red</option>
+                            <option value="orange">Orange</option>
+                          </select>
+                        </div>
+
+                        {/* Language Checkboxes */}
+                        <div className="flex-1">
+                          <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                            Languages
+                          </label>
+                          <div className="space-y-1">
+                            {['thai', 'english', 'japanese', 'chinese'].map(lang => (
+                              <label key={lang} className="flex items-center text-xs">
+                                <input
+                                  type="checkbox"
+                                  checked={selectedLanguages.includes(lang)}
+                                  onChange={() => handleLanguageChange(lang)}
+                                  className="mr-1 w-3 h-3"
+                                />
+                                <span className="capitalize text-slate-700 dark:text-slate-300">{lang}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Alert/Modal Type Selector */}
+                        <div className="flex-1">
+                          <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                            Alert Type
+                          </label>
+                          <select 
+                            value={selectedAlertType} 
+                            onChange={(e) => setSelectedAlertType(e.target.value)}
+                            className="w-full text-xs border border-slate-300 dark:border-slate-600 rounded px-2 py-1 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200"
+                          >
+                            <option value="modal">Modal</option>
+                            <option value="toast">Toast</option>
+                            <option value="alert">Alert</option>
+                            <option value="notification">Notification</option>
+                            <option value="popup">Popup</option>
+                          </select>
+                        </div>
+
+                      </div>
+                    </div>
+                  )}
+
                   {/* Action Buttons */}
                   <div className="absolute top-4 right-4 flex space-x-2">
                     <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-lg transition-all duration-200 transform hover:scale-105 border border-green-600">
