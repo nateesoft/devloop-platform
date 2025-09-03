@@ -6,19 +6,27 @@ import { ChevronUp } from 'lucide-react';
 const ScrollToTopButton: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
 
-  // Show button when user scrolls down 400px
+  // Show button when user scrolls down 400px with throttling
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout | null = null;
+    
     const toggleVisibility = () => {
-      if (window.pageYOffset > 400) {
-        setIsVisible(true);
-      } else {
-        setIsVisible(false);
-      }
+      if (timeoutId) return; // Throttle scroll events
+      
+      timeoutId = setTimeout(() => {
+        const shouldShow = window.pageYOffset > 400;
+        setIsVisible(shouldShow);
+        timeoutId = null;
+      }, 150); // Throttle to ~6fps for visibility toggle
     };
 
-    window.addEventListener('scroll', toggleVisibility);
+    window.addEventListener('scroll', toggleVisibility, { passive: true });
+    toggleVisibility(); // Check initial state
 
-    return () => window.removeEventListener('scroll', toggleVisibility);
+    return () => {
+      window.removeEventListener('scroll', toggleVisibility);
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, []);
 
   // Scroll to top function

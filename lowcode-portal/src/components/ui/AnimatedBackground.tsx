@@ -29,25 +29,35 @@ const AnimatedBackground: React.FC = () => {
     };
   }, []);
 
-  // Track scroll position for parallax effect with throttling
+  // Track scroll position for parallax effect with optimized throttling
   useEffect(() => {
-    let rafId: number;
+    let rafId: number | null = null;
+    let lastScrollTime = 0;
+    const throttleDelay = 16; // ~60fps
+    
     const handleScroll = () => {
+      const now = performance.now();
+      if (now - lastScrollTime < throttleDelay) return;
+      
+      if (rafId !== null) return; // Prevent multiple RAF calls
+      
       rafId = requestAnimationFrame(() => {
         setScrollY(window.scrollY);
+        lastScrollTime = performance.now();
+        rafId = null;
       });
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      if (rafId) cancelAnimationFrame(rafId);
+      if (rafId !== null) cancelAnimationFrame(rafId);
     };
   }, []);
 
 
   return (
-    <div className="fixed inset-0 -z-10 overflow-hidden will-change-transform">
+    <div className="fixed inset-0 -z-10 overflow-hidden will-change-transform" style={{ contain: 'layout style paint' }}>
       {/* Ocean of Technology Base */}
       <div className="absolute inset-0 bg-gradient-to-b from-blue-400 via-blue-700 to-blue-950 dark:from-slate-700 dark:via-blue-950 dark:to-slate-900" />
       
