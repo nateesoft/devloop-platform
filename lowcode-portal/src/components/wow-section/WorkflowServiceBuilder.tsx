@@ -14,7 +14,10 @@ import ReactFlow, {
   Handle,
   Position,
   NodeProps,
-  MarkerType
+  MarkerType,
+  EdgeProps,
+  getBezierPath,
+  BaseEdge
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
@@ -1042,7 +1045,7 @@ const CustomNode = ({ data, id }: NodeProps) => {
           </div>
         );
       
-      case 'page':
+      case 'component':
         return (
           <div className="flex flex-col items-center justify-center p-2">
             <PageLayout 
@@ -1150,7 +1153,7 @@ const CustomNode = ({ data, id }: NodeProps) => {
           padding: '8px',
         };
       
-      case 'page':
+      case 'component':
         return {
           background: 'transparent',
           border: 'none',
@@ -1206,6 +1209,95 @@ const CustomNode = ({ data, id }: NodeProps) => {
         style={handleStyles.right}
       />
     </div>
+  );
+};
+
+// Custom Edge Component with editable labels
+const CustomEdge = ({ id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, data }: EdgeProps) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [label, setLabel] = useState(data?.label || '');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Focus input when editing starts
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [isEditing]);
+
+  const handleDoubleClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    setIsEditing(true);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === 'Escape') {
+      finishEditing();
+    }
+  };
+
+  const finishEditing = () => {
+    setIsEditing(false);
+    if (label.trim() && label !== data?.label) {
+      // Update edge data through a custom event that parent can listen to
+      const updateEvent = new CustomEvent('updateEdgeLabel', {
+        detail: { edgeId: id, newLabel: label.trim() }
+      });
+      window.dispatchEvent(updateEvent);
+    } else {
+      setLabel(data?.label || '');
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLabel(e.target.value);
+  };
+
+  const [edgePath, labelX, labelY] = getBezierPath({
+    sourceX,
+    sourceY,
+    sourcePosition,
+    targetX,
+    targetY,
+    targetPosition,
+  });
+
+  return (
+    <>
+      <BaseEdge path={edgePath} markerEnd={MarkerType.ArrowClosed} />
+      <foreignObject
+        width={120}
+        height={40}
+        x={labelX - 60}
+        y={labelY - 20}
+        className="edgebutton-foreignobject"
+        requiredExtensions="http://www.w3.org/1999/xhtml"
+      >
+        <div className="flex items-center justify-center w-full h-full">
+          {isEditing ? (
+            <input
+              ref={inputRef}
+              type="text"
+              value={label}
+              onChange={handleInputChange}
+              onBlur={finishEditing}
+              onKeyDown={handleKeyDown}
+              className="bg-white border border-blue-300 rounded px-2 py-1 text-xs text-center shadow-sm min-w-20 max-w-28"
+              placeholder="Label..."
+            />
+          ) : (
+            <div
+              onDoubleClick={handleDoubleClick}
+              className="bg-white/90 backdrop-blur-sm border border-slate-300 rounded px-2 py-1 text-xs font-medium text-slate-700 cursor-pointer hover:bg-white shadow-sm transition-all duration-200 hover:border-blue-400"
+              title="Double-click to edit"
+            >
+              {data?.label || 'Click to add label'}
+            </div>
+          )}
+        </div>
+      </foreignObject>
+    </>
   );
 };
 
@@ -1272,12 +1364,30 @@ const initialNodes: Node[] = [
 ];
 
 const initialEdges: Edge[] = [
-  { id: 'e1-2', source: '1', target: '2', type: 'smoothstep', markerEnd: { type: MarkerType.ArrowClosed } },
-  { id: 'e1-3', source: '1', target: '3', type: 'smoothstep', markerEnd: { type: MarkerType.ArrowClosed } }
+  { 
+    id: 'e1-2', 
+    source: '1', 
+    target: '2', 
+    type: 'customEdge', 
+    markerEnd: { type: MarkerType.ArrowClosed },
+    data: { label: 'access' }
+  },
+  { 
+    id: 'e1-3', 
+    source: '1', 
+    target: '3', 
+    type: 'customEdge', 
+    markerEnd: { type: MarkerType.ArrowClosed },
+    data: { label: 'navigate' }
+  }
 ];
 
 const nodeTypes = {
   customNode: CustomNode,
+};
+
+const edgeTypes = {
+  customEdge: CustomEdge,
 };
 
 // LocalStorage functions
@@ -1321,8 +1431,8 @@ const WorkflowServiceBuilder: React.FC = () => {
   // State for collapsible groups
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({
     'User': false,
-    'Page': false,
-    'Components': false
+    'Component': false,
+    'Template': false
   });
 
   const toggleGroup = (groupName: string) => {
@@ -1370,7 +1480,12 @@ const WorkflowServiceBuilder: React.FC = () => {
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialFlow.edges);
   
     const onConnect = useCallback((params: Connection) => {
-      const newEdge = { ...params, markerEnd: { type: MarkerType.ArrowClosed } };
+      const newEdge = { 
+        ...params, 
+        type: 'customEdge',
+        markerEnd: { type: MarkerType.ArrowClosed },
+        data: { label: '' }
+      };
       setEdges((els) => addEdge(newEdge, els));
     }, [setEdges]);
   
@@ -1384,20 +1499,38 @@ const WorkflowServiceBuilder: React.FC = () => {
         )
       );
     }, [setNodes]);
+
+    // Handle edge label updates
+    const updateEdgeLabel = useCallback((edgeId: string, newLabel: string) => {
+      setEdges((eds) => 
+        eds.map((edge) => 
+          edge.id === edgeId 
+            ? { ...edge, data: { ...edge.data, label: newLabel } }
+            : edge
+        )
+      );
+    }, [setEdges]);
   
-    // Listen for node label update events
+    // Listen for node and edge label update events
     useEffect(() => {
       const handleUpdateNodeLabel = (e: CustomEvent) => {
         const { nodeId, newLabel } = e.detail;
         updateNodeLabel(nodeId, newLabel);
       };
+
+      const handleUpdateEdgeLabel = (e: CustomEvent) => {
+        const { edgeId, newLabel } = e.detail;
+        updateEdgeLabel(edgeId, newLabel);
+      };
   
       window.addEventListener('updateNodeLabel', handleUpdateNodeLabel as EventListener);
+      window.addEventListener('updateEdgeLabel', handleUpdateEdgeLabel as EventListener);
       
       return () => {
         window.removeEventListener('updateNodeLabel', handleUpdateNodeLabel as EventListener);
+        window.removeEventListener('updateEdgeLabel', handleUpdateEdgeLabel as EventListener);
       };
-    }, [updateNodeLabel]);
+    }, [updateNodeLabel, updateEdgeLabel]);
   
     // Save flow data whenever nodes or edges change
     useEffect(() => {
@@ -1494,7 +1627,7 @@ const WorkflowServiceBuilder: React.FC = () => {
               
               {/* Draggable Components Palette */}
               <div className="absolute top-4 left-4 bottom-4 bg-white dark:bg-slate-800 rounded-xl p-4 shadow-lg border border-slate-200 dark:border-slate-700 z-10 overflow-y-auto">
-                <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Tools</h4>
+                <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Service Tools</h4>
                 <div className="space-y-3">
                   
                   {/* User Group */}
@@ -1542,12 +1675,12 @@ const WorkflowServiceBuilder: React.FC = () => {
                           <span className="text-xs text-slate-600 dark:text-slate-400">User</span>
                         </div>
 
-                        {/* Actor - Login User Nodes */}
+                        {/* Actor - User Authentication Nodes */}
                         <div 
                           className="flex items-center space-x-2 p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
                           draggable
                           onDragStart={(event) => onDragStart(event, 'user', {
-                            label: 'User-Login',
+                            label: 'User-Authen',
                             nodeType: 'actor',
                             style: {
                               background: 'transparent',
@@ -1563,48 +1696,24 @@ const WorkflowServiceBuilder: React.FC = () => {
                           })}
                         >
                           <div className="w-4 h-4 bg-green-500 rounded"></div>
-                          <span className="text-xs text-slate-600 dark:text-slate-400">User-Login</span>
-                        </div>
-
-                        {/* Actor - Admin User Nodes */}
-                        <div 
-                          className="flex items-center space-x-2 p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
-                          draggable
-                          onDragStart={(event) => onDragStart(event, 'user', {
-                            label: 'User-Admin',
-                            nodeType: 'actor',
-                            style: {
-                              background: 'transparent',
-                              strokeColor: 'brown',
-                              color: '#FFFAFA',
-                              border: 'none',
-                              borderRadius: '10px',
-                              fontSize: '14px',
-                              fontWeight: 'bold',
-                              width: 140,
-                              textAlign: 'center',
-                            }
-                          })}
-                        >
-                          <div className="w-4 h-4 bg-amber-600 rounded"></div>
-                          <span className="text-xs text-slate-600 dark:text-slate-400">User-Admin</span>
+                          <span className="text-xs text-slate-600 dark:text-slate-400">User-Authen</span>
                         </div>
                       </div>
                     )}
                   </div>
 
-                  {/* Page Group */}
+                  {/* Component Group */}
                   <div>
                     <button 
-                      onClick={() => toggleGroup('Page')}
+                      onClick={() => toggleGroup('Component')}
                       className="flex items-center justify-between w-full text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
                     >
                       <span className="flex items-center">
                         <div className="w-3 h-3 bg-green-500 rounded mr-2"></div>
-                        Page
+                        Component
                       </span>
                       <svg 
-                        className={`w-4 h-4 transition-transform ${collapsedGroups['Page'] ? 'rotate-0' : 'rotate-90'}`} 
+                        className={`w-4 h-4 transition-transform ${collapsedGroups['Component'] ? 'rotate-0' : 'rotate-90'}`} 
                         fill="none" 
                         stroke="currentColor" 
                         viewBox="0 0 24 24"
@@ -1612,15 +1721,15 @@ const WorkflowServiceBuilder: React.FC = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     </button>
-                    {!collapsedGroups['Page'] && (
+                    {!collapsedGroups['Component'] && (
                       <div className="mt-2 ml-5 space-y-2">
-                        {/* Login Node */}
+                        {/* Authentication Node */}
                         <div 
                           className="flex items-center space-x-2 p-2 bg-green-50 dark:bg-green-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
                           draggable
-                          onDragStart={(event) => onDragStart(event, 'login', {
-                            label: 'Login',
-                            nodeType: 'login',
+                          onDragStart={(event) => onDragStart(event, 'authentication', {
+                            label: 'Authentication',
+                            nodeType: 'autthentication',
                             style: {
                               background: '#10B981',
                               color: 'white',
@@ -1634,113 +1743,21 @@ const WorkflowServiceBuilder: React.FC = () => {
                           })}
                         >
                           <div className="w-4 h-4 bg-green-500 rounded"></div>
-                          <span className="text-xs text-slate-600 dark:text-slate-400">Login</span>
-                        </div>
-
-                        {/* Landing Page Node */}
-                        <div 
-                          className="flex items-center space-x-2 p-2 bg-green-50 dark:bg-green-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
-                          draggable
-                          onDragStart={(event) => onDragStart(event, 'page', {
-                            label: 'Landing',
-                            nodeType: 'page',
-                            style: {
-                              background: '#10B981',
-                              color: 'white',
-                              border: '2px solid #047857',
-                              borderRadius: '10px',
-                              fontSize: '14px',
-                              fontWeight: 'bold',
-                              width: 140,
-                              textAlign: 'center',
-                            }
-                          })}
-                        >
-                          <div className="w-4 h-4 bg-green-500 rounded"></div>
-                          <span className="text-xs text-slate-600 dark:text-slate-400">Landing-Page</span>
-                        </div>
-
-                        {/* User Home Node */}
-                        <div 
-                          className="flex items-center space-x-2 p-2 bg-green-50 dark:bg-green-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
-                          draggable
-                          onDragStart={(event) => onDragStart(event, 'page', {
-                            label: 'Home-User',
-                            nodeType: 'page',
-                            style: {
-                              background: '#10B981',
-                              color: 'white',
-                              border: '2px solid #047857',
-                              borderRadius: '10px',
-                              fontSize: '14px',
-                              fontWeight: 'bold',
-                              width: 140,
-                              textAlign: 'center',
-                            }
-                          })}
-                        >
-                          <div className="w-4 h-4 bg-green-500 rounded"></div>
-                          <span className="text-xs text-slate-600 dark:text-slate-400">Home-User</span>
-                        </div>
-
-                        {/* Admin Home Node */}
-                        <div 
-                          className="flex items-center space-x-2 p-2 bg-green-50 dark:bg-green-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
-                          draggable
-                          onDragStart={(event) => onDragStart(event, 'page', {
-                            label: 'Home-Admin',
-                            nodeType: 'page',
-                            style: {
-                              background: '#10B981',
-                              color: 'white',
-                              border: '2px solid #047857',
-                              borderRadius: '10px',
-                              fontSize: '14px',
-                              fontWeight: 'bold',
-                              width: 140,
-                              textAlign: 'center',
-                            }
-                          })}
-                        >
-                          <div className="w-4 h-4 bg-green-500 rounded"></div>
-                          <span className="text-xs text-slate-600 dark:text-slate-400">Home-Admin</span>
-                        </div>
-
-                        {/* Route Node */}
-                        <div 
-                          className="flex items-center space-x-2 p-2 bg-red-50 dark:bg-red-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
-                          draggable
-                          onDragStart={(event) => onDragStart(event, 'route', {
-                            label: 'Route?',
-                            nodeType: 'route',
-                            style: {
-                              background: 'red',
-                              color: 'white',
-                              border: '2px solid darkred',
-                              borderRadius: '10px',
-                              fontSize: '14px',
-                              fontWeight: 'bold',
-                              width: 140,
-                              textAlign: 'center',
-                            }
-                          })}
-                        >
-                          <div className="w-4 h-4 bg-red-500 rounded"></div>
-                          <span className="text-xs text-slate-600 dark:text-slate-400">Route</span>
+                          <span className="text-xs text-slate-600 dark:text-slate-400">Authentication</span>
                         </div>
                       </div>
                     )}
                   </div>
 
-                  {/* Components Group */}
+                  {/* Template Group */}
                   <div>
                     <button 
-                      onClick={() => toggleGroup('Components')}
+                      onClick={() => toggleGroup('Template')}
                       className="flex items-center justify-between w-full text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
                     >
                       <span className="flex items-center">
                         <div className="w-3 h-3 bg-purple-500 rounded mr-2"></div>
-                        Components
+                        Template
                       </span>
                       <svg 
                         className={`w-4 h-4 transition-transform ${collapsedGroups['Components'] ? 'rotate-0' : 'rotate-90'}`} 
@@ -1751,15 +1768,15 @@ const WorkflowServiceBuilder: React.FC = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     </button>
-                    {!collapsedGroups['Components'] && (
+                    {!collapsedGroups['Templates'] && (
                       <div className="mt-2 ml-5 space-y-2">
                         {/* Components - CRUD Node */}
                         <div 
                           className="flex items-center space-x-2 p-2 bg-purple-50 dark:bg-purple-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
                           draggable
-                          onDragStart={(event) => onDragStart(event, 'page', {
-                            label: 'CRUD Component',
-                            nodeType: 'crud-component',
+                          onDragStart={(event) => onDragStart(event, 'template', {
+                            label: 'CRUD Templates',
+                            nodeType: 'crud-template',
                             style: {
                               background: '#8B5CF6',
                               color: 'white',
@@ -1774,75 +1791,6 @@ const WorkflowServiceBuilder: React.FC = () => {
                         >
                           <div className="w-4 h-4 bg-purple-500 rounded"></div>
                           <span className="text-xs text-slate-600 dark:text-slate-400">c-CRUD</span>
-                        </div>
-
-                        {/* Components - Tabs Node */}
-                        <div 
-                          className="flex items-center space-x-2 p-2 bg-purple-50 dark:bg-purple-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
-                          draggable
-                          onDragStart={(event) => onDragStart(event, 'page', {
-                            label: 'Tabs Component',
-                            nodeType: 'tabs-component',
-                            style: {
-                              background: '#8B5CF6',
-                              color: 'white',
-                              border: '2px solid #6D28D9',
-                              borderRadius: '10px',
-                              fontSize: '14px',
-                              fontWeight: 'bold',
-                              width: 140,
-                              textAlign: 'center',
-                            }
-                          })}
-                        >
-                          <div className="w-4 h-4 bg-purple-500 rounded"></div>
-                          <span className="text-xs text-slate-600 dark:text-slate-400">c-Tabs</span>
-                        </div>
-
-                        {/* Components - Dashboard Node */}
-                        <div 
-                          className="flex items-center space-x-2 p-2 bg-purple-50 dark:bg-purple-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
-                          draggable
-                          onDragStart={(event) => onDragStart(event, 'page', {
-                            label: 'Dashboard Component',
-                            nodeType: 'dashboard-component',
-                            style: {
-                              background: '#8B5CF6',
-                              color: 'white',
-                              border: '2px solid #6D28D9',
-                              borderRadius: '10px',
-                              fontSize: '14px',
-                              fontWeight: 'bold',
-                              width: 140,
-                              textAlign: 'center',
-                            }
-                          })}
-                        >
-                          <div className="w-4 h-4 bg-purple-500 rounded"></div>
-                          <span className="text-xs text-slate-600 dark:text-slate-400">c-Dashboard</span>
-                        </div>
-
-                        {/* Components - Settings Node */}
-                        <div 
-                          className="flex items-center space-x-2 p-2 bg-purple-50 dark:bg-purple-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
-                          draggable
-                          onDragStart={(event) => onDragStart(event, 'page', {
-                            label: 'Settings Component',
-                            nodeType: 'settings-component',
-                            style: {
-                              background: '#8B5CF6',
-                              color: 'white',
-                              border: '2px solid #6D28D9',
-                              borderRadius: '10px',
-                              fontSize: '14px',
-                              fontWeight: 'bold',
-                              width: 140,
-                              textAlign: 'center',
-                            }
-                          })}
-                        >
-                          <div className="w-4 h-4 bg-purple-500 rounded"></div>
-                          <span className="text-xs text-slate-600 dark:text-slate-400">c-Settings</span>
                         </div>
                       </div>
                     )}
@@ -1867,6 +1815,7 @@ const WorkflowServiceBuilder: React.FC = () => {
                       onConnect={onConnect}
                       onInit={setReactFlowInstance}
                       nodeTypes={nodeTypes}
+                      edgeTypes={edgeTypes}
                       fitView
                       nodesDraggable={true}
                       nodesConnectable={true}
