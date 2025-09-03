@@ -49,19 +49,19 @@ const AnimatedBackground: React.FC = () => {
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden will-change-transform">
       {/* Ocean of Technology Base */}
-      <div className="absolute inset-0 bg-gradient-to-b from-sky-200 via-blue-500 to-blue-900 dark:from-slate-800 dark:via-blue-900 dark:to-slate-950" />
+      <div className="absolute inset-0 bg-gradient-to-b from-blue-400 via-blue-700 to-blue-950 dark:from-slate-700 dark:via-blue-950 dark:to-slate-900" />
       
       {/* Flying Drone Perspective Effect */}
       <div 
         className="absolute inset-0"
         style={{
           background: `
-            radial-gradient(ellipse at center, transparent 10%, rgba(0,100,200,0.3) 70%),
+            radial-gradient(ellipse at center, transparent 10%, rgba(0,64,128,0.4) 70%),
             linear-gradient(180deg, 
               transparent 0%, 
-              rgba(59, 130, 246, 0.2) 30%, 
-              rgba(29, 78, 216, 0.4) 60%, 
-              rgba(30, 64, 175, 0.6) 100%
+              rgba(30, 64, 175, 0.3) 30%, 
+              rgba(15, 39, 108, 0.5) 60%, 
+              rgba(7, 23, 68, 0.7) 100%
             )
           `,
           transform: `perspective(1000px) rotateX(${Math.sin(time * 0.3) * 5 + 15}deg) translateZ(${scrollY * -0.5}px)`
@@ -78,9 +78,9 @@ const AnimatedBackground: React.FC = () => {
               bottom: `${i * 15}%`,
               background: `linear-gradient(90deg, 
                 transparent, 
-                rgba(59, 130, 246, 0.3), 
-                rgba(147, 51, 234, 0.3),
-                rgba(59, 130, 246, 0.3), 
+                rgba(30, 64, 175, 0.4), 
+                rgba(15, 39, 108, 0.4),
+                rgba(30, 64, 175, 0.4), 
                 transparent
               )`,
               transform: `
@@ -106,7 +106,7 @@ const AnimatedBackground: React.FC = () => {
         return (
           <div
             key={i}
-            className="absolute bg-cyan-400/40 rounded-sm will-change-transform"
+            className="absolute bg-blue-300/30 rounded-sm will-change-transform"
             style={{
               width: `${4 + depth * 8}px`,
               height: `${4 + depth * 8}px`,
@@ -122,7 +122,7 @@ const AnimatedBackground: React.FC = () => {
                 scale(${0.5 + depth})
               `,
               opacity: depth * 0.8,
-              boxShadow: `0 0 ${10 + depth * 20}px rgba(34, 211, 238, ${depth * 0.6})`
+              boxShadow: `0 0 ${10 + depth * 20}px rgba(30, 64, 175, ${depth * 0.6})`
             }}
           />
         );
@@ -170,7 +170,7 @@ const AnimatedBackground: React.FC = () => {
         return (
           <div
             key={symbol}
-            className="absolute text-cyan-300/60 font-mono font-bold pointer-events-none will-change-transform"
+            className="absolute text-blue-300/50 font-mono font-bold pointer-events-none will-change-transform"
             style={{
               left: `${20 + (i * 15) % 60}%`,
               top: `${30 + (i * 10) % 40}%`,
@@ -180,7 +180,7 @@ const AnimatedBackground: React.FC = () => {
                 rotateY(${time * (20 + i * 10)}deg) 
                 scale(${0.8 + depth * 0.4})
               `,
-              textShadow: `0 0 ${10 + depth * 20}px rgba(34, 211, 238, 0.8)`,
+              textShadow: `0 0 ${10 + depth * 20}px rgba(30, 64, 175, 0.8)`,
               opacity: 0.6 + Math.sin(time + i) * 0.3
             }}
           >
@@ -196,13 +196,13 @@ const AnimatedBackground: React.FC = () => {
           background: `
             conic-gradient(
               from ${time * 30}deg at ${50 + Math.sin(time * 0.7) * 25}% ${40 + Math.cos(time * 0.5) * 20}%,
-              rgba(59, 130, 246, 0.1) 0deg,
+              rgba(30, 64, 175, 0.15) 0deg,
               transparent 60deg,
-              rgba(147, 51, 234, 0.1) 120deg,
+              rgba(15, 39, 108, 0.15) 120deg,
               transparent 180deg,
-              rgba(59, 130, 246, 0.1) 240deg,
+              rgba(30, 64, 175, 0.15) 240deg,
               transparent 300deg,
-              rgba(59, 130, 246, 0.1) 360deg
+              rgba(30, 64, 175, 0.15) 360deg
             )
           `
         }}
@@ -210,7 +210,7 @@ const AnimatedBackground: React.FC = () => {
 
       {/* Depth Fog Effect */}
       <div 
-        className="absolute inset-0 bg-gradient-to-t from-blue-900/30 via-transparent to-sky-200/20 dark:from-slate-950/50 dark:to-blue-900/20"
+        className="absolute inset-0 bg-gradient-to-t from-blue-950/40 via-transparent to-blue-400/15 dark:from-slate-950/60 dark:to-blue-950/20"
         style={{
           transform: `translateY(${scrollY * 0.2}px)`
         }}
