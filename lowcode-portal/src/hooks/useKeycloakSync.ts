@@ -5,6 +5,7 @@ import { useKeycloakAuth } from '@/contexts/KeycloakContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { KeycloakUserSyncRequest } from '@/lib/api';
+import { getDefaultRedirectForRole } from '@/lib/routes';
 
 export const useKeycloakSync = () => {
   const { user: keycloakUser, isAuthenticated: isKeycloakAuthenticated, token } = useKeycloakAuth();
@@ -23,26 +24,22 @@ export const useKeycloakSync = () => {
         try {
           console.log('Keycloak user detected, syncing to local database:', keycloakUser);
           
-          // Extract role from Keycloak user
-          let role = 'user'; // Default role
-          if (keycloakUser.role) {
-            role = keycloakUser.role;
-          }
-
+          // Do NOT send role to backend - role management is separate
           const syncData: KeycloakUserSyncRequest = {
             keycloakId: keycloakUser.id,
             email: keycloakUser.email,
             firstName: keycloakUser.firstName || 'Unknown',
             lastName: keycloakUser.lastName || 'User',
-            role: role,
+            // role: removed - let backend handle role from database
             emailVerified: keycloakUser.emailVerified
           };
 
-          await syncKeycloakUser(syncData);
+          const response = await syncKeycloakUser(syncData);
           
-          // Redirect to dashboard after successful sync
-          console.log('Keycloak sync successful, redirecting to dashboard');
-          router.push('/dashboard');
+          // Get redirect URL based on user role from backend response
+          const redirectUrl = getDefaultRedirectForRole(response?.user?.role);
+          console.log(`Keycloak sync successful, redirecting to ${redirectUrl} based on role: ${response?.user?.role}`);
+          router.push(redirectUrl);
           
         } catch (error) {
           console.error('Failed to sync Keycloak user:', error);

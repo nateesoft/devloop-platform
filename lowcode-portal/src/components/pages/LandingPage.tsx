@@ -39,7 +39,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
       <AnimatedBackground />
       
       {/* Navigation */}
-      <nav className="border-b border-white/20 dark:border-slate-700/20 bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl sticky top-0 z-50">
+      <nav className="border-b border-white/20 dark:border-slate-700/20 bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl sticky top-0 z-50 transition-all duration-300 ease-in-out">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
@@ -54,32 +54,32 @@ const LandingPage: React.FC<LandingPageProps> = ({
             <div className="hidden md:flex items-center space-x-6">
               <button 
                 onClick={() => scrollToSection('sandbox')}
-                className={`text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition ${
-                  activeSection === 'sandbox' ? 'text-blue-600 dark:text-blue-400 font-semibold' : ''
+                className={`text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-all duration-300 ease-out transform hover:scale-105 hover:bg-white/10 dark:hover:bg-slate-800/20 px-3 py-2 rounded-lg ${
+                  activeSection === 'sandbox' ? 'text-blue-600 dark:text-blue-400 font-semibold bg-blue-50/50 dark:bg-blue-900/20' : ''
                 }`}
               >
                 Sandbox
               </button>
               <button 
                 onClick={() => scrollToSection('features')}
-                className={`text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition ${
-                  activeSection === 'features' ? 'text-blue-600 dark:text-blue-400 font-semibold' : ''
+                className={`text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-all duration-300 ease-out transform hover:scale-105 hover:bg-white/10 dark:hover:bg-slate-800/20 px-3 py-2 rounded-lg ${
+                  activeSection === 'features' ? 'text-blue-600 dark:text-blue-400 font-semibold bg-blue-50/50 dark:bg-blue-900/20' : ''
                 }`}
               >
                 {t('features')}
               </button>
               <button 
                 onClick={() => scrollToSection('templates')}
-                className={`text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition ${
-                  activeSection === 'templates' ? 'text-blue-600 dark:text-blue-400 font-semibold' : ''
+                className={`text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-all duration-300 ease-out transform hover:scale-105 hover:bg-white/10 dark:hover:bg-slate-800/20 px-3 py-2 rounded-lg ${
+                  activeSection === 'templates' ? 'text-blue-600 dark:text-blue-400 font-semibold bg-blue-50/50 dark:bg-blue-900/20' : ''
                 }`}
               >
                 {t('templates')}
               </button>
               <button 
                 onClick={() => scrollToSection('pricing')}
-                className={`text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition ${
-                  activeSection === 'pricing' ? 'text-blue-600 dark:text-blue-400 font-semibold' : ''
+                className={`text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-all duration-300 ease-out transform hover:scale-105 hover:bg-white/10 dark:hover:bg-slate-800/20 px-3 py-2 rounded-lg ${
+                  activeSection === 'pricing' ? 'text-blue-600 dark:text-blue-400 font-semibold bg-blue-50/50 dark:bg-blue-900/20' : ''
                 }`}
               >
                 {t('pricing')}
@@ -88,7 +88,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
               <LanguageSwitcher />
               <button 
                 onClick={() => router.push('/login')}
-                className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:shadow-lg transition transform hover:scale-105"
+                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:shadow-xl transition-all duration-300 ease-out transform hover:scale-105 hover:from-blue-700 hover:to-purple-700 active:scale-95"
               >
                 Get Started
               </button>
@@ -98,7 +98,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
             <div className="md:hidden">
               <button 
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition"
+                className="p-2 text-slate-600 dark:text-slate-300 hover:bg-white/20 dark:hover:bg-slate-800/30 rounded-lg transition-all duration-300 ease-out transform hover:scale-110 active:scale-95 backdrop-blur-sm"
               >
                 {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </button>
@@ -106,16 +106,18 @@ const LandingPage: React.FC<LandingPageProps> = ({
           </div>
           
           {/* Mobile Menu */}
-          {mobileMenuOpen && (
-            <div className="md:hidden border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 py-4">
-              <div className="flex flex-col space-y-4 px-4">
+          <div className={`md:hidden border-t border-white/20 dark:border-slate-700/30 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl overflow-hidden transition-all duration-500 ease-out transform ${
+            mobileMenuOpen ? 'max-h-96 opacity-100 translate-y-0' : 'max-h-0 opacity-0 -translate-y-4'
+          }`}>
+            <div className="py-4">
+              <div className="flex flex-col space-y-2 px-4">
                 <button 
                   onClick={() => {
                     scrollToSection('sandbox');
                     setMobileMenuOpen(false);
                   }}
-                  className={`text-left text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition py-2 ${
-                    activeSection === 'sandbox' ? 'text-blue-600 dark:text-blue-400 font-semibold' : ''
+                  className={`w-full text-left text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-all duration-300 ease-out py-3 px-4 rounded-lg hover:bg-white/20 dark:hover:bg-slate-700/30 transform hover:translate-x-2 ${
+                    activeSection === 'sandbox' ? 'text-blue-600 dark:text-blue-400 font-semibold bg-blue-50/50 dark:bg-blue-900/20' : ''
                   }`}
                 >
                   Sandbox
@@ -125,8 +127,8 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     scrollToSection('features');
                     setMobileMenuOpen(false);
                   }}
-                  className={`text-left text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition py-2 ${
-                    activeSection === 'features' ? 'text-blue-600 dark:text-blue-400 font-semibold' : ''
+                  className={`w-full text-left text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-all duration-300 ease-out py-3 px-4 rounded-lg hover:bg-white/20 dark:hover:bg-slate-700/30 transform hover:translate-x-2 ${
+                    activeSection === 'features' ? 'text-blue-600 dark:text-blue-400 font-semibold bg-blue-50/50 dark:bg-blue-900/20' : ''
                   }`}
                 >
                   {t('features')}
@@ -136,8 +138,8 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     scrollToSection('templates');
                     setMobileMenuOpen(false);
                   }}
-                  className={`text-left text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition py-2 ${
-                    activeSection === 'templates' ? 'text-blue-600 dark:text-blue-400 font-semibold' : ''
+                  className={`w-full text-left text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-all duration-300 ease-out py-3 px-4 rounded-lg hover:bg-white/20 dark:hover:bg-slate-700/30 transform hover:translate-x-2 ${
+                    activeSection === 'templates' ? 'text-blue-600 dark:text-blue-400 font-semibold bg-blue-50/50 dark:bg-blue-900/20' : ''
                   }`}
                 >
                   {t('templates')}
@@ -147,21 +149,21 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     scrollToSection('pricing');
                     setMobileMenuOpen(false);
                   }}
-                  className={`text-left text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition py-2 ${
-                    activeSection === 'pricing' ? 'text-blue-600 dark:text-blue-400 font-semibold' : ''
+                  className={`w-full text-left text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-all duration-300 ease-out py-3 px-4 rounded-lg hover:bg-white/20 dark:hover:bg-slate-700/30 transform hover:translate-x-2 ${
+                    activeSection === 'pricing' ? 'text-blue-600 dark:text-blue-400 font-semibold bg-blue-50/50 dark:bg-blue-900/20' : ''
                   }`}
                 >
                   {t('pricing')}
                 </button>
                 <button 
                   onClick={() => { router.push('/login'); setMobileMenuOpen(false); }}
-                  className="px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:shadow-lg transition text-center mt-4"
+                  className="w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:shadow-xl transition-all duration-300 ease-out text-center mt-6 transform hover:scale-105 hover:from-blue-700 hover:to-purple-700 active:scale-95"
                 >
                   Get Started
                 </button>
               </div>
             </div>
-          )}
+          </div>
         </div>
       </nav>
 

@@ -10,9 +10,9 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   isAdmin: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<{ user: User; tokens: any; message: string }>;
   register: (email: string, password: string, firstName: string, lastName: string, role?: string) => Promise<void>;
-  syncKeycloakUser: (keycloakUserData: KeycloakUserSyncRequest) => Promise<void>;
+  syncKeycloakUser: (keycloakUserData: KeycloakUserSyncRequest) => Promise<{ user: User; tokens: any; message: string }>;
   logout: () => void;
   refreshAuth: () => Promise<void>;
 }
@@ -159,6 +159,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       // Reset auto-logout timeout after successful login
       resetTimeout();
+      
+      return response;
     } catch (error) {
       throw error;
     }
@@ -181,12 +183,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       console.log('Syncing Keycloak user data:', keycloakUserData);
       const response = await authAPI.syncKeycloakUser(keycloakUserData);
+      
+      // IMPORTANT: Use user data from backend response (includes database role)
+      // NOT from Keycloak token data
       setUser(response.user);
       setIsAuthenticated(true);
-      console.log('Keycloak user sync successful:', response.user);
+      console.log('Keycloak user sync successful with database role:', response.user.role);
       
       // Reset auto-logout timeout after successful Keycloak sync
       resetTimeout();
+      
+      return response;
     } catch (error) {
       console.error('Keycloak user sync failed:', error);
       throw error;

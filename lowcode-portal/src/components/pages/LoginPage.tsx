@@ -6,6 +6,7 @@ import { useKeycloakSync } from '@/hooks/useKeycloakSync';
 import { useRouter } from 'next/navigation';
 import KeycloakStatus from '@/components/debug/KeycloakStatus';
 import { extractErrorMessage } from '@/utils/errorUtils';
+import { getDefaultRedirectForRole } from '@/lib/routes';
 
 interface LoginPageProps {
   setIsAuthenticated: (authenticated: boolean) => void;
@@ -16,7 +17,7 @@ const LoginPage: React.FC<LoginPageProps> = ({
   setIsAuthenticated,
   setUserRole,
 }) => {
-  const { login, register } = useAuth();
+  const { login, register, user } = useAuth();
   const keycloakAuth = useKeycloakSafe();
   const { isSyncing, syncError, isKeycloakAuthenticated, isLocalAuthenticated } = useKeycloakSync();
   const router = useRouter();
@@ -50,12 +51,15 @@ const LoginPage: React.FC<LoginPageProps> = ({
       if (isLogin) {
         console.log('Attempting login...');
         // Use AuthContext login which handles both API call and state management
-        await login(formData.email, formData.password);
+        const response = await login(formData.email, formData.password);
         console.log('Login successful');
         // Set legacy state for any components that still depend on it
         setIsAuthenticated(true);
-        // Redirect to dashboard
-        router.push('/dashboard');
+        
+        // Get redirect URL based on user role from response
+        const redirectUrl = getDefaultRedirectForRole(response.user.role);
+        console.log(`Form login successful, redirecting to ${redirectUrl} based on role: ${response.user.role}`);
+        router.push(redirectUrl);
       } else {
         if (!formData.firstName || !formData.lastName) {
           console.log('Registration validation failed: missing fields');

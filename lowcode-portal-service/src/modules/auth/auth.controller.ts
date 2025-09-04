@@ -4,6 +4,7 @@ import { AuthExceptionFilter } from '../../common/filters/auth-exception.filter'
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { KeycloakSyncDto } from './dto/keycloak-sync.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 
 @ApiTags('Authentication')
@@ -67,7 +68,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'User synced successfully' })
   @Post('keycloak-sync')
   async keycloakSync(
-    @Body() keycloakData: any,
+    @Body() keycloakSyncDto: KeycloakSyncDto,
     @Ip() ip: string,
     @Headers('user-agent') userAgent: string
   ) {
@@ -76,7 +77,7 @@ export class AuthController {
       userAgent,
       deviceInfo: 'Keycloak SSO'
     };
-    return this.authService.syncKeycloakUser(keycloakData, deviceInfo);
+    return this.authService.syncKeycloakUser(keycloakSyncDto, deviceInfo);
   }
 
   @ApiOperation({ summary: 'Logout user' })
