@@ -1,9 +1,10 @@
 import { NodeTypes } from 'reactflow';
+import React from 'react';
 import CustomNode from './CustomNode';
 
 // Wrapper component for ReactFlow compatibility
 const CustomNodeWrapper = (props: any) => {
-  return <CustomNode {...props} />;
+  return React.createElement(CustomNode, props);
 };
 
 export const nodeTypes: NodeTypes = {

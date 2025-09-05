@@ -928,6 +928,74 @@ const loadFlowFromLocalStorage = () => {
   return null;
 };
 
+// Template definitions
+const WORKFLOW_TEMPLATES = [
+  {
+    id: 'view-all',
+    name: 'เรียกดูข้อมูลทั้งหมด',
+    description: 'Template สำหรับการดึงข้อมูลทั้งหมด',
+    nodes: [
+      { type: 'httpIn', label: 'HTTP In', position: { x: 50, y: 100 } },
+      { type: 'databaseAction', label: 'DB Action', position: { x: 250, y: 100 } },
+      { type: 'paginator', label: 'Paginator', position: { x: 450, y: 100 } },
+      { type: 'httpResponse', label: 'HTTP Out', position: { x: 650, y: 100 } }
+    ]
+  },
+  {
+    id: 'view-by-id',
+    name: 'เรียกดูเฉพาะรหัส',
+    description: 'Template สำหรับการดึงข้อมูลตาม ID',
+    nodes: [
+      { type: 'httpIn', label: 'HTTP In', position: { x: 50, y: 100 } },
+      { type: 'paramExtract', label: 'Param Extract', position: { x: 200, y: 100 } },
+      { type: 'mapper', label: 'Mapper', position: { x: 350, y: 100 } },
+      { type: 'databaseAction', label: 'DB Action', position: { x: 500, y: 100 } },
+      { type: 'paginator', label: 'Paginator', position: { x: 650, y: 100 } },
+      { type: 'httpResponse', label: 'HTTP Out', position: { x: 800, y: 100 } }
+    ]
+  },
+  {
+    id: 'search-data',
+    name: 'ค้นหาข้อมูล',
+    description: 'Template สำหรับการค้นหาข้อมูล',
+    nodes: [
+      { type: 'httpIn', label: 'HTTP In', position: { x: 50, y: 100 } },
+      { type: 'paramExtract', label: 'Param Extract', position: { x: 200, y: 100 } },
+      { type: 'mapper', label: 'Mapper', position: { x: 350, y: 100 } },
+      { type: 'databaseAction', label: 'DB Action', position: { x: 500, y: 100 } },
+      { type: 'paginator', label: 'Paginator', position: { x: 650, y: 100 } },
+      { type: 'httpResponse', label: 'HTTP Out', position: { x: 800, y: 100 } }
+    ]
+  },
+  {
+    id: 'crud-data',
+    name: 'เพิ่ม/แก้ไขข้อมูล',
+    description: 'Template สำหรับการเพิ่มหรือแก้ไขข้อมูล',
+    nodes: [
+      { type: 'httpIn', label: 'HTTP In', position: { x: 50, y: 100 } },
+      { type: 'paramExtract', label: 'Param Extract', position: { x: 200, y: 100 } },
+      { type: 'validator', label: 'Validator', position: { x: 350, y: 100 } },
+      { type: 'mapper', label: 'Mapper', position: { x: 500, y: 100 } },
+      { type: 'databaseAction', label: 'DB Action', position: { x: 650, y: 100 } },
+      { type: 'paginator', label: 'Paginator', position: { x: 800, y: 100 } },
+      { type: 'httpResponse', label: 'HTTP Out', position: { x: 950, y: 100 } }
+    ]
+  },
+  {
+    id: 'delete-data',
+    name: 'ลบข้อมูล',
+    description: 'Template สำหรับการลบข้อมูล',
+    nodes: [
+      { type: 'httpIn', label: 'HTTP In', position: { x: 50, y: 100 } },
+      { type: 'paramExtract', label: 'Param Extract', position: { x: 200, y: 100 } },
+      { type: 'validator', label: 'Validator', position: { x: 350, y: 100 } },
+      { type: 'mapper', label: 'Mapper', position: { x: 500, y: 100 } },
+      { type: 'databaseAction', label: 'DB Action', position: { x: 650, y: 100 } },
+      { type: 'httpResponse', label: 'HTTP Out', position: { x: 800, y: 100 } }
+    ]
+  }
+];
+
 const WorkflowServiceBuilder: React.FC = () => {
 
   // State for collapsible groups
@@ -948,6 +1016,9 @@ const WorkflowServiceBuilder: React.FC = () => {
 
   // State for option panel
   const [showOptionPanel, setShowOptionPanel] = useState(false);
+  
+  // State for template selection
+  const [selectedTemplate, setSelectedTemplate] = useState<string>('');
   
   // Service Builder specific options
   const [serviceType, setServiceType] = useState('RestApis');
@@ -1136,6 +1207,117 @@ const WorkflowServiceBuilder: React.FC = () => {
       };
       setEdges((els) => addEdge(newEdge, els));
     }, [setEdges]);
+
+    // Function to apply template
+    const applyTemplate = useCallback((templateId: string) => {
+      const template = WORKFLOW_TEMPLATES.find(t => t.id === templateId);
+      if (!template) return;
+
+      // Clear existing nodes and edges
+      setNodes([]);
+      setEdges([]);
+
+      // Create nodes from template
+      const newNodes: Node[] = template.nodes.map((nodeTemplate, index) => {
+        const nodeTypeMapping: Record<string, string> = {
+          httpIn: 'httpIn',
+          paramExtract: 'paramExtract', 
+          validator: 'validator',
+          mapper: 'mapper',
+          databaseAction: 'databaseAction',
+          paginator: 'paginator',
+          httpResponse: 'httpResponse'
+        };
+
+        const nodeType = nodeTypeMapping[nodeTemplate.type] || nodeTemplate.type;
+        
+        // Get style based on node type
+        const getNodeStyle = (type: string) => {
+          switch (type) {
+            case 'httpIn':
+            case 'paramExtract':
+            case 'validator':
+              return {
+                background: '#3B82F6',
+                color: 'white',
+                border: '2px solid #1D4ED8',
+                borderRadius: '10px',
+                fontSize: '14px',
+                fontWeight: 'bold',
+                width: 140,
+                textAlign: 'center' as const,
+              };
+            case 'mapper':
+            case 'databaseAction':
+            case 'paginator':
+              return {
+                background: '#059669',
+                color: 'white',
+                border: '2px solid #047857',
+                borderRadius: '10px',
+                fontSize: '14px',
+                fontWeight: 'bold',
+                width: 140,
+                textAlign: 'center' as const,
+              };
+            case 'httpResponse':
+              return {
+                background: '#DC2626',
+                color: 'white',
+                border: '2px solid #B91C1C',
+                borderRadius: '10px',
+                fontSize: '14px',
+                fontWeight: 'bold',
+                width: 140,
+                textAlign: 'center' as const,
+              };
+            default:
+              return {
+                background: '#6B7280',
+                color: 'white',
+                border: '2px solid #4B5563',
+                borderRadius: '10px',
+                fontSize: '14px',
+                fontWeight: 'bold',
+                width: 140,
+                textAlign: 'center' as const,
+              };
+          }
+        };
+
+        return {
+          id: `template-node-${index}`,
+          type: 'customNode',
+          position: nodeTemplate.position,
+          data: {
+            label: nodeTemplate.label,
+            nodeType: nodeType,
+            style: getNodeStyle(nodeType),
+            orderNumber: index + 1,
+            isFirstNode: index === 0
+          }
+        };
+      });
+
+      // Create edges to connect the nodes
+      const newEdges: Edge[] = [];
+      for (let i = 0; i < newNodes.length - 1; i++) {
+        newEdges.push({
+          id: `template-edge-${i}`,
+          source: newNodes[i].id,
+          target: newNodes[i + 1].id,
+          sourceHandle: 'output-right',
+          targetHandle: 'input-left',
+          type: 'stepEdge',
+          markerEnd: { type: MarkerType.ArrowClosed },
+          data: { label: `step ${i + 1}` }
+        });
+      }
+
+      // Apply the new nodes and edges
+      setNodes(newNodes);
+      setEdges(newEdges);
+    }, [setNodes, setEdges]);
 
     // Handle node drag to show visual feedback  
     const onNodeDrag = useCallback((event: React.MouseEvent, node: Node) => {
@@ -1568,6 +1750,31 @@ const WorkflowServiceBuilder: React.FC = () => {
                   {isFullscreen && (
                     <span className="text-xs text-slate-500 dark:text-slate-400">ESC to exit</span>
                   )}
+                </div>
+
+                {/* Template Selection Dropdown */}
+                <div className="mb-4 pb-3 border-b border-slate-200 dark:border-slate-600">
+                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-2">
+                    Template
+                  </label>
+                  <select
+                    value={selectedTemplate}
+                    onChange={(e) => {
+                      const templateId = e.target.value;
+                      setSelectedTemplate(templateId);
+                      if (templateId) {
+                        applyTemplate(templateId);
+                      }
+                    }}
+                    className="w-full p-2 text-xs border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="">เลือก Template</option>
+                    {WORKFLOW_TEMPLATES.map((template) => (
+                      <option key={template.id} value={template.id}>
+                        {template.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="space-y-3">
                   
