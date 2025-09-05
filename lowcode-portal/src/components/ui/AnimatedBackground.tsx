@@ -6,10 +6,84 @@ const AnimatedBackground: React.FC = () => {
   const [scrollY, setScrollY] = useState(0);
   const [isClient, setIsClient] = useState(false);
   const [time, setTime] = useState(0);
+  const [oceanColors, setOceanColors] = useState({
+    primary: 'rgba(59, 130, 246, 0.8)',
+    secondary: 'rgba(30, 64, 175, 0.6)',
+    deep: 'rgba(15, 39, 108, 0.7)'
+  });
 
-  // Client-side hydration check
+  // Dark programmer-themed ocean color palettes
+  const getRandomOceanColors = () => {
+    const oceanPalettes = [
+      // Deep Code Blue
+      {
+        primary: 'rgba(30, 58, 138, 0.9)',
+        secondary: 'rgba(15, 23, 42, 0.8)',
+        deep: 'rgba(8, 13, 30, 0.9)',
+        name: 'Deep Code Blue'
+      },
+      // Matrix Green
+      {
+        primary: 'rgba(34, 197, 94, 0.8)',
+        secondary: 'rgba(5, 46, 22, 0.9)',
+        deep: 'rgba(2, 20, 8, 0.9)',
+        name: 'Matrix Green'
+      },
+      // Cyber Purple
+      {
+        primary: 'rgba(109, 40, 217, 0.9)',
+        secondary: 'rgba(55, 16, 109, 0.9)',
+        deep: 'rgba(24, 5, 48, 0.9)',
+        name: 'Cyber Purple'
+      },
+      // Terminal Black
+      {
+        primary: 'rgba(51, 65, 85, 0.9)',
+        secondary: 'rgba(30, 41, 59, 0.9)',
+        deep: 'rgba(15, 23, 42, 0.9)',
+        name: 'Terminal Black'
+      },
+      // Neon Cyan
+      {
+        primary: 'rgba(6, 182, 212, 0.8)',
+        secondary: 'rgba(8, 51, 68, 0.9)',
+        deep: 'rgba(4, 25, 34, 0.9)',
+        name: 'Neon Cyan'
+      },
+      // Hacker Red
+      {
+        primary: 'rgba(220, 38, 127, 0.8)',
+        secondary: 'rgba(136, 19, 55, 0.9)',
+        deep: 'rgba(55, 8, 23, 0.9)',
+        name: 'Hacker Red'
+      },
+      // Electric Orange
+      {
+        primary: 'rgba(234, 88, 12, 0.8)',
+        secondary: 'rgba(124, 45, 18, 0.9)',
+        deep: 'rgba(67, 20, 7, 0.9)',
+        name: 'Electric Orange'
+      },
+      // Dark Void
+      {
+        primary: 'rgba(75, 85, 99, 0.8)',
+        secondary: 'rgba(31, 41, 55, 0.9)',
+        deep: 'rgba(17, 24, 39, 0.9)',
+        name: 'Dark Void'
+      }
+    ];
+
+    const randomIndex = Math.floor(Math.random() * oceanPalettes.length);
+    return oceanPalettes[randomIndex];
+  };
+
+  // Client-side hydration check and random color initialization
   useEffect(() => {
     setIsClient(true);
+    // Set random colors on initial load
+    const randomColors = getRandomOceanColors();
+    setOceanColors(randomColors);
+    console.log(`💻 Dark Programmer Ocean theme: ${randomColors.name}`);
   }, []);
 
   // Animation time for drone movement
@@ -59,19 +133,24 @@ const AnimatedBackground: React.FC = () => {
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden will-change-transform" style={{ contain: 'layout style paint' }}>
       {/* Ocean of Technology Base */}
-      <div className="absolute inset-0 bg-gradient-to-b from-blue-400 via-blue-700 to-blue-950 dark:from-slate-700 dark:via-blue-950 dark:to-slate-900" />
+      <div 
+        className="absolute inset-0 transition-colors duration-1000 ease-in-out"
+        style={{
+          background: `linear-gradient(to bottom, ${oceanColors.primary}, ${oceanColors.secondary}, ${oceanColors.deep})`
+        }}
+      />
       
       {/* Flying Drone Perspective Effect */}
       <div 
         className="absolute inset-0"
         style={{
           background: `
-            radial-gradient(ellipse at center, transparent 10%, rgba(0,64,128,0.4) 70%),
+            radial-gradient(ellipse at center, transparent 10%, ${oceanColors.secondary} 70%),
             linear-gradient(180deg, 
               transparent 0%, 
-              rgba(30, 64, 175, 0.3) 30%, 
-              rgba(15, 39, 108, 0.5) 60%, 
-              rgba(7, 23, 68, 0.7) 100%
+              ${oceanColors.primary} 30%, 
+              ${oceanColors.secondary} 60%, 
+              ${oceanColors.deep} 100%
             )
           `,
           transform: `perspective(1000px) rotateX(${Math.sin(time * 0.3) * 5 + 15}deg) translateZ(${scrollY * -0.5}px)`
@@ -88,9 +167,9 @@ const AnimatedBackground: React.FC = () => {
               bottom: `${i * 15}%`,
               background: `linear-gradient(90deg, 
                 transparent, 
-                rgba(30, 64, 175, 0.4), 
-                rgba(15, 39, 108, 0.4),
-                rgba(30, 64, 175, 0.4), 
+                ${oceanColors.primary}, 
+                ${oceanColors.secondary},
+                ${oceanColors.primary}, 
                 transparent
               )`,
               transform: `
@@ -116,12 +195,13 @@ const AnimatedBackground: React.FC = () => {
         return (
           <div
             key={i}
-            className="absolute bg-blue-300/30 rounded-sm will-change-transform"
+            className="absolute rounded-sm will-change-transform"
             style={{
               width: `${4 + depth * 8}px`,
               height: `${4 + depth * 8}px`,
               left: `${pseudoRandom2 * 100}%`,
               top: `${pseudoRandom3 * 100}%`,
+              backgroundColor: oceanColors.primary,
               transform: `
                 translate3d(
                   ${Math.sin(time * (0.5 + depth) + i) * 200 * depth}px,
@@ -131,8 +211,8 @@ const AnimatedBackground: React.FC = () => {
                 rotateZ(${time * (50 + depth * 100)}deg)
                 scale(${0.5 + depth})
               `,
-              opacity: depth * 0.8,
-              boxShadow: `0 0 ${10 + depth * 20}px rgba(30, 64, 175, ${depth * 0.6})`
+              opacity: depth * 0.5,
+              boxShadow: `0 0 ${10 + depth * 20}px ${oceanColors.secondary}`
             }}
           />
         );
@@ -145,7 +225,7 @@ const AnimatedBackground: React.FC = () => {
           background: `
             radial-gradient(
               circle at ${50 + Math.sin(time * 0.8) * 20}% ${50 + Math.cos(time * 0.6) * 15}%,
-              rgba(59, 130, 246, 0.1) 0%,
+              ${oceanColors.primary.replace('0.8', '0.1')} 0%,
               transparent 30%
             )
           `,
@@ -158,8 +238,8 @@ const AnimatedBackground: React.FC = () => {
         className="absolute inset-0 opacity-10 dark:opacity-20"
         style={{
           backgroundImage: `
-            linear-gradient(rgba(59, 130, 246, 0.3) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(59, 130, 246, 0.3) 1px, transparent 1px)
+            linear-gradient(${oceanColors.primary.replace('0.8', '0.3')} 1px, transparent 1px),
+            linear-gradient(90deg, ${oceanColors.primary.replace('0.8', '0.3')} 1px, transparent 1px)
           `,
           backgroundSize: `${150 + Math.sin(time * 0.3) * 50}px ${150 + Math.cos(time * 0.4) * 50}px`,
           transform: `
@@ -180,17 +260,18 @@ const AnimatedBackground: React.FC = () => {
         return (
           <div
             key={symbol}
-            className="absolute text-blue-300/50 font-mono font-bold pointer-events-none will-change-transform"
+            className="absolute font-mono font-bold pointer-events-none will-change-transform"
             style={{
               left: `${20 + (i * 15) % 60}%`,
               top: `${30 + (i * 10) % 40}%`,
               fontSize: `${1 + depth}rem`,
+              color: oceanColors.primary.replace('0.8', '0.5'),
               transform: `
                 translate3d(${offsetX}px, ${offsetY + scrollY * (0.1 + depth * 0.2)}px, 0) 
                 rotateY(${time * (20 + i * 10)}deg) 
                 scale(${0.8 + depth * 0.4})
               `,
-              textShadow: `0 0 ${10 + depth * 20}px rgba(30, 64, 175, 0.8)`,
+              textShadow: `0 0 ${10 + depth * 20}px ${oceanColors.secondary}`,
               opacity: 0.6 + Math.sin(time + i) * 0.3
             }}
           >
@@ -206,13 +287,13 @@ const AnimatedBackground: React.FC = () => {
           background: `
             conic-gradient(
               from ${time * 30}deg at ${50 + Math.sin(time * 0.7) * 25}% ${40 + Math.cos(time * 0.5) * 20}%,
-              rgba(30, 64, 175, 0.15) 0deg,
+              ${oceanColors.primary.replace('0.8', '0.15')} 0deg,
               transparent 60deg,
-              rgba(15, 39, 108, 0.15) 120deg,
+              ${oceanColors.secondary.replace('0.6', '0.15')} 120deg,
               transparent 180deg,
-              rgba(30, 64, 175, 0.15) 240deg,
+              ${oceanColors.primary.replace('0.8', '0.15')} 240deg,
               transparent 300deg,
-              rgba(30, 64, 175, 0.15) 360deg
+              ${oceanColors.primary.replace('0.8', '0.15')} 360deg
             )
           `
         }}
@@ -220,8 +301,9 @@ const AnimatedBackground: React.FC = () => {
 
       {/* Depth Fog Effect */}
       <div 
-        className="absolute inset-0 bg-gradient-to-t from-blue-950/40 via-transparent to-blue-400/15 dark:from-slate-950/60 dark:to-blue-950/20"
+        className="absolute inset-0"
         style={{
+          background: `linear-gradient(to top, ${oceanColors.deep.replace('0.7', '0.4')}, transparent, ${oceanColors.primary.replace('0.8', '0.15')})`,
           transform: `translateY(${scrollY * 0.2}px)`
         }}
       />
