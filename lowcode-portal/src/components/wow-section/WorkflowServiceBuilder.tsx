@@ -21,6 +21,61 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
+// Add CSS for drag over effect and group styling
+const groupNodeStyles = `
+  .group-node-container.drag-over {
+    background-color: rgba(251, 146, 60, 0.2) !important;
+    border-color: #f97316 !important;
+    box-shadow: 0 0 20px rgba(251, 146, 60, 0.5) !important;
+  }
+  
+  /* Group nodes should have low z-index to be behind other nodes */
+  .react-flow__node[data-nodetype="group"] {
+    z-index: 1 !important;
+  }
+  
+  /* Regular nodes should have higher z-index */
+  .react-flow__node:not([data-nodetype="group"]) {
+    z-index: 10 !important;
+  }
+  
+  /* Nodes in groups should have even higher z-index and be clickable */
+  .react-flow__node.node-in-group {
+    z-index: 100 !important;
+    pointer-events: auto !important;
+  }
+  
+  /* Group node content should allow drag but not block child nodes */
+  .group-node-container {
+    pointer-events: auto !important;
+  }
+  
+  .group-node-container > div:not([style*="pointer-events: auto"]) {
+    pointer-events: none !important;
+  }
+  
+  /* But allow pointer events on specific group elements */
+  .group-node-container button {
+    pointer-events: auto !important;
+  }
+  
+  .group-node-container input {
+    pointer-events: auto !important;
+  }
+  
+  /* Ensure nodes in groups are fully interactive */
+  .node-in-group * {
+    pointer-events: auto !important;
+  }
+`;
+
+// Inject styles
+if (typeof document !== 'undefined') {
+  const styleSheet = document.createElement('style');
+  styleSheet.textContent = groupNodeStyles;
+  document.head.appendChild(styleSheet);
+}
+
 // Custom Node Component with different shapes based on node type
 const CustomNode = ({ data, id }: NodeProps) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -34,6 +89,7 @@ const CustomNode = ({ data, id }: NodeProps) => {
       inputRef.current.select();
     }
   }, [isEditing]);
+
 
   const handleDoubleClick = () => {
     setIsEditing(true);
@@ -62,9 +118,68 @@ const CustomNode = ({ data, id }: NodeProps) => {
     setLabel(e.target.value);
   };
 
+  // Handle group resize with +/- buttons
+  const handleGroupResize = useCallback((nodeId: string, action: 'expand' | 'shrink') => {
+    const resizeEvent = new CustomEvent('groupResize', {
+      detail: { nodeId, action }
+    });
+    window.dispatchEvent(resizeEvent);
+  }, []);
+
   // Determine node shape based on data.nodeType
   const renderNodeContent = () => {
     const nodeType = data.nodeType || 'default';
+    
+    if (nodeType === 'group') {
+      return (
+        <div 
+          className="relative p-4 text-center flex flex-col items-center justify-center w-full h-full group-node-container" 
+          style={data.style}
+          onDrop={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Drop event on group node:', id);
+            
+            // Dispatch custom event to parent component
+            const dropEvent = new CustomEvent('nodeDropOnGroup', {
+              detail: { 
+                groupId: id, 
+                dropX: e.clientX, 
+                dropY: e.clientY,
+                originalEvent: e 
+              }
+            });
+            window.dispatchEvent(dropEvent);
+          }}
+          onDragOver={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            e.dataTransfer.dropEffect = 'move';
+          }}
+          onDragEnter={(e) => {
+            e.preventDefault();
+            e.currentTarget.classList.add('drag-over');
+          }}
+          onDragLeave={(e) => {
+            e.preventDefault();
+            if (!e.currentTarget.contains(e.relatedTarget as EventTarget)) {
+              e.currentTarget.classList.remove('drag-over');
+            }
+          }}
+        >
+          <div className="absolute top-2 left-2 text-xs opacity-70 pointer-events-none">
+            {renderLabelContent()}
+          </div>
+          <div className="absolute bottom-2 left-2 text-xs opacity-50 pointer-events-none">
+            {data.style?.width || 200} x {data.style?.height || 150}
+          </div>
+          <div className="flex-1 flex items-center justify-center text-sm opacity-50 pointer-events-none">
+            Drop nodes here
+          </div>
+        </div>
+      );
+    }
+    
     return (
       <div className="px-3 py-2 text-center" style={data.style}>
         {renderLabelContent()}
@@ -110,6 +225,12 @@ const CustomNode = ({ data, id }: NodeProps) => {
           left: { left: -8, top: '50%', transform: 'translateY(-50%)', background: '#555' },
           right: { right: -8, top: '50%', transform: 'translateY(-50%)', background: '#555' }
         };
+      case 'group':
+        return {
+          left: { left: -8, top: '20px', background: '#F97316' },
+          right: { right: -8, top: '20px', background: '#F97316' },
+          bottom: { bottom: -8, left: '50%', transform: 'translateX(-50%)', background: '#F97316' }
+        };
       default:
         return {
           left: { left: -8, background: '#555' },
@@ -119,11 +240,23 @@ const CustomNode = ({ data, id }: NodeProps) => {
   };
 
   const handleStyles = getHandleStyles();
+  const nodeType = data.nodeType || 'default';
+
+  const nodeStyle = getContainerStyles();
+  const isInGroup = data.isInGroup;
+  const combinedStyle = isInGroup 
+    ? { 
+        ...nodeStyle, 
+        border: '2px solid #f97316', 
+        boxShadow: '0 0 10px rgba(251, 146, 60, 0.3)',
+        zIndex: 100  // Ensure nodes in group are visible
+      }
+    : nodeStyle;
 
   return (
     <div 
-      className="relative transition-all duration-200 hover:shadow-lg" 
-      style={getContainerStyles()}
+      className={`relative transition-all duration-200 hover:shadow-lg ${isInGroup ? 'node-in-group' : ''}`}
+      style={combinedStyle}
     >
       {/* Input handle on left */}
       <Handle
@@ -142,6 +275,47 @@ const CustomNode = ({ data, id }: NodeProps) => {
         id="output"
         style={handleStyles.right}
       />
+
+      {/* Additional bottom handle for group nodes */}
+      {nodeType === 'group' && (
+        <Handle
+          type="source"
+          position={Position.Bottom}
+          id="bottom-output"
+          style={handleStyles.bottom}
+        />
+      )}
+
+      {/* Resize buttons for group nodes */}
+      {nodeType === 'group' && (
+        <div className="absolute top-2 right-2 flex space-x-1 z-50" style={{pointerEvents: 'auto'}}>
+          {/* Expand button (+) */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleGroupResize(id, 'expand');
+            }}
+            className="w-6 h-6 bg-orange-500 hover:bg-orange-600 text-white rounded-full flex items-center justify-center text-sm font-bold shadow-lg transition-all duration-200 hover:scale-110"
+            title="Expand group"
+            style={{pointerEvents: 'auto'}}
+          >
+            +
+          </button>
+          
+          {/* Shrink button (-) */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleGroupResize(id, 'shrink');
+            }}
+            className="w-6 h-6 bg-orange-500 hover:bg-orange-600 text-white rounded-full flex items-center justify-center text-sm font-bold shadow-lg transition-all duration-200 hover:scale-110"
+            title="Shrink group"
+            style={{pointerEvents: 'auto'}}
+          >
+            -
+          </button>
+        </div>
+      )}
     </div>
   );
 };
@@ -366,7 +540,8 @@ const WorkflowServiceBuilder: React.FC = () => {
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({
     'Input': false,
     'Process': false,
-    'Output': false
+    'Output': false,
+    'Group Service': false
   });
 
   const toggleGroup = (groupName: string) => {
@@ -410,8 +585,64 @@ const WorkflowServiceBuilder: React.FC = () => {
     const initialFlow = getInitialFlow();
   
     // ReactFlow state
-    const [nodes, setNodes, onNodesChange] = useNodesState(initialFlow.nodes);
+    const [nodes, setNodes, originalOnNodesChange] = useNodesState(initialFlow.nodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialFlow.edges);
+    
+    // Store previous node positions for delta calculation
+    const previousPositionsRef = useRef<Record<string, { x: number, y: number }>>({});
+
+    // Custom onNodesChange to handle group movement
+    const onNodesChange = useCallback((changes: any[]) => {
+      // Apply the original changes first
+      originalOnNodesChange(changes);
+      
+      // Handle group movement
+      changes.forEach(change => {
+        if (change.type === 'position' && change.position) {
+          const movedNode = nodes.find(n => n.id === change.id);
+          
+          if (movedNode?.data?.nodeType === 'group') {
+            const prevPosition = previousPositionsRef.current[change.id];
+            
+            if (prevPosition) {
+              const deltaX = change.position.x - prevPosition.x;
+              const deltaY = change.position.y - prevPosition.y;
+              
+              // Move all nodes in this group
+              const nodesInGroup = nodes.filter(n => n.data?.groupId === change.id);
+              
+              if (nodesInGroup.length > 0 && (Math.abs(deltaX) > 0.1 || Math.abs(deltaY) > 0.1)) {
+                console.log(`Moving ${nodesInGroup.length} nodes with group ${change.id} by ${deltaX}, ${deltaY}`);
+                
+                setNodes((nds) =>
+                  nds.map((n) => {
+                    if (n.data?.groupId === change.id) {
+                      return {
+                        ...n,
+                        position: {
+                          x: n.position.x + deltaX,
+                          y: n.position.y + deltaY
+                        }
+                      };
+                    }
+                    return n;
+                  })
+                );
+              }
+            }
+            
+            // Update previous position
+            previousPositionsRef.current[change.id] = { ...change.position };
+          } else {
+            // Update previous position for non-group nodes too
+            previousPositionsRef.current[change.id] = { ...change.position };
+          }
+        }
+      });
+    }, [originalOnNodesChange, nodes, setNodes]);
+    
+    // Drag and drop functionality
+    const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
   
     const onConnect = useCallback((params: Connection) => {
       const newEdge = { 
@@ -422,6 +653,142 @@ const WorkflowServiceBuilder: React.FC = () => {
       };
       setEdges((els) => addEdge(newEdge, els));
     }, [setEdges]);
+
+    // Handle node drag to show visual feedback  
+    const onNodeDrag = useCallback((event: React.MouseEvent, node: Node) => {
+      // Find if the node is over a group node
+      const elementsBelow = document.elementsFromPoint(event.clientX, event.clientY);
+      const groupContainer = elementsBelow.find(el => el.classList.contains('group-node-container'));
+      
+      // Remove drag-over class from all group containers
+      document.querySelectorAll('.group-node-container').forEach(container => {
+        container.classList.remove('drag-over');
+      });
+      
+      // Add drag-over class to the current group container if hovering
+      if (groupContainer) {
+        const nodeElement = groupContainer.closest('.react-flow__node');
+        if (nodeElement) {
+          const groupId = nodeElement.getAttribute('data-id');
+          if (groupId && groupId !== node.id) {
+            groupContainer.classList.add('drag-over');
+          }
+        }
+      }
+    }, []);
+
+    // Handle node drag stop to check if dropped on group
+    const onNodeDragStop = useCallback((event: React.MouseEvent, node: Node) => {
+      // Remove all drag-over classes
+      document.querySelectorAll('.group-node-container').forEach(container => {
+        container.classList.remove('drag-over');
+      });
+
+      if (!reactFlowInstance) return;
+
+      // If it's a group node that was moved, move all nodes in that group
+      if (node.data?.nodeType === 'group') {
+        const nodesInGroup = nodes.filter(n => n.data?.groupId === node.id);
+        
+        if (nodesInGroup.length > 0) {
+          console.log(`Moving ${nodesInGroup.length} nodes with group ${node.id}`);
+          
+          // We don't need to do anything here because nodes will automatically
+          // move with their absolute positions when we update them in onNodeDrag
+        }
+        return;
+      }
+
+      // Find if the node is over a group node
+      const elementsBelow = document.elementsFromPoint(event.clientX, event.clientY);
+      const groupContainer = elementsBelow.find(el => el.classList.contains('group-node-container'));
+      
+      if (groupContainer) {
+        // Find the group node ID from the container's parent node
+        const nodeElement = groupContainer.closest('.react-flow__node');
+        if (nodeElement) {
+          const groupId = nodeElement.getAttribute('data-id');
+          
+          if (groupId && groupId !== node.id) {
+            console.log(`Dropping node ${node.id} on group ${groupId}`);
+            
+            // Find the group node
+            const groupNode = nodes.find(n => n.id === groupId);
+            if (groupNode) {
+              // Calculate relative position within the group (with padding)
+              const relativeX = Math.max(10, node.position.x - groupNode.position.x);
+              const relativeY = Math.max(10, node.position.y - groupNode.position.y);
+              
+              console.log('Group node found:', groupNode);
+              console.log('Node position:', node.position);
+              console.log('Group position:', groupNode.position);
+              console.log('Relative position:', { x: relativeX, y: relativeY });
+              
+              setNodes((nds) => {
+                const updatedNodes = nds.map((n) => 
+                  n.id === node.id 
+                    ? {
+                        ...n,
+                        // Keep absolute position for now to test visibility
+                        position: { x: node.position.x, y: node.position.y },
+                        data: {
+                          ...n.data,
+                          // Store group information in data instead
+                          groupId: groupId,
+                          isInGroup: true
+                        }
+                      }
+                    : n
+                );
+                console.log('Updated nodes after grouping:', updatedNodes);
+                console.log('Target node after update:', updatedNodes.find(n => n.id === node.id));
+                
+                // Force DOM update for z-index classes
+                setTimeout(() => {
+                  const nodeElement = document.querySelector(`[data-id="${node.id}"]`);
+                  if (nodeElement) {
+                    nodeElement.classList.add('node-in-group');
+                    console.log('Added node-in-group class to:', nodeElement);
+                  }
+                }, 50);
+                
+                return updatedNodes;
+              });
+            }
+          }
+        }
+      } else if (node.data?.isInGroup) {
+        // Node was dragged outside of its parent group - ungroup it
+        console.log(`Ungrouping node ${node.id} from group ${node.data.groupId}`);
+        
+        setNodes((nds) => {
+          const updatedNodes = nds.map((n) => 
+            n.id === node.id 
+              ? {
+                  ...n,
+                  position: { x: node.position.x, y: node.position.y },
+                  data: {
+                    ...n.data,
+                    groupId: undefined,
+                    isInGroup: false
+                  }
+                }
+              : n
+          );
+          
+          // Force DOM update for z-index classes
+          setTimeout(() => {
+            const nodeElement = document.querySelector(`[data-id="${node.id}"]`);
+            if (nodeElement) {
+              nodeElement.classList.remove('node-in-group');
+              console.log('Removed node-in-group class from:', nodeElement);
+            }
+          }, 50);
+          
+          return updatedNodes;
+        });
+      }
+    }, [reactFlowInstance, nodes, setNodes]);
   
     // Handle node label updates
     const updateNodeLabel = useCallback((nodeId: string, newLabel: string) => {
@@ -444,7 +811,70 @@ const WorkflowServiceBuilder: React.FC = () => {
         )
       );
     }, [setEdges]);
+
+    // Handle group resize
+    const handleGroupResize = useCallback((nodeId: string, action: 'expand' | 'shrink') => {
+      setNodes((nds) => 
+        nds.map((node) => {
+          if (node.id === nodeId && node.data.nodeType === 'group') {
+            const currentWidth = node.data.style?.width || 200;
+            const currentHeight = node.data.style?.height || 150;
+            
+            const step = 50; // Resize step in pixels
+            let newWidth = currentWidth;
+            let newHeight = currentHeight;
+            
+            if (action === 'expand') {
+              newWidth = currentWidth + step;
+              newHeight = currentHeight + step;
+            } else if (action === 'shrink') {
+              newWidth = Math.max(150, currentWidth - step); // Min width 150px
+              newHeight = Math.max(100, currentHeight - step); // Min height 100px
+            }
+            
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                style: {
+                  ...node.data.style,
+                  width: newWidth,
+                  height: newHeight
+                }
+              }
+            };
+          }
+          return node;
+        })
+      );
+    }, [setNodes]);
+
   
+    // Handle node drop on group
+    const handleNodeDropOnGroup = useCallback((groupId: string, droppedNodeId: string, position: { x: number, y: number }) => {
+      setNodes((nds) => 
+        nds.map((node) => {
+          if (node.id === droppedNodeId) {
+            // Find the group node to get its position
+            const groupNode = nds.find(n => n.id === groupId);
+            if (groupNode) {
+              // Calculate relative position within the group
+              const relativeX = position.x - groupNode.position.x;
+              const relativeY = position.y - groupNode.position.y;
+              
+              return {
+                ...node,
+                position: { x: relativeX, y: relativeY },
+                parentId: groupId,
+                extent: 'parent' as const
+              };
+            }
+          }
+          return node;
+        })
+      );
+    }, [setNodes]);
+
     // Listen for node and edge label update events
     useEffect(() => {
       const handleUpdateNodeLabel = (e: CustomEvent) => {
@@ -456,24 +886,54 @@ const WorkflowServiceBuilder: React.FC = () => {
         const { edgeId, newLabel } = e.detail;
         updateEdgeLabel(edgeId, newLabel);
       };
+
+      const handleNodeDropOnGroupEvent = (e: CustomEvent) => {
+        const { groupId, dropX, dropY } = e.detail;
+        console.log('Node drop on group event received:', { groupId, dropX, dropY });
+        // This will be handled by ReactFlow's onNodeDrag events instead
+      };
+
+      const handleGroupResizeEvent = (e: CustomEvent) => {
+        const { nodeId, action } = e.detail;
+        handleGroupResize(nodeId, action);
+      };
+
   
       window.addEventListener('updateNodeLabel', handleUpdateNodeLabel as EventListener);
       window.addEventListener('updateEdgeLabel', handleUpdateEdgeLabel as EventListener);
+      window.addEventListener('nodeDropOnGroup', handleNodeDropOnGroupEvent as EventListener);
+      window.addEventListener('groupResize', handleGroupResizeEvent as EventListener);
       
       return () => {
         window.removeEventListener('updateNodeLabel', handleUpdateNodeLabel as EventListener);
         window.removeEventListener('updateEdgeLabel', handleUpdateEdgeLabel as EventListener);
+        window.removeEventListener('nodeDropOnGroup', handleNodeDropOnGroupEvent as EventListener);
+        window.removeEventListener('groupResize', handleGroupResizeEvent as EventListener);
       };
-    }, [updateNodeLabel, updateEdgeLabel]);
+    }, [updateNodeLabel, updateEdgeLabel, handleGroupResize]);
   
+    // Initialize and update node positions tracking
+    useEffect(() => {
+      nodes.forEach(node => {
+        if (!previousPositionsRef.current[node.id]) {
+          previousPositionsRef.current[node.id] = { ...node.position };
+        }
+      });
+    }, [nodes]);
+
     // Save flow data whenever nodes or edges change
     useEffect(() => {
       saveFlowToLocalStorage(nodes, edges);
+      
+      // Debug: log nodes in groups
+      const groupedNodes = nodes.filter(n => n.data?.isInGroup);
+      if (groupedNodes.length > 0) {
+        console.log('Current nodes in groups:', groupedNodes);
+      }
+      console.log('All nodes:', nodes);
     }, [nodes, edges]);
 
 
-  // Drag and drop functionality
-  const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
   
   // Initialize nodeId based on existing nodes
   const getInitialNodeId = () => {
@@ -890,6 +1350,57 @@ const WorkflowServiceBuilder: React.FC = () => {
                     )}
                   </div>
 
+                  {/* Group Service Group */}
+                  <div>
+                    <button 
+                      onClick={() => toggleGroup('Group Service')}
+                      className="flex items-center justify-between w-full text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
+                    >
+                      <span className="flex items-center">
+                        <div className="w-3 h-3 bg-orange-500 rounded mr-2"></div>
+                        Group Service
+                      </span>
+                      <svg 
+                        className={`w-4 h-4 transition-transform ${collapsedGroups['Group Service'] ? 'rotate-0' : 'rotate-90'}`} 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                    {!collapsedGroups['Group Service'] && (
+                      <div className="mt-2 ml-5 space-y-2">
+                        {/* Group Node */}
+                        <div 
+                          className="flex items-center space-x-2 p-2 bg-orange-50 dark:bg-orange-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
+                          draggable
+                          onDragStart={(event) => onDragStart(event, 'group', {
+                            label: 'Group',
+                            nodeType: 'group',
+                            style: {
+                              background: 'rgba(251, 146, 60, 0.1)',
+                              color: '#F97316',
+                              border: '2px dashed #F97316',
+                              borderRadius: '15px',
+                              fontSize: '14px',
+                              fontWeight: 'bold',
+                              width: 200,
+                              height: 150,
+                              textAlign: 'center',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }
+                          })}
+                        >
+                          <div className="w-4 h-4 bg-orange-500 rounded"></div>
+                          <span className="text-xs text-slate-600 dark:text-slate-400">Group</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
                 </div>
               </div>
 
@@ -907,6 +1418,8 @@ const WorkflowServiceBuilder: React.FC = () => {
                       onNodesChange={onNodesChange}
                       onEdgesChange={onEdgesChange}
                       onConnect={onConnect}
+                      onNodeDrag={onNodeDrag}
+                      onNodeDragStop={onNodeDragStop}
                       onInit={setReactFlowInstance}
                       nodeTypes={nodeTypes}
                       edgeTypes={edgeTypes}
