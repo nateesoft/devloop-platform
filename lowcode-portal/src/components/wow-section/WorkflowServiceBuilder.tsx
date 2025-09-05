@@ -948,9 +948,16 @@ const WorkflowServiceBuilder: React.FC = () => {
 
   // State for option panel
   const [showOptionPanel, setShowOptionPanel] = useState(false);
-  const [selectedTheme, setSelectedTheme] = useState('blue');
-  const [selectedLanguages, setSelectedLanguages] = useState<string[]>(['thai', 'english']);
-  const [selectedAlertType, setSelectedAlertType] = useState('modal');
+  
+  // Service Builder specific options
+  const [serviceType, setServiceType] = useState('RestApis');
+  const [programmingLanguage, setProgrammingLanguage] = useState('NodeJS');
+  const [enableLogs, setEnableLogs] = useState(true);
+  const [enableAuditLogs, setEnableAuditLogs] = useState(false);
+  const [rateLimit, setRateLimit] = useState('100');
+  const [authType, setAuthType] = useState('JWT Token');
+  const [databaseType, setDatabaseType] = useState('PostgreSQL');
+  const [enableCache, setEnableCache] = useState(false);
 
   // State for fullscreen mode
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -965,16 +972,6 @@ const WorkflowServiceBuilder: React.FC = () => {
     if (!isFullscreen) {
       setShowOptionPanel(false);
     }
-  };
-
-  const handleLanguageChange = (language: string) => {
-    setSelectedLanguages(prev => {
-      if (prev.includes(language)) {
-        return prev.filter(lang => lang !== language);
-      } else {
-        return [...prev, language];
-      }
-    });
   };
 
   // Initialize with saved data or defaults
@@ -2096,9 +2093,9 @@ const WorkflowServiceBuilder: React.FC = () => {
 
                   {/* Option Panel Overlay */}
                   {showOptionPanel && (
-                    <div className="absolute top-16 left-4 bg-white dark:bg-slate-800 rounded-xl p-4 shadow-xl border border-slate-200 dark:border-slate-700 z-20 w-80">
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">Options</h3>
+                    <div className="absolute top-16 left-4 bg-white dark:bg-slate-800 rounded-xl p-6 shadow-xl border border-slate-200 dark:border-slate-700 z-20 w-96 max-h-96 overflow-y-auto">
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">Service Configuration</h3>
                         <button 
                           onClick={toggleOptionPanel}
                           className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
@@ -2109,63 +2106,134 @@ const WorkflowServiceBuilder: React.FC = () => {
                         </button>
                       </div>
 
-                      {/* Options Panel Content - Single Row */}
-                      <div className="flex items-center space-x-4">
+                      {/* Service Builder Options */}
+                      <div className="space-y-4">
                         
-                        {/* Theme Selector */}
-                        <div className="flex-1">
-                          <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-                            Theme
+                        {/* Service Type */}
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                            Service Type
                           </label>
                           <select 
-                            value={selectedTheme} 
-                            onChange={(e) => setSelectedTheme(e.target.value)}
-                            className="w-full text-xs border border-slate-300 dark:border-slate-600 rounded px-2 py-1 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200"
+                            value={serviceType} 
+                            onChange={(e) => setServiceType(e.target.value)}
+                            className="w-full text-sm border border-slate-300 dark:border-slate-600 rounded px-3 py-2 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200"
                           >
-                            <option value="blue">Blue</option>
-                            <option value="green">Green</option>
-                            <option value="purple">Purple</option>
-                            <option value="red">Red</option>
-                            <option value="orange">Orange</option>
+                            <option value="RestApis">REST APIs</option>
+                            <option value="Graphql">GraphQL</option>
+                            <option value="SocketIO">Socket.IO</option>
+                            <option value="Webhook">Webhook</option>
                           </select>
                         </div>
 
-                        {/* Language Checkboxes */}
-                        <div className="flex-1">
-                          <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-                            Languages
+                        {/* Programming Language for Export */}
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                            Export Language
                           </label>
-                          <div className="space-y-1">
-                            {['thai', 'english', 'japanese', 'chinese'].map(lang => (
-                              <label key={lang} className="flex items-center text-xs">
-                                <input
-                                  type="checkbox"
-                                  checked={selectedLanguages.includes(lang)}
-                                  onChange={() => handleLanguageChange(lang)}
-                                  className="mr-1 w-3 h-3"
-                                />
-                                <span className="capitalize text-slate-700 dark:text-slate-300">{lang}</span>
-                              </label>
-                            ))}
+                          <select 
+                            value={programmingLanguage} 
+                            onChange={(e) => setProgrammingLanguage(e.target.value)}
+                            className="w-full text-sm border border-slate-300 dark:border-slate-600 rounded px-3 py-2 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200"
+                          >
+                            <option value="NodeJS">Node.js</option>
+                            <option value="NestJS">NestJS</option>
+                            <option value="Java Springboot">Java Spring Boot</option>
+                            <option value="Golang">Go</option>
+                            <option value="Python">Python</option>
+                            <option value="PHP">PHP</option>
+                          </select>
+                        </div>
+
+                        {/* Logs & Audit */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1 mr-4">
+                            <label className="flex items-center text-sm text-slate-700 dark:text-slate-300">
+                              <input
+                                type="checkbox"
+                                checked={enableLogs}
+                                onChange={(e) => setEnableLogs(e.target.checked)}
+                                className="mr-2 w-4 h-4"
+                              />
+                              Enable System Logs
+                            </label>
+                          </div>
+                          <div className="flex-1">
+                            <label className="flex items-center text-sm text-slate-700 dark:text-slate-300">
+                              <input
+                                type="checkbox"
+                                checked={enableAuditLogs}
+                                onChange={(e) => setEnableAuditLogs(e.target.checked)}
+                                className="mr-2 w-4 h-4"
+                              />
+                              Audit Logs
+                            </label>
                           </div>
                         </div>
 
-                        {/* Alert/Modal Type Selector */}
-                        <div className="flex-1">
-                          <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-                            Alert Type
+                        {/* Rate Limit */}
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                            Rate Limit (req/min)
+                          </label>
+                          <input
+                            type="number"
+                            value={rateLimit}
+                            onChange={(e) => setRateLimit(e.target.value)}
+                            className="w-full text-sm border border-slate-300 dark:border-slate-600 rounded px-3 py-2 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200"
+                            placeholder="100"
+                            min="1"
+                            max="10000"
+                          />
+                        </div>
+
+                        {/* Authentication */}
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                            Authentication
                           </label>
                           <select 
-                            value={selectedAlertType} 
-                            onChange={(e) => setSelectedAlertType(e.target.value)}
-                            className="w-full text-xs border border-slate-300 dark:border-slate-600 rounded px-2 py-1 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200"
+                            value={authType} 
+                            onChange={(e) => setAuthType(e.target.value)}
+                            className="w-full text-sm border border-slate-300 dark:border-slate-600 rounded px-3 py-2 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200"
                           >
-                            <option value="modal">Modal</option>
-                            <option value="toast">Toast</option>
-                            <option value="alert">Alert</option>
-                            <option value="notification">Notification</option>
-                            <option value="popup">Popup</option>
+                            <option value="Basic Auth">Basic Auth</option>
+                            <option value="OAuth2">OAuth 2.0</option>
+                            <option value="JWT Token">JWT Token</option>
+                            <option value="API Key">API Key</option>
+                            <option value="None">No Authentication</option>
                           </select>
+                        </div>
+
+                        {/* Database */}
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                            Database
+                          </label>
+                          <select 
+                            value={databaseType} 
+                            onChange={(e) => setDatabaseType(e.target.value)}
+                            className="w-full text-sm border border-slate-300 dark:border-slate-600 rounded px-3 py-2 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200"
+                          >
+                            <option value="MySQL">MySQL</option>
+                            <option value="PostgreSQL">PostgreSQL</option>
+                            <option value="SQLite">SQLite</option>
+                            <option value="MongoDB">MongoDB</option>
+                            <option value="Redis">Redis</option>
+                          </select>
+                        </div>
+
+                        {/* Cache */}
+                        <div>
+                          <label className="flex items-center text-sm text-slate-700 dark:text-slate-300">
+                            <input
+                              type="checkbox"
+                              checked={enableCache}
+                              onChange={(e) => setEnableCache(e.target.checked)}
+                              className="mr-2 w-4 h-4"
+                            />
+                            Enable Cache System
+                          </label>
                         </div>
 
                       </div>
