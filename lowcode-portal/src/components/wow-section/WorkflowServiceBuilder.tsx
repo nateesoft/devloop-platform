@@ -188,10 +188,166 @@ const CustomNode = ({ data, id }: NodeProps) => {
         </div>
       );
     }
+
+    // External node with API/web service icon
+    if (nodeType === 'externalService') {
+      return (
+        <div className="px-3 py-2 text-center flex flex-col items-center" style={data.style}>
+          <div className="flex items-center justify-center mb-1">
+            {/* External Service Icon - Simple globe with arrow */}
+            <svg className="w-6 h-6 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M2 12h20"/>
+              <path d="M12 2c2.5 2.5 2.5 9.5 0 10"/>
+              <path d="M12 22c-2.5-2.5-2.5-9.5 0-10"/>
+              <path d="M16 8l4 4-4 4" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          {renderLabelContent()}
+        </div>
+      );
+    }
     
+    // Add icons for different node types - designed to represent their actual meanings
+    const renderNodeIcon = () => {
+      switch (nodeType) {
+        // Input nodes (สิ่งที่เข้ามา)
+        case 'httpIn': // เมื่อมีคนมาเคาะประตู - จุดเริ่มต้น เมื่อมีคนเรียก URL
+          return (
+            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <circle cx="9" cy="9" r="2"/>
+              <path d="M21 15l-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+              <path d="M9 12v6"/>
+              <path d="M15 9v9"/>
+            </svg>
+          );
+        case 'authentication': // ขอดูบัตรก่อนเข้า - ตรวจสอบสิทธิ์
+          return (
+            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+              <path d="M9 12l2 2 4-4"/>
+              <path d="M12 1a3 3 0 0 0-3 3v1m6-4a3 3 0 0 1 3 3v1"/>
+              <rect x="6" y="5" width="12" height="13" rx="1"/>
+              <path d="M12 9v4"/>
+            </svg>
+          );
+        case 'paramExtract': // หยิบข้อมูลจากคำขอ - อ่านค่าที่ส่งมา
+          return (
+            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              <path d="M8 12h8"/>
+              <path d="M12 8v8"/>
+            </svg>
+          );
+        case 'validator': // ตรวจสอบความถูกต้อง - เช็กว่าข้อมูลกรอกมาถูกหรือไม่
+          return (
+            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+              <path d="M9 11l3 3L22 4"/>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+            </svg>
+          );
+
+        // Process nodes (สิ่งที่เราทำ)
+        case 'mapper': // ปรับข้อมูลให้นำไปใช้ได้ - แปลง/เติมค่า
+          return (
+            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+              <path d="M14 2v4a2 2 0 0 0 2 2h4"/>
+              <path d="M16 18v-4a2 2 0 0 1 2-2h4"/>
+              <rect x="3" y="3" width="8" height="6" rx="1"/>
+              <rect x="13" y="13" width="8" height="6" rx="1"/>
+              <path d="M7 12v2"/>
+              <path d="M17 10v2"/>
+            </svg>
+          );
+        case 'databaseAction': // ทำงานกับตารางข้อมูล - ค้นหา เพิ่ม แก้ไข ลบข้อมูล
+          return (
+            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+              <ellipse cx="12" cy="5" rx="9" ry="3"/>
+              <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+              <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+            </svg>
+          );
+        case 'jsonLogic': // ใช้สูตรหรือกฎ - ประมวลผลตามเงื่อนไข
+          return (
+            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+              <path d="M9.26 9a2 2 0 1 1 0 4H3v-4h6.26z"/>
+              <path d="M21 11V9a2 2 0 0 0-2-2H3v4h16a2 2 0 0 0 2-2z"/>
+              <path d="M3 15h6.26a2 2 0 1 1 0 4H3v-4z"/>
+              <circle cx="17" cy="12" r="1"/>
+            </svg>
+          );
+        case 'branch': // แยกทางเดิน - ตัดสินใจ
+          return (
+            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+              <line x1="6" y1="3" x2="6" y2="15"/>
+              <circle cx="18" cy="6" r="3"/>
+              <circle cx="6" cy="18" r="3"/>
+              <path d="M18 9a9 9 0 0 1-9 9"/>
+            </svg>
+          );
+        case 'paginator': // แบ่งข้อมูลเป็นหน้า ๆ - แสดงผลทีละชุด
+          return (
+            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+              <rect x="3" y="4" width="18" height="16" rx="2"/>
+              <path d="M7 8h10"/>
+              <path d="M7 12h7"/>
+              <path d="M7 16h4"/>
+            </svg>
+          );
+        case 'errorHandler': // จัดการปัญหา - ถ้าเกิดข้อผิดพลาด ให้ส่งข้อความเข้าใจง่าย
+          return (
+            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          );
+
+        // Output nodes (สิ่งที่ออกไป)
+        case 'httpResponse': // ส่งคำตอบกลับ - ขั้นตอนสุดท้าย ส่งผลลัพธ์กลับ
+          return (
+            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+              <path d="M9 12l2 2 4-4"/>
+            </svg>
+          );
+
+        // Special nodes
+        case 'trigger': // จุดเริ่มต้นอื่นๆ ที่ไม่ใช่ HTTP
+          return (
+            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+              <polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/>
+            </svg>
+          );
+        case 'externalService': // เชื่อมต่อกับบริการภายนอก
+          return (
+            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M2 12h20"/>
+              <path d="M12 2c2.5 2.5 2.5 9.5 0 10"/>
+              <path d="M12 22c-2.5-2.5-2.5-9.5 0-10"/>
+              <path d="M16 8l4 4-4 4" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          );
+
+        // Existing node types for backward compatibility
+        case 'decision':
+          return (
+            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+              <path d="M9 12l2 2 4-4" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M21 12c.5 0-.5-10-9-10s-9.5 10-9 10c-.5 0 .5 10 9 10s9.5-10 9-10z" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          );
+        
+        default:
+          return null;
+      }
+    };
+
     return (
-      <div className="px-3 py-2 text-center" style={data.style}>
-        {renderLabelContent()}
+      <div className="px-3 py-2 text-center flex items-center justify-center" style={data.style}>
+        {renderNodeIcon()}
+        <div>{renderLabelContent()}</div>
       </div>
     );
   };
@@ -1126,7 +1282,7 @@ const WorkflowServiceBuilder: React.FC = () => {
                           draggable
                           onDragStart={(event) => onDragStart(event, 'http-in', {
                             label: 'HTTP In',
-                            nodeType: 'input',
+                            nodeType: 'httpIn',
                             style: {
                               background: '#3B82F6',
                               color: 'white',
@@ -1139,7 +1295,12 @@ const WorkflowServiceBuilder: React.FC = () => {
                             }
                           })}
                         >
-                          <div className="w-4 h-4 bg-blue-500 rounded"></div>
+                          <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" strokeLinecap="round" strokeLinejoin="round"/>
+                            <polyline points="14,2 14,8 20,8" strokeLinecap="round" strokeLinejoin="round"/>
+                            <line x1="16" y1="13" x2="8" y2="13" strokeLinecap="round" strokeLinejoin="round"/>
+                            <line x1="16" y1="17" x2="8" y2="17" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
                           <span className="text-xs text-slate-600 dark:text-slate-400">HTTP In</span>
                         </div>
 
@@ -1149,7 +1310,7 @@ const WorkflowServiceBuilder: React.FC = () => {
                           draggable
                           onDragStart={(event) => onDragStart(event, 'auth', {
                             label: 'Auth',
-                            nodeType: 'input',
+                            nodeType: 'authentication',
                             style: {
                               background: '#3B82F6',
                               color: 'white',
@@ -1172,7 +1333,7 @@ const WorkflowServiceBuilder: React.FC = () => {
                           draggable
                           onDragStart={(event) => onDragStart(event, 'param-extract', {
                             label: 'Param Extract',
-                            nodeType: 'input',
+                            nodeType: 'paramExtract',
                             style: {
                               background: '#3B82F6',
                               color: 'white',
@@ -1195,7 +1356,7 @@ const WorkflowServiceBuilder: React.FC = () => {
                           draggable
                           onDragStart={(event) => onDragStart(event, 'validator', {
                             label: 'Validator',
-                            nodeType: 'input',
+                            nodeType: 'validator',
                             style: {
                               background: '#3B82F6',
                               color: 'white',
@@ -1243,7 +1404,7 @@ const WorkflowServiceBuilder: React.FC = () => {
                           draggable
                           onDragStart={(event) => onDragStart(event, 'mapper', {
                             label: 'Mapper',
-                            nodeType: 'process',
+                            nodeType: 'mapper',
                             style: {
                               background: '#10B981',
                               color: 'white',
@@ -1266,7 +1427,7 @@ const WorkflowServiceBuilder: React.FC = () => {
                           draggable
                           onDragStart={(event) => onDragStart(event, 'db-action', {
                             label: 'DB Action',
-                            nodeType: 'process',
+                            nodeType: 'databaseAction',
                             style: {
                               background: '#10B981',
                               color: 'white',
@@ -1289,7 +1450,7 @@ const WorkflowServiceBuilder: React.FC = () => {
                           draggable
                           onDragStart={(event) => onDragStart(event, 'json-logic', {
                             label: 'JSON Logic',
-                            nodeType: 'process',
+                            nodeType: 'jsonLogic',
                             style: {
                               background: '#10B981',
                               color: 'white',
@@ -1312,7 +1473,7 @@ const WorkflowServiceBuilder: React.FC = () => {
                           draggable
                           onDragStart={(event) => onDragStart(event, 'branch', {
                             label: 'Branch',
-                            nodeType: 'process',
+                            nodeType: 'branch',
                             style: {
                               background: '#10B981',
                               color: 'white',
@@ -1334,8 +1495,8 @@ const WorkflowServiceBuilder: React.FC = () => {
                           className="flex items-center space-x-2 p-2 bg-green-50 dark:bg-green-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
                           draggable
                           onDragStart={(event) => onDragStart(event, 'paginator', {
-                            label: 'Paninator',
-                            nodeType: 'process',
+                            label: 'Paginator',
+                            nodeType: 'paginator',
                             style: {
                               background: '#10B981',
                               color: 'white',
@@ -1358,7 +1519,7 @@ const WorkflowServiceBuilder: React.FC = () => {
                           draggable
                           onDragStart={(event) => onDragStart(event, 'error-handler', {
                             label: 'Error Handler',
-                            nodeType: 'process',
+                            nodeType: 'errorHandler',
                             style: {
                               background: '#10B981',
                               color: 'white',
@@ -1405,7 +1566,7 @@ const WorkflowServiceBuilder: React.FC = () => {
                           draggable
                           onDragStart={(event) => onDragStart(event, 'http-out', {
                             label: 'HTTP Out',
-                            nodeType: 'output',
+                            nodeType: 'httpResponse',
                             style: {
                               background: '#8B5CF6',
                               color: 'white',
@@ -1475,7 +1636,7 @@ const WorkflowServiceBuilder: React.FC = () => {
                           draggable
                           onDragStart={(event) => onDragStart(event, 'external', {
                             label: 'External',
-                            nodeType: 'external',
+                            nodeType: 'externalService',
                             style: {
                               background: '#FFFF33',
                               color: 'black',
@@ -1488,7 +1649,13 @@ const WorkflowServiceBuilder: React.FC = () => {
                             }
                           })}
                         >
-                          <div className="w-4 h-4 bg-yellow-500 rounded"></div>
+                          <svg className="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M2 12h20"/>
+                            <path d="M12 2c2.5 2.5 2.5 9.5 0 10"/>
+                            <path d="M12 22c-2.5-2.5-2.5-9.5 0-10"/>
+                            <path d="M16 8l4 4-4 4" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
                           <span className="text-xs text-slate-600 dark:text-slate-400">External</span>
                         </div>
                       </div>
