@@ -564,6 +564,7 @@ const WorkflowServiceBuilder: React.FC = () => {
     'Input': false,
     'Process': false,
     'Output': false,
+    'Special': false,
     'Group Service': false
   });
 
@@ -1419,6 +1420,76 @@ const WorkflowServiceBuilder: React.FC = () => {
                         >
                           <div className="w-4 h-4 bg-purple-500 rounded"></div>
                           <span className="text-xs text-slate-600 dark:text-slate-400">HTTP Out</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Special Group */}
+                  <div>
+                    <button 
+                      onClick={() => toggleGroup('Special')}
+                      className="flex items-center justify-between w-full text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
+                    >
+                      <span className="flex items-center">
+                        <div className="w-3 h-3 bg-yellow-500 rounded mr-2"></div>
+                        Special
+                      </span>
+                      <svg 
+                        className={`w-4 h-4 transition-transform ${collapsedGroups['Special'] ? 'rotate-0' : 'rotate-90'}`} 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                    {!collapsedGroups['Special'] && (
+                      <div className="mt-2 ml-5 space-y-2">
+                        {/* Trigger Node */}
+                        <div 
+                          className="flex items-center space-x-2 p-2 bg-yellow-50 dark:bg-yellow-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
+                          draggable
+                          onDragStart={(event) => onDragStart(event, 'trigger', {
+                            label: 'Trigger',
+                            nodeType: 'trigger',
+                            style: {
+                              background: '#FFFF33',
+                              color: 'black',
+                              border: '2px solid #F0F000',
+                              borderRadius: '10px',
+                              fontSize: '14px',
+                              fontWeight: 'bold',
+                              width: 140,
+                              textAlign: 'center',
+                            }
+                          })}
+                        >
+                          <div className="w-4 h-4 bg-yellow-500 rounded"></div>
+                          <span className="text-xs text-slate-600 dark:text-slate-400">Trigger</span>
+                        </div>
+
+                        {/* External Node */}
+                        <div 
+                          className="flex items-center space-x-2 p-2 bg-yellow-50 dark:bg-yellow-900/30 rounded-lg cursor-grab hover:scale-105 transition-transform active:cursor-grabbing"
+                          draggable
+                          onDragStart={(event) => onDragStart(event, 'external', {
+                            label: 'External',
+                            nodeType: 'external',
+                            style: {
+                              background: '#FFFF33',
+                              color: 'black',
+                              border: '2px solid #F0F000',
+                              borderRadius: '10px',
+                              fontSize: '14px',
+                              fontWeight: 'bold',
+                              width: 140,
+                              textAlign: 'center',
+                            }
+                          })}
+                        >
+                          <div className="w-4 h-4 bg-yellow-500 rounded"></div>
+                          <span className="text-xs text-slate-600 dark:text-slate-400">External</span>
                         </div>
                       </div>
                     )}
