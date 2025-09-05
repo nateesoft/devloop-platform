@@ -1533,7 +1533,7 @@ const WorkflowServiceBuilder: React.FC = () => {
 
   return (
     <div className={isFullscreen ? "fixed inset-0 z-50 bg-slate-50 dark:bg-slate-900" : ""}>
-      <section id="sandbox" className={isFullscreen ? "w-full h-full" : "py-32 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-slate-900 dark:to-slate-800 relative overflow-hidden"}>
+      <section id="sandbox" className={isFullscreen ? "w-full h-full" : "py-32 bg-gradient-to-br from-green-50 to-teal-50 dark:from-slate-800 dark:to-emerald-900 relative overflow-hidden"}>
         {!isFullscreen && <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>}
         
         <div className={isFullscreen ? "w-full h-full relative" : "max-w-7xl mx-auto px-4 relative"}>
@@ -1541,7 +1541,7 @@ const WorkflowServiceBuilder: React.FC = () => {
             <div className="text-center mb-16">
               <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6">
                 Sandbox - 
-                <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> (Service Builder Workflow)</span>
+                <span className="bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent"> (Service Builder Workflow)</span>
               </h2>
             </div>
           )}
@@ -1556,7 +1556,7 @@ const WorkflowServiceBuilder: React.FC = () => {
               ? "w-full h-full relative" 
               : "bg-slate-50 dark:bg-slate-900 rounded-2xl p-6 border-2 border-dashed border-slate-300 dark:border-slate-600 min-h-96 relative overflow-hidden"
             }>
-              {!isFullscreen && <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5"></div>}
+              {!isFullscreen && <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-teal-500/5"></div>}
               
               {/* Draggable Components Palette */}
               <div className={isFullscreen 
