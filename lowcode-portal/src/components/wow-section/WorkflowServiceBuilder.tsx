@@ -63,6 +63,15 @@ const groupNodeStyles = `
     pointer-events: auto !important;
   }
   
+  /* Allow pointer events on label editing elements */
+  .group-node-container [style*="pointer-events: auto"] {
+    pointer-events: auto !important;
+  }
+  
+  .group-node-container [style*="pointer-events: auto"] * {
+    pointer-events: auto !important;
+  }
+  
   /* Ensure nodes in groups are fully interactive */
   .node-in-group * {
     pointer-events: auto !important;
@@ -167,7 +176,7 @@ const CustomNode = ({ data, id }: NodeProps) => {
             }
           }}
         >
-          <div className="absolute top-2 left-2 text-xs opacity-70 pointer-events-none">
+          <div className="absolute top-2 left-2 text-sm font-semibold opacity-80" style={{pointerEvents: 'auto'}}>
             {renderLabelContent()}
           </div>
           <div className="absolute bottom-2 left-2 text-xs opacity-50 pointer-events-none">
@@ -187,27 +196,41 @@ const CustomNode = ({ data, id }: NodeProps) => {
     );
   };
 
-  const renderLabelContent = () => (
-    <div onDoubleClick={handleDoubleClick} className="min-w-0 relative">
-      {isEditing ? (
-        <input
-          ref={inputRef}
-          type="text"
-          value={label}
-          onChange={handleInputChange}
-          onBlur={finishEditing}
-          onKeyDown={handleKeyDown}
-          className="bg-white/20 border border-white/40 rounded px-1 outline-none text-center w-full text-white placeholder-white/70"
-          style={{ fontSize: 'inherit', fontWeight: 'inherit' }}
-          placeholder="Enter label..."
-        />
-      ) : (
-        <div className="cursor-pointer select-none hover:bg-white/10 rounded px-1 py-0.5 transition-colors" title="Double-click to edit">
-          {data.label}
-        </div>
-      )}
-    </div>
-  );
+  const renderLabelContent = () => {
+    const nodeType = data.nodeType || 'default';
+    const isGroupNode = nodeType === 'group';
+    
+    return (
+      <div onDoubleClick={handleDoubleClick} className="min-w-0 relative">
+        {isEditing ? (
+          <input
+            ref={inputRef}
+            type="text"
+            value={label}
+            onChange={handleInputChange}
+            onBlur={finishEditing}
+            onKeyDown={handleKeyDown}
+            className={isGroupNode 
+              ? "bg-orange-100 border border-orange-300 rounded px-2 py-1 outline-none text-center w-full text-orange-800 placeholder-orange-400" 
+              : "bg-white/20 border border-white/40 rounded px-1 outline-none text-center w-full text-white placeholder-white/70"
+            }
+            style={{ fontSize: 'inherit', fontWeight: 'inherit' }}
+            placeholder={isGroupNode ? "Enter group name..." : "Enter label..."}
+          />
+        ) : (
+          <div 
+            className={isGroupNode 
+              ? "cursor-pointer select-none hover:bg-orange-200/30 rounded px-2 py-0.5 transition-colors" 
+              : "cursor-pointer select-none hover:bg-white/10 rounded px-1 py-0.5 transition-colors"
+            } 
+            title="Double-click to edit"
+          >
+            {data.label}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   // Get container styles based on node type
   const getContainerStyles = () => {
@@ -591,9 +614,52 @@ const WorkflowServiceBuilder: React.FC = () => {
     // Store previous node positions for delta calculation
     const previousPositionsRef = useRef<Record<string, { x: number, y: number }>>({});
 
-    // Custom onNodesChange to handle group movement
+    // Custom onNodesChange to handle group movement and deletion
     const onNodesChange = useCallback((changes: any[]) => {
-      // Apply the original changes first
+      // Check for group node deletions before applying changes
+      const deletionChanges = changes.filter(change => change.type === 'remove');
+      
+      deletionChanges.forEach(change => {
+        const deletedNode = nodes.find(n => n.id === change.id);
+        
+        if (deletedNode?.data?.nodeType === 'group') {
+          // Find all nodes in this group
+          const nodesInGroup = nodes.filter(n => n.data?.groupId === change.id);
+          
+          if (nodesInGroup.length > 0) {
+            console.log(`Deleting group ${change.id} with ${nodesInGroup.length} child nodes`);
+            
+            // Add removal changes for all child nodes
+            const childDeletions = nodesInGroup.map(node => ({
+              type: 'remove',
+              id: node.id
+            }));
+            
+            // Apply child deletions first
+            originalOnNodesChange(childDeletions);
+            
+            // Also remove related edges
+            const edgesToRemove = edges.filter(edge => 
+              nodesInGroup.some(node => edge.source === node.id || edge.target === node.id)
+            );
+            
+            if (edgesToRemove.length > 0) {
+              console.log(`Removing ${edgesToRemove.length} edges connected to deleted group nodes`);
+              const edgeDeletions = edgesToRemove.map(edge => ({
+                type: 'remove',
+                id: edge.id
+              }));
+              setEdges(currentEdges => 
+                currentEdges.filter(edge => 
+                  !edgesToRemove.some(toRemove => toRemove.id === edge.id)
+                )
+              );
+            }
+          }
+        }
+      });
+      
+      // Apply the original changes
       originalOnNodesChange(changes);
       
       // Handle group movement
@@ -639,7 +705,7 @@ const WorkflowServiceBuilder: React.FC = () => {
           }
         }
       });
-    }, [originalOnNodesChange, nodes, setNodes]);
+    }, [originalOnNodesChange, nodes, setNodes, edges, setEdges]);
     
     // Drag and drop functionality
     const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
@@ -925,12 +991,20 @@ const WorkflowServiceBuilder: React.FC = () => {
     useEffect(() => {
       saveFlowToLocalStorage(nodes, edges);
       
-      // Debug: log nodes in groups
+      // Debug: log nodes in groups and group relationships
       const groupedNodes = nodes.filter(n => n.data?.isInGroup);
+      const groupNodes = nodes.filter(n => n.data?.nodeType === 'group');
+      
       if (groupedNodes.length > 0) {
         console.log('Current nodes in groups:', groupedNodes);
       }
-      console.log('All nodes:', nodes);
+      if (groupNodes.length > 0) {
+        console.log('Current group nodes:', groupNodes);
+        groupNodes.forEach(group => {
+          const childNodes = nodes.filter(n => n.data?.groupId === group.id);
+          console.log(`Group ${group.id} (${group.data.label}) has ${childNodes.length} child nodes:`, childNodes.map(n => n.id));
+        });
+      }
     }, [nodes, edges]);
 
 
