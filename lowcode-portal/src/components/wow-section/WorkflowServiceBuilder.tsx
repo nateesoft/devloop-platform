@@ -952,8 +952,19 @@ const WorkflowServiceBuilder: React.FC = () => {
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>(['thai', 'english']);
   const [selectedAlertType, setSelectedAlertType] = useState('modal');
 
+  // State for fullscreen mode
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
   const toggleOptionPanel = () => {
     setShowOptionPanel(!showOptionPanel);
+  };
+
+  const toggleFullscreen = () => {
+    setIsFullscreen(!isFullscreen);
+    // Close option panel when entering fullscreen
+    if (!isFullscreen) {
+      setShowOptionPanel(false);
+    }
   };
 
   const handleLanguageChange = (language: string) => {
@@ -1404,6 +1415,20 @@ const WorkflowServiceBuilder: React.FC = () => {
         window.removeEventListener('groupResize', handleGroupResizeEvent as EventListener);
       };
     }, [updateNodeLabel, updateNodeTag, updateEdgeLabel, handleGroupResize]);
+
+    // Handle ESC key to exit fullscreen
+    useEffect(() => {
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.key === 'Escape' && isFullscreen) {
+          setIsFullscreen(false);
+        }
+      };
+
+      document.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.removeEventListener('keydown', handleKeyDown);
+      };
+    }, [isFullscreen]);
   
     // Initialize and update node positions tracking
     useEffect(() => {
@@ -1510,25 +1535,43 @@ const WorkflowServiceBuilder: React.FC = () => {
     };
 
   return (
-    <section id="sandbox" className="py-32 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-slate-900 dark:to-slate-800 relative overflow-hidden">
-        <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
-        <div className="max-w-7xl mx-auto px-4 relative">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6">
-              Sandbox - 
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> (Service Builder Workflow)</span>
-            </h2>
-          </div>
+    <div className={isFullscreen ? "fixed inset-0 z-50 bg-slate-50 dark:bg-slate-900" : ""}>
+      <section id="sandbox" className={isFullscreen ? "w-full h-full" : "py-32 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-slate-900 dark:to-slate-800 relative overflow-hidden"}>
+        {!isFullscreen && <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>}
+        
+        <div className={isFullscreen ? "w-full h-full relative" : "max-w-7xl mx-auto px-4 relative"}>
+          {!isFullscreen && (
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6">
+                Sandbox - 
+                <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> (Service Builder Workflow)</span>
+              </h2>
+            </div>
+          )}
 
           {/* Interactive Sandbox Preview */}
-          <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-3xl border border-white/20 dark:border-slate-700/20 p-8 shadow-2xl">
+          <div className={isFullscreen 
+            ? "w-full h-full" 
+            : "bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-3xl border border-white/20 dark:border-slate-700/20 p-8 shadow-2xl"
+          }>
             {/* Mock Sandbox Interface */}
-            <div className="bg-slate-50 dark:bg-slate-900 rounded-2xl p-6 border-2 border-dashed border-slate-300 dark:border-slate-600 min-h-96 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5"></div>
+            <div className={isFullscreen 
+              ? "w-full h-full relative" 
+              : "bg-slate-50 dark:bg-slate-900 rounded-2xl p-6 border-2 border-dashed border-slate-300 dark:border-slate-600 min-h-96 relative overflow-hidden"
+            }>
+              {!isFullscreen && <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5"></div>}
               
               {/* Draggable Components Palette */}
-              <div className="absolute top-4 left-4 bottom-4 bg-white dark:bg-slate-800 rounded-xl p-4 shadow-lg border border-slate-200 dark:border-slate-700 z-10 overflow-y-auto">
-                <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Service Tools</h4>
+              <div className={isFullscreen 
+                ? "absolute top-4 left-4 bottom-4 w-56 bg-white dark:bg-slate-800 rounded-xl p-4 shadow-lg border border-slate-200 dark:border-slate-700 z-10 overflow-y-auto" 
+                : "absolute top-4 left-4 bottom-4 bg-white dark:bg-slate-800 rounded-xl p-4 shadow-lg border border-slate-200 dark:border-slate-700 z-10 overflow-y-auto"
+              }>
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300">Service Tools</h4>
+                  {isFullscreen && (
+                    <span className="text-xs text-slate-500 dark:text-slate-400">ESC to exit</span>
+                  )}
+                </div>
                 <div className="space-y-3">
                   
                   {/* Input Group */}
@@ -1993,10 +2036,16 @@ const WorkflowServiceBuilder: React.FC = () => {
               </div>
 
               {/* ReactFlow Canvas */}
-              <div className="ml-48 mr-4 mt-4">
-                <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 min-h-80 relative overflow-hidden">
+              <div className={isFullscreen ? "ml-64 mr-4 mt-4 mb-4" : "ml-48 mr-4 mt-4"}>
+                <div className={isFullscreen 
+                  ? "bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 relative overflow-hidden h-full" 
+                  : "bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 min-h-80 relative overflow-hidden"
+                }>
                   <div 
-                    style={{ width: '100%', height: '500px' }}
+                    style={{ 
+                      width: '100%', 
+                      height: isFullscreen ? 'calc(100vh - 8rem)' : '500px' 
+                    }}
                     onDrop={onDrop}
                     onDragOver={onDragOver}
                   >
@@ -2125,6 +2174,29 @@ const WorkflowServiceBuilder: React.FC = () => {
 
                   {/* Action Buttons */}
                   <div className="absolute top-4 right-4 flex space-x-2">
+                    {/* Fullscreen Toggle Button */}
+                    <button 
+                      onClick={toggleFullscreen}
+                      className="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-lg transition-all duration-200 transform hover:scale-105 border border-indigo-600 flex items-center space-x-2"
+                      title={isFullscreen ? "Exit Fullscreen (ESC)" : "Enter Fullscreen"}
+                    >
+                      {isFullscreen ? (
+                        <>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                          <span>Exit</span>
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4a2 2 0 012-2h4M4 16v4a2 2 0 002 2h4M16 4h4a2 2 0 012 2v4M16 20h4a2 2 0 01-2 2h-4" />
+                          </svg>
+                          <span>Fullscreen</span>
+                        </>
+                      )}
+                    </button>
+                    
                     <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-lg transition-all duration-200 transform hover:scale-105 border border-green-600">
                       Publish
                     </button>
@@ -2135,6 +2207,7 @@ const WorkflowServiceBuilder: React.FC = () => {
           </div>
         </div>
       </section>
+    </div>
   );
 };
 
