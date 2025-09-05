@@ -8,6 +8,7 @@ import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 import CurrencySwitcher from '@/components/ui/CurrencySwitcher';
 import ScrollToTopButton from '@/components/ui/ScrollToTopButton';
 import AnimatedBackground from '@/components/ui/AnimatedBackground';
+import StatsCounter from '@/components/ui/StatsCounter';
 import VideoModal from '@/components/VideoModal';
 import InteractiveBook from '@/components/ui/InteractiveBook';
 import { useScrollToSection } from '@/hooks/useScrollToSection';
@@ -168,7 +169,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
       </nav>
 
       {/* Hero Section */}
-      <section id="home" className="pt-20 pb-32 px-4">
+      <section id="home" className="pt-20 pb-20 px-4">
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-slate-900 dark:text-white mb-6">
             Build Apps <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">10x Faster</span>
@@ -232,6 +233,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
           </div>
         </div>
       </section>
+
+      {/* Statistics Counter Section */}
+      <StatsCounter />
 
       {/* Wow Section - Sandbox */}
       <WorkflowWebBuilder />
