@@ -40,7 +40,7 @@ export const StepEdgeComponent = ({
     
     // Dispatch custom event to update the edge label
     const updateEvent = new CustomEvent('updateEdgeLabel', {
-      detail: { edgeId: id, label: label }
+      detail: { edgeId: id, newLabel: label }
     });
     window.dispatchEvent(updateEvent);
   };
@@ -54,16 +54,56 @@ export const StepEdgeComponent = ({
     }
   };
 
-  // Create a step path with rounded corners
-  const stepPath = `
-    M ${sourceX} ${sourceY}
-    L ${sourceX + 50} ${sourceY}
-    L ${sourceX + 50} ${targetY}
-    L ${targetX} ${targetY}
-  `;
+  // Create adaptive step path based on connection positions
+  const createAdaptivePath = () => {
+    const isVerticalConnection = 
+      (sourcePosition === 'bottom' && targetPosition === 'top') ||
+      (sourcePosition === 'top' && targetPosition === 'bottom');
+    
+    const isHorizontalConnection = 
+      (sourcePosition === 'right' && targetPosition === 'left') ||
+      (sourcePosition === 'left' && targetPosition === 'right');
 
-  const labelX = sourceX + 50;
-  const labelY = (sourceY + targetY) / 2;
+    if (isVerticalConnection) {
+      // For vertical connections (bottom to top or top to bottom) - use straight line
+      return {
+        path: `M ${sourceX} ${sourceY} L ${targetX} ${targetY}`,
+        labelX: (sourceX + targetX) / 2,
+        labelY: (sourceY + targetY) / 2
+      };
+    } else if (isHorizontalConnection) {
+      // For horizontal connections - use step path
+      const midX = (sourceX + targetX) / 2;
+      return {
+        path: `
+          M ${sourceX} ${sourceY}
+          L ${midX} ${sourceY}
+          L ${midX} ${targetY}
+          L ${targetX} ${targetY}
+        `,
+        labelX: midX,
+        labelY: (sourceY + targetY) / 2
+      };
+    } else {
+      // For mixed connections - use adaptive step path
+      const offsetX = sourcePosition === 'right' ? 50 : -50;
+      const offsetY = targetPosition === 'top' ? -30 : 30;
+      
+      return {
+        path: `
+          M ${sourceX} ${sourceY}
+          L ${sourceX + offsetX} ${sourceY}
+          L ${sourceX + offsetX} ${targetY + offsetY}
+          L ${targetX} ${targetY + offsetY}
+          L ${targetX} ${targetY}
+        `,
+        labelX: sourceX + offsetX,
+        labelY: (sourceY + targetY) / 2
+      };
+    }
+  };
+
+  const { path: stepPath, labelX, labelY } = createAdaptivePath();
 
   return (
     <>
@@ -147,7 +187,7 @@ export const LabeledEdgeComponent = ({
     
     // Dispatch custom event to update the edge label
     const updateEvent = new CustomEvent('updateEdgeLabel', {
-      detail: { edgeId: id, label: label }
+      detail: { edgeId: id, newLabel: label }
     });
     window.dispatchEvent(updateEvent);
   };

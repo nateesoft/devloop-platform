@@ -6,6 +6,17 @@ export const createNodesFromTemplate = (templateId: string) => {
   const template = WORKFLOW_TEMPLATES.find(t => t.id === templateId);
   if (!template) return { nodes: [], edges: [] };
 
+  // If template has fullTemplate, return it directly
+  if (template.fullTemplate) {
+    return {
+      nodes: template.fullTemplate.nodes,
+      edges: template.fullTemplate.edges
+    };
+  }
+
+  // Fallback to old method for backward compatibility
+  if (!template.nodes) return { nodes: [], edges: [] };
+
   // Create nodes from template
   const newNodes: Node[] = template.nodes.map((nodeTemplate, index) => {
     const nodeTypeMapping: Record<string, string> = {
@@ -15,7 +26,8 @@ export const createNodesFromTemplate = (templateId: string) => {
       mapper: 'mapper',
       databaseAction: 'databaseAction',
       paginator: 'paginator',
-      httpResponse: 'httpResponse'
+      httpResponse: 'httpResponse',
+      authentication: 'authentication'
     };
 
     const nodeType = nodeTypeMapping[nodeTemplate.type] || nodeTemplate.type;
@@ -64,6 +76,7 @@ export const getNodeStyle = (type: string) => {
     case 'httpIn':
     case 'paramExtract':
     case 'validator':
+    case 'authentication':
       return {
         background: '#3B82F6',
         color: 'white',

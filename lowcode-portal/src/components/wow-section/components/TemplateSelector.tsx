@@ -26,8 +26,9 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
         className="w-full p-2 text-xs border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
       >
         <option value="">เลือก Template</option>
+        <option disabled>────────────</option>
         {WORKFLOW_TEMPLATES.map((template) => (
-          <option key={template.id} value={template.id}>
+          <option disabled={template.id==='separate'} key={template.id} value={template.id}>
             {template.name}
           </option>
         ))}

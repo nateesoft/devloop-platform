@@ -45,7 +45,7 @@ const CustomNode = ({ data, id }: NodeProps) => {
     
     // Dispatch custom event to update the node label
     const updateEvent = new CustomEvent('updateNodeLabel', {
-      detail: { nodeId: id, label: label }
+      detail: { nodeId: id, newLabel: label }
     });
     window.dispatchEvent(updateEvent);
   };
@@ -55,7 +55,7 @@ const CustomNode = ({ data, id }: NodeProps) => {
     
     // Dispatch custom event to update the node tag
     const updateTagEvent = new CustomEvent('updateNodeTag', {
-      detail: { nodeId: id, tagLabel: tagLabel }
+      detail: { nodeId: id, newTag: tagLabel }
     });
     window.dispatchEvent(updateTagEvent);
   };
