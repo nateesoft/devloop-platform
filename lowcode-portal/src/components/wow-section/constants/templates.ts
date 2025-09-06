@@ -20,65 +20,1530 @@ export const WORKFLOW_TEMPLATES: TemplateDefinition[] = [
     id: 'view-all',
     name: 'เรียกดูข้อมูลทั้งหมด(R)',
     description: 'Template สำหรับการดึงข้อมูลทั้งหมด',
-    nodes: [
-      { type: 'httpIn', label: 'GET ALL', position: { x: 50, y: 100 } },
-      { type: 'databaseAction', label: 'DB Action', position: { x: 250, y: 100 } },
-      { type: 'paginator', label: 'Paginator', position: { x: 450, y: 100 } },
-      { type: 'httpResponse', label: 'Response', position: { x: 650, y: 100 } }
-    ]
+    fullTemplate: {
+      nodes: [
+        {
+          "id": "template-node-0",
+          "type": "customNode",
+          "position": {
+            "x": 68.90654329985284,
+            "y": 100
+          },
+          "data": {
+            "label": "GET ALL",
+            "nodeType": "httpIn",
+            "style": {
+              "background": "#3B82F6",
+              "color": "white",
+              "border": "2px solid #1D4ED8",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            },
+            "orderNumber": 1,
+            "isFirstNode": true
+          },
+          "width": 140,
+          "height": 49,
+          "selected": false,
+          "positionAbsolute": {
+            "x": 68.90654329985284,
+            "y": 100
+          },
+          "dragging": false
+        },
+        {
+          "id": "template-node-1",
+          "type": "customNode",
+          "position": {
+            "x": 400,
+            "y": 100
+          },
+          "data": {
+            "label": "DB Action",
+            "nodeType": "databaseAction",
+            "style": {
+              "background": "#059669",
+              "color": "white",
+              "border": "2px solid #047857",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            },
+            "orderNumber": 2,
+            "isFirstNode": false
+          },
+          "width": 140,
+          "height": 49
+        },
+        {
+          "id": "template-node-2",
+          "type": "customNode",
+          "position": {
+            "x": 737.395637800098,
+            "y": 100
+          },
+          "data": {
+            "label": "Paginator",
+            "nodeType": "paginator",
+            "style": {
+              "background": "#059669",
+              "color": "white",
+              "border": "2px solid #047857",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            },
+            "orderNumber": 3,
+            "isFirstNode": false
+          },
+          "width": 140,
+          "height": 49,
+          "selected": false,
+          "positionAbsolute": {
+            "x": 737.395637800098,
+            "y": 100
+          },
+          "dragging": false
+        },
+        {
+          "id": "dndnode_42",
+          "type": "customNode",
+          "position": {
+            "x": 1031.511337730475,
+            "y": 102.86617189616317
+          },
+          "data": {
+            "label": "Response",
+            "nodeType": "httpResponse",
+            "orderNumber": 4,
+            "tagLabel": "4",
+            "style": {
+              "background": "#8B5CF6",
+              "color": "white",
+              "border": "2px solid #6D28D9",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            }
+          },
+          "width": 140,
+          "height": 49,
+          "selected": false,
+          "positionAbsolute": {
+            "x": 1031.511337730475,
+            "y": 102.86617189616317
+          },
+          "dragging": false
+        }
+      ],
+      edges: [
+        {
+          "id": "template-edge-0",
+          "source": "template-node-0",
+          "target": "template-node-1",
+          "sourceHandle": "output-right",
+          "targetHandle": "input-left",
+          "type": "stepEdge",
+          "markerEnd": {
+            "type": "arrowclosed"
+          },
+          "data": {
+            "label": "step 1"
+          }
+        },
+        {
+          "id": "template-edge-1",
+          "source": "template-node-1",
+          "target": "template-node-2",
+          "sourceHandle": "output-right",
+          "targetHandle": "input-left",
+          "type": "stepEdge",
+          "markerEnd": {
+            "type": "arrowclosed"
+          },
+          "data": {
+            "label": "step 2"
+          }
+        },
+        {
+          "source": "template-node-2",
+          "sourceHandle": "output-right",
+          "target": "dndnode_42",
+          "targetHandle": "input-left",
+          "type": "stepEdge",
+          "markerEnd": {
+            "type": "arrowclosed"
+          },
+          "data": {
+            "label": "step"
+          },
+          "id": "reactflow__edge-template-node-2output-right-dndnode_42input-left"
+        }
+      ]
+    }
   },
   {
     id: 'view-by-id',
     name: 'เรียกดูเฉพาะรหัส(R)',
     description: 'Template สำหรับการดึงข้อมูลตาม ID',
-    nodes: [
-      { type: 'httpIn', label: 'GET BY ID', position: { x: 50, y: 100 } },
-      { type: 'paramExtract', label: 'Param Extract', position: { x: 200, y: 100 } },
-      { type: 'mapper', label: 'Mapper', position: { x: 350, y: 100 } },
-      { type: 'databaseAction', label: 'DB Action', position: { x: 500, y: 100 } },
-      { type: 'paginator', label: 'Paginator', position: { x: 650, y: 100 } },
-      { type: 'httpResponse', label: 'Response', position: { x: 800, y: 100 } }
-    ]
+    fullTemplate: {
+      nodes: [
+        {
+          "id": "template-node-0",
+          "type": "customNode",
+          "position": {
+            "x": 50,
+            "y": 100
+          },
+          "data": {
+            "label": "GET BY ID",
+            "nodeType": "httpIn",
+            "style": {
+              "background": "#3B82F6",
+              "color": "white",
+              "border": "2px solid #1D4ED8",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            },
+            "orderNumber": 1,
+            "isFirstNode": true
+          },
+          "width": 140,
+          "height": 49
+        },
+        {
+          "id": "template-node-1",
+          "type": "customNode",
+          "position": {
+            "x": 350,
+            "y": 86.9117291414752
+          },
+          "data": {
+            "label": "Param Extract",
+            "nodeType": "paramExtract",
+            "style": {
+              "background": "#3B82F6",
+              "color": "white",
+              "border": "2px solid #1D4ED8",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            },
+            "orderNumber": 2,
+            "isFirstNode": false
+          },
+          "width": 140,
+          "height": 70,
+          "selected": false,
+          "positionAbsolute": {
+            "x": 350,
+            "y": 86.9117291414752
+          },
+          "dragging": false
+        },
+        {
+          "id": "dndnode_43",
+          "type": "customNode",
+          "position": {
+            "x": 613.6880290205563,
+            "y": 95.73518742442562
+          },
+          "data": {
+            "label": "Validator",
+            "nodeType": "validator",
+            "orderNumber": 3,
+            "tagLabel": "3",
+            "style": {
+              "background": "#3B82F6",
+              "color": "white",
+              "border": "2px solid #1D4ED8",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            }
+          },
+          "width": 140,
+          "height": 49,
+          "selected": false,
+          "positionAbsolute": {
+            "x": 613.6880290205563,
+            "y": 95.73518742442562
+          },
+          "dragging": false
+        },
+        {
+          "id": "dndnode_44",
+          "type": "customNode",
+          "position": {
+            "x": 897.2672309552602,
+            "y": 91.37243047158398
+          },
+          "data": {
+            "label": "Mapper",
+            "nodeType": "mapper",
+            "orderNumber": 4,
+            "tagLabel": "4",
+            "style": {
+              "background": "#10B981",
+              "color": "white",
+              "border": "2px solid #047857",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            }
+          },
+          "width": 140,
+          "height": 49,
+          "selected": false,
+          "positionAbsolute": {
+            "x": 897.2672309552602,
+            "y": 91.37243047158398
+          },
+          "dragging": false
+        },
+        {
+          "id": "dndnode_45",
+          "type": "customNode",
+          "position": {
+            "x": 1169.9395405078596,
+            "y": 91.37243047158404
+          },
+          "data": {
+            "label": "DB Action",
+            "nodeType": "databaseAction",
+            "orderNumber": 5,
+            "tagLabel": "5",
+            "style": {
+              "background": "#10B981",
+              "color": "white",
+              "border": "2px solid #047857",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            }
+          },
+          "width": 140,
+          "height": 49,
+          "selected": false,
+          "positionAbsolute": {
+            "x": 1169.9395405078596,
+            "y": 91.37243047158404
+          },
+          "dragging": false
+        },
+        {
+          "id": "dndnode_46",
+          "type": "customNode",
+          "position": {
+            "x": 1169.9395405078596,
+            "y": 213.52962515114876
+          },
+          "data": {
+            "label": "Paginator",
+            "nodeType": "paginator",
+            "orderNumber": 6,
+            "tagLabel": "6",
+            "style": {
+              "background": "#10B981",
+              "color": "white",
+              "border": "2px solid #047857",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            }
+          },
+          "width": 140,
+          "height": 49,
+          "selected": false,
+          "positionAbsolute": {
+            "x": 1169.9395405078596,
+            "y": 213.52962515114876
+          },
+          "dragging": false
+        },
+        {
+          "id": "dndnode_47",
+          "type": "customNode",
+          "position": {
+            "x": 1169.9395405078599,
+            "y": 348.7750906892382
+          },
+          "data": {
+            "label": "Response",
+            "nodeType": "httpResponse",
+            "orderNumber": 7,
+            "tagLabel": "7",
+            "style": {
+              "background": "#8B5CF6",
+              "color": "white",
+              "border": "2px solid #6D28D9",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            }
+          },
+          "width": 140,
+          "height": 49,
+          "selected": true,
+          "positionAbsolute": {
+            "x": 1169.9395405078599,
+            "y": 348.7750906892382
+          },
+          "dragging": false
+        }
+      ],
+      edges: [
+        {
+          "id": "template-edge-0",
+          "source": "template-node-0",
+          "target": "template-node-1",
+          "sourceHandle": "output-right",
+          "targetHandle": "input-left",
+          "type": "stepEdge",
+          "markerEnd": {
+            "type": "arrowclosed"
+          },
+          "data": {
+            "label": "step 1"
+          }
+        },
+        {
+          "source": "template-node-1",
+          "sourceHandle": "output-right",
+          "target": "dndnode_43",
+          "targetHandle": "input-left",
+          "type": "stepEdge",
+          "markerEnd": {
+            "type": "arrowclosed"
+          },
+          "data": {
+            "label": "step"
+          },
+          "id": "reactflow__edge-template-node-1output-right-dndnode_43input-left"
+        },
+        {
+          "source": "dndnode_43",
+          "sourceHandle": "output-right",
+          "target": "dndnode_44",
+          "targetHandle": "input-left",
+          "type": "stepEdge",
+          "markerEnd": {
+            "type": "arrowclosed"
+          },
+          "data": {
+            "label": "step"
+          },
+          "id": "reactflow__edge-dndnode_43output-right-dndnode_44input-left"
+        },
+        {
+          "source": "dndnode_44",
+          "sourceHandle": "output-right",
+          "target": "dndnode_45",
+          "targetHandle": "input-left",
+          "type": "stepEdge",
+          "markerEnd": {
+            "type": "arrowclosed"
+          },
+          "data": {
+            "label": "step"
+          },
+          "id": "reactflow__edge-dndnode_44output-right-dndnode_45input-left"
+        },
+        {
+          "source": "dndnode_45",
+          "sourceHandle": "output-bottom",
+          "target": "dndnode_46",
+          "targetHandle": "input-top",
+          "type": "stepEdge",
+          "markerEnd": {
+            "type": "arrowclosed"
+          },
+          "data": {
+            "label": "step"
+          },
+          "id": "reactflow__edge-dndnode_45output-bottom-dndnode_46input-top"
+        },
+        {
+          "source": "dndnode_46",
+          "sourceHandle": "output-bottom",
+          "target": "dndnode_47",
+          "targetHandle": "input-top",
+          "type": "stepEdge",
+          "markerEnd": {
+            "type": "arrowclosed"
+          },
+          "data": {
+            "label": "step"
+          },
+          "id": "reactflow__edge-dndnode_46output-bottom-dndnode_47input-top"
+        }
+      ]
+    }
   },
   {
     id: 'search-data',
     name: 'ค้นหาข้อมูล(R)',
     description: 'Template สำหรับการค้นหาข้อมูล',
-    nodes: [
-      { type: 'httpIn', label: 'SEARCH', position: { x: 50, y: 100 } },
-      { type: 'paramExtract', label: 'Param Extract', position: { x: 200, y: 100 } },
-      { type: 'mapper', label: 'Mapper', position: { x: 350, y: 100 } },
-      { type: 'databaseAction', label: 'DB Action', position: { x: 500, y: 100 } },
-      { type: 'paginator', label: 'Paginator', position: { x: 650, y: 100 } },
-      { type: 'httpResponse', label: 'Response', position: { x: 800, y: 100 } }
-    ]
+    fullTemplate: {
+      nodes: [
+        {
+          "id": "template-node-0",
+          "type": "customNode",
+          "position": {
+            "x": 50,
+            "y": 100
+          },
+          "data": {
+            "label": "SEARCH",
+            "nodeType": "httpIn",
+            "style": {
+              "background": "#3B82F6",
+              "color": "white",
+              "border": "2px solid #1D4ED8",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            },
+            "orderNumber": 1,
+            "isFirstNode": true
+          },
+          "width": 140,
+          "height": 49,
+          "selected": true,
+          "dragging": false
+        },
+        {
+          "id": "template-node-1",
+          "type": "customNode",
+          "position": {
+            "x": 350,
+            "y": 86.9117291414752
+          },
+          "data": {
+            "label": "Param Extract",
+            "nodeType": "paramExtract",
+            "style": {
+              "background": "#3B82F6",
+              "color": "white",
+              "border": "2px solid #1D4ED8",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            },
+            "orderNumber": 2,
+            "isFirstNode": false
+          },
+          "width": 140,
+          "height": 70,
+          "selected": false,
+          "positionAbsolute": {
+            "x": 350,
+            "y": 86.9117291414752
+          },
+          "dragging": false
+        },
+        {
+          "id": "dndnode_43",
+          "type": "customNode",
+          "position": {
+            "x": 613.6880290205563,
+            "y": 95.73518742442562
+          },
+          "data": {
+            "label": "Validator",
+            "nodeType": "validator",
+            "orderNumber": 3,
+            "tagLabel": "3",
+            "style": {
+              "background": "#3B82F6",
+              "color": "white",
+              "border": "2px solid #1D4ED8",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            }
+          },
+          "width": 140,
+          "height": 49,
+          "selected": false,
+          "positionAbsolute": {
+            "x": 613.6880290205563,
+            "y": 95.73518742442562
+          },
+          "dragging": false
+        },
+        {
+          "id": "dndnode_44",
+          "type": "customNode",
+          "position": {
+            "x": 897.2672309552602,
+            "y": 91.37243047158398
+          },
+          "data": {
+            "label": "Mapper",
+            "nodeType": "mapper",
+            "orderNumber": 4,
+            "tagLabel": "4",
+            "style": {
+              "background": "#10B981",
+              "color": "white",
+              "border": "2px solid #047857",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            }
+          },
+          "width": 140,
+          "height": 49,
+          "selected": false,
+          "positionAbsolute": {
+            "x": 897.2672309552602,
+            "y": 91.37243047158398
+          },
+          "dragging": false
+        },
+        {
+          "id": "dndnode_45",
+          "type": "customNode",
+          "position": {
+            "x": 1169.9395405078596,
+            "y": 91.37243047158404
+          },
+          "data": {
+            "label": "DB Action",
+            "nodeType": "databaseAction",
+            "orderNumber": 5,
+            "tagLabel": "5",
+            "style": {
+              "background": "#10B981",
+              "color": "white",
+              "border": "2px solid #047857",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            }
+          },
+          "width": 140,
+          "height": 49,
+          "selected": false,
+          "positionAbsolute": {
+            "x": 1169.9395405078596,
+            "y": 91.37243047158404
+          },
+          "dragging": false
+        },
+        {
+          "id": "dndnode_46",
+          "type": "customNode",
+          "position": {
+            "x": 1169.9395405078596,
+            "y": 213.52962515114876
+          },
+          "data": {
+            "label": "Paginator",
+            "nodeType": "paginator",
+            "orderNumber": 6,
+            "tagLabel": "6",
+            "style": {
+              "background": "#10B981",
+              "color": "white",
+              "border": "2px solid #047857",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            }
+          },
+          "width": 140,
+          "height": 49,
+          "selected": false,
+          "positionAbsolute": {
+            "x": 1169.9395405078596,
+            "y": 213.52962515114876
+          },
+          "dragging": false
+        },
+        {
+          "id": "dndnode_47",
+          "type": "customNode",
+          "position": {
+            "x": 1169.9395405078599,
+            "y": 348.7750906892382
+          },
+          "data": {
+            "label": "Response",
+            "nodeType": "httpResponse",
+            "orderNumber": 7,
+            "tagLabel": "7",
+            "style": {
+              "background": "#8B5CF6",
+              "color": "white",
+              "border": "2px solid #6D28D9",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            }
+          },
+          "width": 140,
+          "height": 49,
+          "selected": false,
+          "positionAbsolute": {
+            "x": 1169.9395405078599,
+            "y": 348.7750906892382
+          },
+          "dragging": false
+        }
+      ],
+      edges: [
+        {
+          "id": "template-edge-0",
+          "source": "template-node-0",
+          "target": "template-node-1",
+          "sourceHandle": "output-right",
+          "targetHandle": "input-left",
+          "type": "stepEdge",
+          "markerEnd": {
+            "type": "arrowclosed"
+          },
+          "data": {
+            "label": "step 1"
+          }
+        },
+        {
+          "source": "template-node-1",
+          "sourceHandle": "output-right",
+          "target": "dndnode_43",
+          "targetHandle": "input-left",
+          "type": "stepEdge",
+          "markerEnd": {
+            "type": "arrowclosed"
+          },
+          "data": {
+            "label": "step"
+          },
+          "id": "reactflow__edge-template-node-1output-right-dndnode_43input-left"
+        },
+        {
+          "source": "dndnode_43",
+          "sourceHandle": "output-right",
+          "target": "dndnode_44",
+          "targetHandle": "input-left",
+          "type": "stepEdge",
+          "markerEnd": {
+            "type": "arrowclosed"
+          },
+          "data": {
+            "label": "step"
+          },
+          "id": "reactflow__edge-dndnode_43output-right-dndnode_44input-left"
+        },
+        {
+          "source": "dndnode_44",
+          "sourceHandle": "output-right",
+          "target": "dndnode_45",
+          "targetHandle": "input-left",
+          "type": "stepEdge",
+          "markerEnd": {
+            "type": "arrowclosed"
+          },
+          "data": {
+            "label": "step"
+          },
+          "id": "reactflow__edge-dndnode_44output-right-dndnode_45input-left"
+        },
+        {
+          "source": "dndnode_45",
+          "sourceHandle": "output-bottom",
+          "target": "dndnode_46",
+          "targetHandle": "input-top",
+          "type": "stepEdge",
+          "markerEnd": {
+            "type": "arrowclosed"
+          },
+          "data": {
+            "label": "step"
+          },
+          "id": "reactflow__edge-dndnode_45output-bottom-dndnode_46input-top"
+        },
+        {
+          "source": "dndnode_46",
+          "sourceHandle": "output-bottom",
+          "target": "dndnode_47",
+          "targetHandle": "input-top",
+          "type": "stepEdge",
+          "markerEnd": {
+            "type": "arrowclosed"
+          },
+          "data": {
+            "label": "step"
+          },
+          "id": "reactflow__edge-dndnode_46output-bottom-dndnode_47input-top"
+        }
+      ]
+    }
   },
   {
     id: 'create-update-data',
     name: 'เพิ่ม/แก้ไขข้อมูล(C/U)',
     description: 'Template สำหรับการเพิ่มหรือแก้ไขข้อมูล',
-    nodes: [
-      { type: 'httpIn', label: 'CREATE/UPDATE', position: { x: 50, y: 100 } },
-      { type: 'paramExtract', label: 'Param Extract', position: { x: 200, y: 100 } },
-      { type: 'validator', label: 'Validator', position: { x: 350, y: 100 } },
-      { type: 'mapper', label: 'Mapper', position: { x: 500, y: 100 } },
-      { type: 'databaseAction', label: 'DB Action', position: { x: 650, y: 100 } },
-      { type: 'paginator', label: 'Paginator', position: { x: 800, y: 100 } },
-      { type: 'httpResponse', label: 'Response', position: { x: 950, y: 100 } }
-    ]
+    fullTemplate: {
+      nodes: [
+        {
+          "id": "template-node-0",
+          "type": "customNode",
+          "position": {
+            "x": 50,
+            "y": 100
+          },
+          "data": {
+            "label": "CREATE/UPDATE",
+            "nodeType": "httpIn",
+            "style": {
+              "background": "#3B82F6",
+              "color": "white",
+              "border": "2px solid #1D4ED8",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            },
+            "orderNumber": 1,
+            "isFirstNode": true,
+            "tagLabel": "2"
+          },
+          "width": 140,
+          "height": 49,
+          "selected": false,
+          "dragging": false
+        },
+        {
+          "id": "template-node-1",
+          "type": "customNode",
+          "position": {
+            "x": 350,
+            "y": 86.9117291414752
+          },
+          "data": {
+            "label": "Param Extract",
+            "nodeType": "paramExtract",
+            "style": {
+              "background": "#3B82F6",
+              "color": "white",
+              "border": "2px solid #1D4ED8",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            },
+            "orderNumber": 2,
+            "isFirstNode": false,
+            "tagLabel": "3"
+          },
+          "width": 140,
+          "height": 70,
+          "selected": false,
+          "positionAbsolute": {
+            "x": 350,
+            "y": 86.9117291414752
+          },
+          "dragging": false
+        },
+        {
+          "id": "dndnode_43",
+          "type": "customNode",
+          "position": {
+            "x": 613.6880290205563,
+            "y": 95.73518742442562
+          },
+          "data": {
+            "label": "Validator",
+            "nodeType": "validator",
+            "orderNumber": 3,
+            "tagLabel": "4",
+            "style": {
+              "background": "#3B82F6",
+              "color": "white",
+              "border": "2px solid #1D4ED8",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            }
+          },
+          "width": 140,
+          "height": 49,
+          "selected": false,
+          "positionAbsolute": {
+            "x": 613.6880290205563,
+            "y": 95.73518742442562
+          },
+          "dragging": false
+        },
+        {
+          "id": "dndnode_44",
+          "type": "customNode",
+          "position": {
+            "x": 897.2672309552602,
+            "y": 91.37243047158398
+          },
+          "data": {
+            "label": "Mapper",
+            "nodeType": "mapper",
+            "orderNumber": 4,
+            "tagLabel": "5",
+            "style": {
+              "background": "#10B981",
+              "color": "white",
+              "border": "2px solid #047857",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            }
+          },
+          "width": 140,
+          "height": 49,
+          "selected": false,
+          "positionAbsolute": {
+            "x": 897.2672309552602,
+            "y": 91.37243047158398
+          },
+          "dragging": false
+        },
+        {
+          "id": "dndnode_45",
+          "type": "customNode",
+          "position": {
+            "x": 1169.9395405078596,
+            "y": 91.37243047158404
+          },
+          "data": {
+            "label": "DB Action",
+            "nodeType": "databaseAction",
+            "orderNumber": 5,
+            "tagLabel": "6",
+            "style": {
+              "background": "#10B981",
+              "color": "white",
+              "border": "2px solid #047857",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            }
+          },
+          "width": 140,
+          "height": 49,
+          "selected": false,
+          "positionAbsolute": {
+            "x": 1169.9395405078596,
+            "y": 91.37243047158404
+          },
+          "dragging": false
+        },
+        {
+          "id": "dndnode_46",
+          "type": "customNode",
+          "position": {
+            "x": 1169.9395405078596,
+            "y": 213.52962515114876
+          },
+          "data": {
+            "label": "Paginator",
+            "nodeType": "paginator",
+            "orderNumber": 6,
+            "tagLabel": "7",
+            "style": {
+              "background": "#10B981",
+              "color": "white",
+              "border": "2px solid #047857",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            }
+          },
+          "width": 140,
+          "height": 49,
+          "selected": false,
+          "positionAbsolute": {
+            "x": 1169.9395405078596,
+            "y": 213.52962515114876
+          },
+          "dragging": false
+        },
+        {
+          "id": "dndnode_47",
+          "type": "customNode",
+          "position": {
+            "x": 1169.9395405078599,
+            "y": 348.7750906892382
+          },
+          "data": {
+            "label": "Response",
+            "nodeType": "httpResponse",
+            "orderNumber": 7,
+            "tagLabel": "8",
+            "style": {
+              "background": "#8B5CF6",
+              "color": "white",
+              "border": "2px solid #6D28D9",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            }
+          },
+          "width": 140,
+          "height": 49,
+          "selected": false,
+          "positionAbsolute": {
+            "x": 1169.9395405078599,
+            "y": 348.7750906892382
+          },
+          "dragging": false
+        },
+        {
+          "id": "dndnode_48",
+          "type": "customNode",
+          "position": {
+            "x": -190.1552059067816,
+            "y": 100.56763963633182
+          },
+          "data": {
+            "label": "Auth",
+            "nodeType": "authentication",
+            "orderNumber": 8,
+            "tagLabel": "1",
+            "style": {
+              "background": "#3B82F6",
+              "color": "white",
+              "border": "2px solid #1D4ED8",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            }
+          },
+          "width": 140,
+          "height": 49,
+          "selected": false,
+          "positionAbsolute": {
+            "x": -190.1552059067816,
+            "y": 100.56763963633182
+          },
+          "dragging": false
+        }
+      ],
+      edges: [
+        {
+          "id": "template-edge-0",
+          "source": "template-node-0",
+          "target": "template-node-1",
+          "sourceHandle": "output-right",
+          "targetHandle": "input-left",
+          "type": "stepEdge",
+          "markerEnd": {
+            "type": "arrowclosed"
+          },
+          "data": {
+            "label": "step 1"
+          }
+        },
+        {
+          "source": "template-node-1",
+          "sourceHandle": "output-right",
+          "target": "dndnode_43",
+          "targetHandle": "input-left",
+          "type": "stepEdge",
+          "markerEnd": {
+            "type": "arrowclosed"
+          },
+          "data": {
+            "label": "step"
+          },
+          "id": "reactflow__edge-template-node-1output-right-dndnode_43input-left"
+        },
+        {
+          "source": "dndnode_43",
+          "sourceHandle": "output-right",
+          "target": "dndnode_44",
+          "targetHandle": "input-left",
+          "type": "stepEdge",
+          "markerEnd": {
+            "type": "arrowclosed"
+          },
+          "data": {
+            "label": "step"
+          },
+          "id": "reactflow__edge-dndnode_43output-right-dndnode_44input-left"
+        },
+        {
+          "source": "dndnode_44",
+          "sourceHandle": "output-right",
+          "target": "dndnode_45",
+          "targetHandle": "input-left",
+          "type": "stepEdge",
+          "markerEnd": {
+            "type": "arrowclosed"
+          },
+          "data": {
+            "label": "step"
+          },
+          "id": "reactflow__edge-dndnode_44output-right-dndnode_45input-left"
+        },
+        {
+          "source": "dndnode_45",
+          "sourceHandle": "output-bottom",
+          "target": "dndnode_46",
+          "targetHandle": "input-top",
+          "type": "stepEdge",
+          "markerEnd": {
+            "type": "arrowclosed"
+          },
+          "data": {
+            "label": "step"
+          },
+          "id": "reactflow__edge-dndnode_45output-bottom-dndnode_46input-top"
+        },
+        {
+          "source": "dndnode_46",
+          "sourceHandle": "output-bottom",
+          "target": "dndnode_47",
+          "targetHandle": "input-top",
+          "type": "stepEdge",
+          "markerEnd": {
+            "type": "arrowclosed"
+          },
+          "data": {
+            "label": "step"
+          },
+          "id": "reactflow__edge-dndnode_46output-bottom-dndnode_47input-top"
+        },
+        {
+          "source": "dndnode_48",
+          "sourceHandle": "output-right",
+          "target": "template-node-0",
+          "targetHandle": "input-left",
+          "type": "stepEdge",
+          "markerEnd": {
+            "type": "arrowclosed"
+          },
+          "data": {
+            "label": "step"
+          },
+          "id": "reactflow__edge-dndnode_48output-right-template-node-0input-left"
+        }
+      ]
+    }
   },
   {
     id: 'delete-data',
     name: 'ลบข้อมูล(D)',
     description: 'Template สำหรับการลบข้อมูล',
-    nodes: [
-      { type: 'httpIn', label: 'DELETE', position: { x: 50, y: 100 } },
-      { type: 'paramExtract', label: 'Param Extract', position: { x: 200, y: 100 } },
-      { type: 'validator', label: 'Validator', position: { x: 350, y: 100 } },
-      { type: 'mapper', label: 'Mapper', position: { x: 500, y: 100 } },
-      { type: 'databaseAction', label: 'DB Action', position: { x: 650, y: 100 } },
-      { type: 'httpResponse', label: 'Response', position: { x: 800, y: 100 } }
-    ]
+    fullTemplate: {
+      nodes: [
+        {
+          "id": "template-node-0",
+          "type": "customNode",
+          "position": {
+            "x": 50,
+            "y": 100
+          },
+          "data": {
+            "label": "DELETE",
+            "nodeType": "httpIn",
+            "style": {
+              "background": "#3B82F6",
+              "color": "white",
+              "border": "2px solid #1D4ED8",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            },
+            "orderNumber": 1,
+            "isFirstNode": true,
+            "tagLabel": "2"
+          },
+          "width": 140,
+          "height": 49,
+          "selected": false,
+          "dragging": false
+        },
+        {
+          "id": "template-node-1",
+          "type": "customNode",
+          "position": {
+            "x": 350,
+            "y": 86.9117291414752
+          },
+          "data": {
+            "label": "Param Extract",
+            "nodeType": "paramExtract",
+            "style": {
+              "background": "#3B82F6",
+              "color": "white",
+              "border": "2px solid #1D4ED8",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            },
+            "orderNumber": 2,
+            "isFirstNode": false,
+            "tagLabel": "3"
+          },
+          "width": 140,
+          "height": 70,
+          "selected": false,
+          "positionAbsolute": {
+            "x": 350,
+            "y": 86.9117291414752
+          },
+          "dragging": false
+        },
+        {
+          "id": "dndnode_43",
+          "type": "customNode",
+          "position": {
+            "x": 613.6880290205563,
+            "y": 95.73518742442562
+          },
+          "data": {
+            "label": "Validator",
+            "nodeType": "validator",
+            "orderNumber": 3,
+            "tagLabel": "4",
+            "style": {
+              "background": "#3B82F6",
+              "color": "white",
+              "border": "2px solid #1D4ED8",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            }
+          },
+          "width": 140,
+          "height": 49,
+          "selected": false,
+          "positionAbsolute": {
+            "x": 613.6880290205563,
+            "y": 95.73518742442562
+          },
+          "dragging": false
+        },
+        {
+          "id": "dndnode_44",
+          "type": "customNode",
+          "position": {
+            "x": 897.2672309552602,
+            "y": 91.37243047158398
+          },
+          "data": {
+            "label": "Mapper",
+            "nodeType": "mapper",
+            "orderNumber": 4,
+            "tagLabel": "5",
+            "style": {
+              "background": "#10B981",
+              "color": "white",
+              "border": "2px solid #047857",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            }
+          },
+          "width": 140,
+          "height": 49,
+          "selected": false,
+          "positionAbsolute": {
+            "x": 897.2672309552602,
+            "y": 91.37243047158398
+          },
+          "dragging": false
+        },
+        {
+          "id": "dndnode_45",
+          "type": "customNode",
+          "position": {
+            "x": 1169.9395405078596,
+            "y": 91.37243047158404
+          },
+          "data": {
+            "label": "DB Action",
+            "nodeType": "databaseAction",
+            "orderNumber": 5,
+            "tagLabel": "6",
+            "style": {
+              "background": "#10B981",
+              "color": "white",
+              "border": "2px solid #047857",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            }
+          },
+          "width": 140,
+          "height": 49,
+          "selected": false,
+          "positionAbsolute": {
+            "x": 1169.9395405078596,
+            "y": 91.37243047158404
+          },
+          "dragging": false
+        },
+        {
+          "id": "dndnode_46",
+          "type": "customNode",
+          "position": {
+            "x": 1169.9395405078596,
+            "y": 213.52962515114876
+          },
+          "data": {
+            "label": "Paginator",
+            "nodeType": "paginator",
+            "orderNumber": 6,
+            "tagLabel": "7",
+            "style": {
+              "background": "#10B981",
+              "color": "white",
+              "border": "2px solid #047857",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            }
+          },
+          "width": 140,
+          "height": 49,
+          "selected": false,
+          "positionAbsolute": {
+            "x": 1169.9395405078596,
+            "y": 213.52962515114876
+          },
+          "dragging": false
+        },
+        {
+          "id": "dndnode_47",
+          "type": "customNode",
+          "position": {
+            "x": 1169.9395405078599,
+            "y": 348.7750906892382
+          },
+          "data": {
+            "label": "Response",
+            "nodeType": "httpResponse",
+            "orderNumber": 7,
+            "tagLabel": "8",
+            "style": {
+              "background": "#8B5CF6",
+              "color": "white",
+              "border": "2px solid #6D28D9",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            }
+          },
+          "width": 140,
+          "height": 49,
+          "selected": false,
+          "positionAbsolute": {
+            "x": 1169.9395405078599,
+            "y": 348.7750906892382
+          },
+          "dragging": false
+        },
+        {
+          "id": "dndnode_48",
+          "type": "customNode",
+          "position": {
+            "x": -190.1552059067816,
+            "y": 100.56763963633182
+          },
+          "data": {
+            "label": "Auth",
+            "nodeType": "authentication",
+            "orderNumber": 8,
+            "tagLabel": "1",
+            "style": {
+              "background": "#3B82F6",
+              "color": "white",
+              "border": "2px solid #1D4ED8",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            }
+          },
+          "width": 140,
+          "height": 49,
+          "selected": false,
+          "positionAbsolute": {
+            "x": -190.1552059067816,
+            "y": 100.56763963633182
+          },
+          "dragging": false
+        }
+      ],
+      edges: [
+        {
+          "id": "template-edge-0",
+          "source": "template-node-0",
+          "target": "template-node-1",
+          "sourceHandle": "output-right",
+          "targetHandle": "input-left",
+          "type": "stepEdge",
+          "markerEnd": {
+            "type": "arrowclosed"
+          },
+          "data": {
+            "label": "step 1"
+          }
+        },
+        {
+          "source": "template-node-1",
+          "sourceHandle": "output-right",
+          "target": "dndnode_43",
+          "targetHandle": "input-left",
+          "type": "stepEdge",
+          "markerEnd": {
+            "type": "arrowclosed"
+          },
+          "data": {
+            "label": "step"
+          },
+          "id": "reactflow__edge-template-node-1output-right-dndnode_43input-left"
+        },
+        {
+          "source": "dndnode_43",
+          "sourceHandle": "output-right",
+          "target": "dndnode_44",
+          "targetHandle": "input-left",
+          "type": "stepEdge",
+          "markerEnd": {
+            "type": "arrowclosed"
+          },
+          "data": {
+            "label": "step"
+          },
+          "id": "reactflow__edge-dndnode_43output-right-dndnode_44input-left"
+        },
+        {
+          "source": "dndnode_44",
+          "sourceHandle": "output-right",
+          "target": "dndnode_45",
+          "targetHandle": "input-left",
+          "type": "stepEdge",
+          "markerEnd": {
+            "type": "arrowclosed"
+          },
+          "data": {
+            "label": "step"
+          },
+          "id": "reactflow__edge-dndnode_44output-right-dndnode_45input-left"
+        },
+        {
+          "source": "dndnode_45",
+          "sourceHandle": "output-bottom",
+          "target": "dndnode_46",
+          "targetHandle": "input-top",
+          "type": "stepEdge",
+          "markerEnd": {
+            "type": "arrowclosed"
+          },
+          "data": {
+            "label": "step"
+          },
+          "id": "reactflow__edge-dndnode_45output-bottom-dndnode_46input-top"
+        },
+        {
+          "source": "dndnode_46",
+          "sourceHandle": "output-bottom",
+          "target": "dndnode_47",
+          "targetHandle": "input-top",
+          "type": "stepEdge",
+          "markerEnd": {
+            "type": "arrowclosed"
+          },
+          "data": {
+            "label": "step"
+          },
+          "id": "reactflow__edge-dndnode_46output-bottom-dndnode_47input-top"
+        },
+        {
+          "source": "dndnode_48",
+          "sourceHandle": "output-right",
+          "target": "template-node-0",
+          "targetHandle": "input-left",
+          "type": "stepEdge",
+          "markerEnd": {
+            "type": "arrowclosed"
+          },
+          "data": {
+            "label": "step"
+          },
+          "id": "reactflow__edge-dndnode_48output-right-template-node-0input-left"
+        }
+      ]
+    }
   },
   {
     id: 'separate',
