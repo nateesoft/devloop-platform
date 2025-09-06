@@ -13,24 +13,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Mock response for testing - in production this should connect to your actual backend
-    const mockUser = {
-      id: Math.floor(Math.random() * 1000) + 1,
-      email,
-      firstName,
-      lastName,
-      isActive: true,
-      role,
-      keycloakId,
-      emailVerified,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+    // Get API base URL
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8888';
 
-    const mockTokens = {
-      access_token: `mock_access_token_${Date.now()}`,
-      refresh_token: `mock_refresh_token_${Date.now()}`,
-    };
+    // Forward to actual backend service
+    const backendResponse = await fetch(`${API_BASE_URL}/auth/keycloak-sync`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-forwarded-for': request.headers.get('x-forwarded-for') || 'unknown',
+        'user-agent': request.headers.get('user-agent') || 'unknown'
+      },
+      body: JSON.stringify({
+        keycloakId,
+        email,
+        firstName,
+        lastName,
+        role,
+        emailVerified
+      })
+    });
+
+    if (!backendResponse.ok) {
+      const errorData = await backendResponse.json().catch(() => ({ error: 'Backend sync failed' }));
+      return NextResponse.json(errorData, { status: backendResponse.status });
+    }
+
+    const result = await backendResponse.json();
 
     // Log the sync attempt
     console.log('Keycloak user sync request:', {
@@ -42,18 +51,9 @@ export async function POST(request: NextRequest) {
       emailVerified,
     });
 
-    // Simulate some processing time
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    console.log('Keycloak user sync response:', result);
 
-    const response = {
-      user: mockUser,
-      tokens: mockTokens,
-      message: 'Keycloak user synced successfully',
-    };
-
-    console.log('Keycloak user sync response:', response);
-
-    return NextResponse.json(response, { status: 200 });
+    return NextResponse.json(result, { status: 200 });
   } catch (error) {
     console.error('Keycloak sync error:', error);
     return NextResponse.json(

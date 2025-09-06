@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Note } from './types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8888';
 
 // Track recent successful logins to prevent unnecessary token refresh attempts
 let recentLoginTime: number | null = null;

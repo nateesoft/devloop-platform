@@ -1,0 +1,37 @@
+{
+  "reporterEnabled": "cypress-multi-reporters",
+  "cypressMultiReportersReporterOptions": {
+    "reporterEnabled": "mocha-junit-reporter, mochawesome",
+    "mochaJunitReporterReporterOptions": {
+      "mochaFile": "cypress/results/junit/test-results-[hash].xml",
+      "toConsole": false
+    },
+    "mochawesomeReporterOptions": {
+      "reportDir": "cypress/results/mochawesome",
+      "reportFilename": "test-results",
+      "reportTitle": "TON Lowcode Platform - Cypress Test Results",
+      "reportPageTitle": "Cypress E2E Test Results",
+      "embeddedScreenshots": true,
+      "inlineAssets": true,
+      "saveAllAttempts": true,
+      "ignoreVideos": false,
+      "videoOnFailOnly": false,
+      "quiet": true,
+      "overwrite": false,
+      "html": true,
+      "json": true,
+      "timestamp": "yyyy-mm-dd_HH-MM-ss",
+      "showPassed": true,
+      "showFailed": true,
+      "showPending": true,
+      "showSkipped": false,
+      "showHooks": "failed",
+      "saveJson": true,
+      "saveHtml": true,
+      "dev": false,
+      "assetsDir": "cypress/results/mochawesome/assets",
+      "jsonFile": "cypress/results/mochawesome/test-results.json",
+      "htmlFile": "cypress/results/mochawesome/test-results.html"
+    }
+  }
+}

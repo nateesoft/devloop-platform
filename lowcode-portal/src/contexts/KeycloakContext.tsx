@@ -51,13 +51,24 @@ const KeycloakContextProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           setInitialized(true);
           
           if (keycloakInstance.authenticated && keycloakInstance.tokenParsed) {
+            // Extract role from realm_access or custom role attribute
+            let userRole = 'user'; // default role
+            const realmRoles = keycloakInstance.tokenParsed.realm_access?.roles || [];
+            if (realmRoles.includes('admin')) {
+              userRole = 'admin';
+            } else if (realmRoles.includes('developer')) {
+              userRole = 'developer';
+            } else if (keycloakInstance.tokenParsed.role) {
+              userRole = keycloakInstance.tokenParsed.role;
+            }
+
             const keycloakUser: KeycloakUser = {
               id: keycloakInstance.tokenParsed.sub || '',
               username: keycloakInstance.tokenParsed.preferred_username || '',
               email: keycloakInstance.tokenParsed.email || '',
               firstName: keycloakInstance.tokenParsed.given_name || '',
               lastName: keycloakInstance.tokenParsed.family_name || '',
-              role: keycloakInstance.tokenParsed.role || 'user',
+              role: userRole,
               emailVerified: keycloakInstance.tokenParsed.email_verified || false,
             };
             setUser(keycloakUser);

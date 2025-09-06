@@ -1,5 +1,3 @@
-import Dinero from 'dinero.js';
-
 // Supported currencies with their exchange rates (relative to USD)
 export const SUPPORTED_CURRENCIES = {
   USD: { 

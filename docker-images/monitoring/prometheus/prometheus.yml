@@ -40,7 +40,7 @@ scrape_configs:
   # Lowcode Platform Backend
   - job_name: 'lowcode-portal-service'
     static_configs:
-      - targets: ['host.docker.internal:4000']
+      - targets: ['host.docker.internal:8080']
     metrics_path: '/metrics'
     scrape_interval: 30s
 

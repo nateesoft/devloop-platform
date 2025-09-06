@@ -51,7 +51,7 @@ const FlowHistoryPanel: React.FC<FlowHistoryPanelProps> = ({
   const loadFlowHistory = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:8080/flows/${flowId}/history`);
+      const response = await fetch(`http://localhost:8888/flows/${flowId}/history`);
       if (!response.ok) {
         throw new Error('Failed to load flow history');
       }
@@ -67,7 +67,7 @@ const FlowHistoryPanel: React.FC<FlowHistoryPanelProps> = ({
 
   const handleRestoreVersion = async (historyItem: FlowHistoryItem) => {
     try {
-      const response = await fetch(`http://localhost:8080/flows/${flowId}/restore/${historyItem.version}`, {
+      const response = await fetch(`http://localhost:8888/flows/${flowId}/restore/${historyItem.version}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -97,7 +97,7 @@ const FlowHistoryPanel: React.FC<FlowHistoryPanelProps> = ({
     }
 
     try {
-      const response = await fetch(`http://localhost:8080/flows/${flowId}/history/${historyId}`, {
+      const response = await fetch(`http://localhost:8888/flows/${flowId}/history/${historyId}`, {
         method: 'DELETE'
       });
 

@@ -1,5 +1,7 @@
+import './polyfill';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
@@ -21,7 +23,24 @@ async function bootstrap() {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
+
+  const config = new DocumentBuilder()
+    .setTitle('Lowcode Portal API')
+    .setDescription('The lowcode portal API documentation')
+    .setVersion('1.0')
+    .addTag('lowcode')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      },
+      'JWT-auth',
+    )
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api-docs', app, document);
   
-  await app.listen(process.env.PORT ?? 8080);
+  await app.listen(process.env.PORT ?? 8888);
 }
 bootstrap();

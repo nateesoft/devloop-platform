@@ -1,0 +1,69 @@
+# Dependencies
+node_modules
+*/node_modules
+
+# Build outputs
+dist
+*/dist
+build
+*/build
+.next
+*/.next
+
+# Development files
+.env*
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Cache
+.npm
+.yarn
+.cache
+*/.cache
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Documentation
+*.md
+docs/
+
+# Testing
+coverage/
+*/coverage/
+.nyc_output/
+
+# Monitoring files that are large
+docker-compose.monitoring.yml
+docker-images/
+scripts/
+
+# Exclude everything except what we need
+!lowcode-portal/
+!lowcode-portal-service/

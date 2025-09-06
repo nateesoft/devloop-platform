@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -18,6 +18,9 @@ import { SecretKeysModule } from './modules/secret-keys/secret-keys.module';
 import { DatabaseModule } from './modules/database.module';
 import { MediaModule } from './modules/media/media.module';
 import { TasksModule } from './modules/tasks/tasks.module';
+import { MetricsModule } from './modules/metrics/metrics.module';
+import { MetricsMiddleware } from './common/middleware/metrics.middleware';
+import { LoggerModule } from './common/logger/logger.module';
 
 @Module({
   imports: [
@@ -56,8 +59,17 @@ import { TasksModule } from './modules/tasks/tasks.module';
     DatabaseModule,
     MediaModule,
     TasksModule,
+    MetricsModule,
+    LoggerModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(MetricsMiddleware)
+      .exclude('metrics')
+      .forRoutes('*');
+  }
+}

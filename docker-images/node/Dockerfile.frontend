@@ -11,8 +11,8 @@ RUN apk add --no-cache libc6-compat git
 WORKDIR /app
 
 # Copy package files
-COPY ../../lowcode-portal/package*.json ./
-COPY ../../lowcode-portal/pnpm-lock.yaml* ./
+COPY lowcode-portal/package*.json ./
+COPY lowcode-portal/pnpm-lock.yaml* ./
 
 # Install dependencies
 RUN \
@@ -33,11 +33,11 @@ RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 
 # Install development dependencies
-COPY ../../lowcode-portal/package*.json ./
+COPY lowcode-portal/package*.json ./
 RUN npm install
 
 # Copy source code
-COPY ../../lowcode-portal .
+COPY lowcode-portal .
 
 # Change ownership to node user
 RUN chown -R nextjs:nodejs /app
@@ -62,7 +62,7 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 
 # Copy source code
-COPY ../../lowcode-portal .
+COPY lowcode-portal .
 
 # Set environment variables for build
 ENV NODE_ENV=production

@@ -45,7 +45,7 @@ export class AuthService {
 
     const existingUser = await this.usersRepository.findOne({ where: { email } });
     if (existingUser) {
-      throw new ConflictException('Email already exists');
+      throw new ConflictException('มี User อยู่แล้วในระบบ');
     }
 
     const saltRounds = 10;
@@ -237,23 +237,29 @@ export class AuthService {
     }
   }
 
-  async syncKeycloakUser(keycloakData: any, deviceInfo?: { ip?: string; userAgent?: string; deviceInfo?: string }): Promise<{ user: Partial<User>; tokens: { access_token: string; refresh_token: string; sessionId: string }; message: string }> {
-    const { preferred_username, email, given_name, family_name } = keycloakData;
+  async syncKeycloakUser(keycloakData: { keycloakId: string; email: string; firstName: string; lastName: string; role?: string; emailVerified?: boolean }, deviceInfo?: { ip?: string; userAgent?: string; deviceInfo?: string }): Promise<{ user: Partial<User>; tokens: { access_token: string; refresh_token: string; sessionId: string }; message: string }> {
+    const { keycloakId, email, firstName, lastName } = keycloakData;
 
     let user = await this.usersRepository.findOne({ where: { email } });
     
     if (!user) {
-      // Create new user from Keycloak data
+      // Create new user from Keycloak data with default role
       user = this.usersRepository.create({
         email: email,
-        firstName: given_name || preferred_username,
-        lastName: family_name || '',
-        role: 'user',
+        firstName: firstName || 'Unknown',
+        lastName: lastName || 'User',
+        role: 'user', // Default role for new users
         password: '', // No password needed for Keycloak users
       });
       
       user = await this.usersRepository.save(user);
+      console.log(`Created new user from Keycloak: ${email} with role: ${user.role}`);
+    } else {
+      console.log(`Found existing user: ${email} with database role: ${user.role}`);
     }
+
+    // IMPORTANT: Use role from DATABASE, not from Keycloak
+    // This ensures role permissions are controlled by database only
 
     // Check for existing active sessions
     const activeSessions = await this.redisService.getUserActiveSessions(user.id);
@@ -278,7 +284,11 @@ export class AuthService {
     });
 
     const { password: _, ...userWithoutPassword } = user;
+    
+    // Generate tokens using DATABASE role, NOT Keycloak role
     const tokens = await this.generateTokens(user, sessionId);
+    
+    console.log(`Generated tokens for user ${email} with database role: ${user.role}`);
     
     return {
       user: { ...userWithoutPassword, currentSessionId: sessionId },

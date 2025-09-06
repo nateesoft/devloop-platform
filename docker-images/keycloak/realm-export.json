@@ -3,7 +3,7 @@
   "displayName": "Lowcode Platform",
   "displayNameHtml": "<div class=\"kc-logo-text\"><span>Lowcode Platform</span></div>",
   "enabled": true,
-  "sslRequired": "external",
+  "sslRequired": "none",
   "registrationAllowed": true,
   "registrationEmailAsUsername": false,
   "rememberMe": true,
@@ -169,6 +169,25 @@
         {
           "type": "password",
           "value": "admin123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["admin"],
+      "attributes": {
+        "role": ["admin"]
+      }
+    },
+    {
+      "username": "nateelive",
+      "email": "natee.live@gmail.com",
+      "firstName": "Natee",
+      "lastName": "Live",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "000000",
           "temporary": false
         }
       ],
