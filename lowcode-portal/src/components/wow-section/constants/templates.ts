@@ -38,7 +38,7 @@ export const WORKFLOW_TEMPLATES = [
     ]
   },
   {
-    id: 'crud-data',
+    id: 'create-update-data',
     name: 'เพิ่ม/แก้ไขข้อมูล',
     description: 'Template สำหรับการเพิ่มหรือแก้ไขข้อมูล',
     nodes: [

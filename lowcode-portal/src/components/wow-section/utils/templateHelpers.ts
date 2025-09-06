@@ -20,10 +20,16 @@ export const createNodesFromTemplate = (templateId: string) => {
 
     const nodeType = nodeTypeMapping[nodeTemplate.type] || nodeTemplate.type;
     
+    // Double the horizontal spacing between nodes
+    const adjustedPosition = {
+      x: index === 0 ? nodeTemplate.position.x : nodeTemplate.position.x + (index * 150),
+      y: nodeTemplate.position.y
+    };
+    
     return {
       id: `template-node-${index}`,
       type: 'customNode',
-      position: nodeTemplate.position,
+      position: adjustedPosition,
       data: {
         label: nodeTemplate.label,
         nodeType: nodeType,
