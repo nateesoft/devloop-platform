@@ -20,6 +20,8 @@ import 'reactflow/dist/style.css';
 
 // Import UI Flow Components
 import { TabsComponent, CRUDComponent, DashboardComponent, SettingsComponent } from './component-ui-flow';
+import TemplateSelector from './component-ui-flow/TemplateSelector';
+import { createNodesFromTemplate } from './utils/ui-templateHelpers';
 
 // Enhanced Stick Figure for Actor nodes - keeping original shape but with modern styling
 const EnhancedStickFigure = ({ color = '#3B82F6', size = 60, strokeWidth = 3 }) => (
@@ -309,10 +311,6 @@ const LoginForm = ({ color = '#10B981', size = 60 }) => (
     />
   </svg>
 );
-
-// Tabs component icon for tabs-component nodes
-
-// Settings component icon for settings-component nodes
 
 // Page layout component icon for page nodes
 const PageLayout = ({ color = '#10B981', size = 60 }) => (
@@ -819,6 +817,9 @@ const WorkflowWebBuilder: React.FC = () => {
   const [selectedTheme, setSelectedTheme] = useState('blue');
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>(['thai', 'english']);
   const [selectedAlertType, setSelectedAlertType] = useState('modal');
+  
+  // State for template selection
+  const [selectedTemplate, setSelectedTemplate] = useState<string>('');
 
   // State for fullscreen mode
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -877,6 +878,25 @@ const WorkflowWebBuilder: React.FC = () => {
         )
       );
     }, [setNodes]);
+
+    // Function to apply template
+    const applyTemplate = useCallback((templateId: string) => {
+      if (!templateId) return;
+  
+      const { nodes: newNodes, edges: newEdges } = createNodesFromTemplate(templateId);
+      
+      // Apply the new nodes and edges
+      setNodes(newNodes);
+      setEdges(newEdges);
+    }, [setNodes, setEdges]);
+
+    // Template selection handler
+    const handleTemplateChange = useCallback((templateId: string) => {
+      setSelectedTemplate(templateId);
+      if (templateId) {
+        applyTemplate(templateId);
+      }
+    }, [applyTemplate]);
   
     // Listen for node label update events
     useEffect(() => {
@@ -1020,6 +1040,13 @@ const WorkflowWebBuilder: React.FC = () => {
                     <span className="text-xs text-slate-500 dark:text-slate-400">ESC to exit</span>
                   )}
                 </div>
+
+                {/* Template Selection Dropdown */}
+                <TemplateSelector 
+                  selectedTemplate={selectedTemplate}
+                  onTemplateChange={handleTemplateChange}
+                />
+
                 <div className="space-y-3">
                   
                   {/* User Group */}
