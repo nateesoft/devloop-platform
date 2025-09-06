@@ -433,7 +433,10 @@ const PageLayout = ({ color = '#10B981', size = 60 }) => (
 const CustomNode = ({ data, id }: NodeProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [label, setLabel] = useState(data.label || '');
+  const [isEditingTag, setIsEditingTag] = useState(false);
+  const [tagLabel, setTagLabel] = useState(data.tagLabel || data.orderNumber?.toString() || '');
   const inputRef = useRef<HTMLInputElement>(null);
+  const tagInputRef = useRef<HTMLInputElement>(null);
 
   // Focus input when editing starts
   useEffect(() => {
@@ -443,13 +446,31 @@ const CustomNode = ({ data, id }: NodeProps) => {
     }
   }, [isEditing]);
 
+  // Focus tag input when tag editing starts
+  useEffect(() => {
+    if (isEditingTag && tagInputRef.current) {
+      tagInputRef.current.focus();
+      tagInputRef.current.select();
+    }
+  }, [isEditingTag]);
+
   const handleDoubleClick = () => {
     setIsEditing(true);
+  };
+
+  const handleTagDoubleClick = () => {
+    setIsEditingTag(true);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === 'Escape') {
       finishEditing();
+    }
+  };
+
+  const handleTagKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === 'Escape') {
+      finishTagEditing();
     }
   };
 
@@ -466,8 +487,77 @@ const CustomNode = ({ data, id }: NodeProps) => {
     }
   };
 
+  const finishTagEditing = () => {
+    setIsEditingTag(false);
+    if (tagLabel.trim() && tagLabel !== data.tagLabel) {
+      // Update node tag through a custom event
+      const updateEvent = new CustomEvent('updateNodeTag', {
+        detail: { nodeId: id, newTagLabel: tagLabel.trim() }
+      });
+      window.dispatchEvent(updateEvent);
+    } else {
+      setTagLabel(data.tagLabel || data.orderNumber?.toString() || '');
+    }
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLabel(e.target.value);
+  };
+
+  const handleTagInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTagLabel(e.target.value);
+  };
+
+  // Get tag colors based on order number
+  const getTagColor = (orderNumber: number) => {
+    const colors = [
+      { bg: '#EF4444', hover: '#DC2626' }, // Red
+      { bg: '#F97316', hover: '#EA580C' }, // Orange  
+      { bg: '#EAB308', hover: '#CA8A04' }, // Yellow
+      { bg: '#22C55E', hover: '#16A34A' }, // Green
+      { bg: '#3B82F6', hover: '#2563EB' }, // Blue
+      { bg: '#8B5CF6', hover: '#7C3AED' }, // Purple
+      { bg: '#EC4899', hover: '#DB2777' }, // Pink
+      { bg: '#06B6D4', hover: '#0891B2' }, // Cyan
+      { bg: '#84CC16', hover: '#65A30D' }, // Lime
+      { bg: '#F59E0B', hover: '#D97706' }, // Amber
+    ];
+    return colors[(orderNumber - 1) % colors.length];
+  };
+
+  // Render tag component
+  const renderTag = () => {
+    if (!data.orderNumber && !data.tagLabel) return null;
+    
+    const tagColor = getTagColor(data.orderNumber || 1);
+    const displayTag = tagLabel || data.orderNumber?.toString() || '';
+    
+    return (
+      <div className="absolute -top-2 -right-2 z-10">
+        {isEditingTag ? (
+          <input
+            ref={tagInputRef}
+            type="text"
+            value={tagLabel}
+            onChange={handleTagInputChange}
+            onBlur={finishTagEditing}
+            onKeyDown={handleTagKeyDown}
+            className="w-8 h-6 text-xs font-bold text-white text-center rounded-full border-2 border-white shadow-lg"
+            style={{ backgroundColor: tagColor.bg }}
+            maxLength={3}
+          />
+        ) : (
+          <div
+            onDoubleClick={handleTagDoubleClick}
+            className="w-8 h-6 flex items-center justify-center text-xs font-bold text-white rounded-full border-2 border-white shadow-lg cursor-pointer hover:scale-110 transition-transform"
+            style={{ backgroundColor: tagColor.bg }}
+            title="Double-click to edit tag"
+          >
+            {displayTag}
+          </div>
+        )}
+      </div>
+    );
   };
 
   // Determine node shape based on data.nodeType
@@ -748,7 +838,105 @@ const CustomNode = ({ data, id }: NodeProps) => {
         id="output"
         style={handleStyles.right}
       />
+
+      {/* Tag display */}
+      {renderTag()}
     </div>
+  );
+};
+
+// Custom Edge Component with editable labels
+const CustomEdge = ({ id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, data }: any) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [label, setLabel] = useState(data?.label || '');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Calculate edge path and label position
+  const edgePath = `M${sourceX},${sourceY} L${targetX},${targetY}`;
+  const labelX = (sourceX + targetX) / 2;
+  const labelY = (sourceY + targetY) / 2;
+
+  // Focus input when editing starts
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [isEditing]);
+
+  const handleDoubleClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === 'Escape') {
+      finishEditing();
+    }
+  };
+
+  const finishEditing = () => {
+    setIsEditing(false);
+    if (label.trim() && label !== (data?.label || '')) {
+      // Update edge data through a custom event
+      const updateEvent = new CustomEvent('updateEdgeLabel', {
+        detail: { edgeId: id, newLabel: label.trim() }
+      });
+      window.dispatchEvent(updateEvent);
+    } else {
+      setLabel(data?.label || '');
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLabel(e.target.value);
+  };
+
+  return (
+    <g>
+      {/* Edge path */}
+      <path
+        id={id}
+        className="react-flow__edge-path"
+        d={edgePath}
+        strokeWidth={2}
+        stroke="#b1b1b7"
+        fill="none"
+        markerEnd="url(#react-flow__arrowclosed)"
+      />
+      
+      {/* Edge label */}
+      <foreignObject
+        width={100}
+        height={32}
+        x={labelX - 50}
+        y={labelY - 16}
+        className="react-flow__edge-label"
+        requiredExtensions="http://www.w3.org/1999/xhtml"
+      >
+        <div className="flex items-center justify-center h-full">
+          {isEditing ? (
+            <input
+              ref={inputRef}
+              type="text"
+              value={label}
+              onChange={handleInputChange}
+              onBlur={finishEditing}
+              onKeyDown={handleKeyDown}
+              className="w-full text-sm text-center font-semibold bg-white border-2 border-blue-400 rounded-md px-2 py-1 outline-none shadow-lg text-slate-800"
+              placeholder="Enter label..."
+            />
+          ) : (
+            <div
+              onDoubleClick={handleDoubleClick}
+              className="text-sm font-bold bg-white border-2 border-slate-300 rounded-md px-3 py-1 cursor-pointer hover:bg-blue-50 hover:border-blue-400 shadow-lg select-none text-slate-800 hover:text-blue-700 transition-all duration-200"
+              title="Double-click to edit"
+            >
+              {data?.label || 'Label'}
+            </div>
+          )}
+        </div>
+      </foreignObject>
+    </g>
   );
 };
 
@@ -758,6 +946,10 @@ const initialEdges: Edge[] = [];
 
 const nodeTypes = {
   customNode: CustomNode,
+};
+
+const edgeTypes = {
+  customEdge: CustomEdge,
 };
 
 // LocalStorage functions
@@ -864,7 +1056,12 @@ const WorkflowWebBuilder: React.FC = () => {
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialFlow.edges);
   
     const onConnect = useCallback((params: Connection) => {
-      const newEdge = { ...params, markerEnd: { type: MarkerType.ArrowClosed } };
+      const newEdge = { 
+        ...params, 
+        type: 'customEdge',
+        markerEnd: { type: MarkerType.ArrowClosed },
+        data: { label: 'Connection' }
+      };
       setEdges((els) => addEdge(newEdge, els));
     }, [setEdges]);
   
@@ -879,15 +1076,38 @@ const WorkflowWebBuilder: React.FC = () => {
       );
     }, [setNodes]);
 
+    // Handle node tag updates
+    const updateNodeTag = useCallback((nodeId: string, newTagLabel: string) => {
+      setNodes((nds) => 
+        nds.map((node) => 
+          node.id === nodeId 
+            ? { ...node, data: { ...node.data, tagLabel: newTagLabel } }
+            : node
+        )
+      );
+    }, [setNodes]);
+
+    // Handle edge label updates
+    const updateEdgeLabel = useCallback((edgeId: string, newLabel: string) => {
+      setEdges((eds) => 
+        eds.map((edge) => 
+          edge.id === edgeId 
+            ? { ...edge, data: { ...edge.data, label: newLabel } }
+            : edge
+        )
+      );
+    }, [setEdges]);
+
     // Function to apply template
     const applyTemplate = useCallback((templateId: string) => {
       if (!templateId) return;
   
-      const { nodes: newNodes, edges: newEdges } = createNodesFromTemplate(templateId);
-      
-      // Apply the new nodes and edges
-      setNodes(newNodes);
-      setEdges(newEdges);
+      const result = createNodesFromTemplate(templateId);
+      if (result && result.nodes && result.edges) {
+        // Apply the new nodes and edges
+        setNodes(result.nodes);
+        setEdges(result.edges);
+      }
     }, [setNodes, setEdges]);
 
     // Template selection handler
@@ -898,19 +1118,56 @@ const WorkflowWebBuilder: React.FC = () => {
       }
     }, [applyTemplate]);
   
-    // Listen for node label update events
+    // Listen for node and edge label update events
     useEffect(() => {
       const handleUpdateNodeLabel = (e: CustomEvent) => {
         const { nodeId, newLabel } = e.detail;
         updateNodeLabel(nodeId, newLabel);
       };
+
+      const handleUpdateNodeTag = (e: CustomEvent) => {
+        const { nodeId, newTagLabel } = e.detail;
+        updateNodeTag(nodeId, newTagLabel);
+      };
+
+      const handleUpdateEdgeLabel = (e: CustomEvent) => {
+        const { edgeId, newLabel } = e.detail;
+        updateEdgeLabel(edgeId, newLabel);
+      };
   
       window.addEventListener('updateNodeLabel', handleUpdateNodeLabel as EventListener);
+      window.addEventListener('updateNodeTag', handleUpdateNodeTag as EventListener);
+      window.addEventListener('updateEdgeLabel', handleUpdateEdgeLabel as EventListener);
       
       return () => {
         window.removeEventListener('updateNodeLabel', handleUpdateNodeLabel as EventListener);
+        window.removeEventListener('updateNodeTag', handleUpdateNodeTag as EventListener);
+        window.removeEventListener('updateEdgeLabel', handleUpdateEdgeLabel as EventListener);
       };
-    }, [updateNodeLabel]);
+    }, [updateNodeLabel, updateNodeTag, updateEdgeLabel]);
+
+    // Re-order tags sequentially whenever nodes change
+    useEffect(() => {
+      const reorderedNodes = nodes.map((node, index) => ({
+        ...node,
+        data: {
+          ...node.data,
+          orderNumber: index + 1,
+          tagLabel: (index + 1).toString(),
+          isFirstNode: index === 0
+        }
+      }));
+      
+      // Only update if the order actually changed
+      const needsUpdate = nodes.some((node, index) => 
+        node.data.orderNumber !== index + 1 || 
+        node.data.tagLabel !== (index + 1).toString()
+      );
+      
+      if (needsUpdate && nodes.length > 0) {
+        setNodes(reorderedNodes);
+      }
+    }, [nodes.length, setNodes]); // Only trigger on nodes count change, not on every node update
   
     // Save flow data whenever nodes or edges change
     useEffect(() => {
@@ -980,6 +1237,9 @@ const WorkflowWebBuilder: React.FC = () => {
   
         const nodeData = JSON.parse(event.dataTransfer.getData('application/nodedata'));
         
+        // Calculate next sequential order number (will be re-ordered by useEffect)
+        const nextOrderNumber = nodes.length + 1;
+        
         const newNode = {
           id: getId(),
           type: 'customNode',
@@ -987,7 +1247,10 @@ const WorkflowWebBuilder: React.FC = () => {
           data: { 
             label: nodeData.label,
             nodeType: nodeData.nodeType || 'default',
-            style: nodeData.style 
+            style: nodeData.style,
+            orderNumber: nextOrderNumber,
+            tagLabel: nextOrderNumber.toString(),
+            isFirstNode: nextOrderNumber === 1
           },
         };
   
@@ -1425,6 +1688,7 @@ const WorkflowWebBuilder: React.FC = () => {
                       onConnect={onConnect}
                       onInit={setReactFlowInstance}
                       nodeTypes={nodeTypes}
+                      edgeTypes={edgeTypes}
                       fitView
                       nodesDraggable={true}
                       nodesConnectable={true}

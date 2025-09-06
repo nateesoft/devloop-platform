@@ -23,11 +23,11 @@ export const WORKFLOW_TEMPLATES: TemplateDefinition[] = [
     fullTemplate: {
       nodes: [
         {
-          "id": "dndnode_43",
+          "id": "dndnode_55",
           "type": "customNode",
           "position": {
-            "x": 140.33615824340177,
-            "y": -33.58506420269646
+            "x": 13.418522645876408,
+            "y": -47.582165149967494
           },
           "data": {
             "label": "User",
@@ -42,23 +42,26 @@ export const WORKFLOW_TEMPLATES: TemplateDefinition[] = [
               "fontWeight": "bold",
               "width": 140,
               "textAlign": "center"
-            }
+            },
+            "orderNumber": 1,
+            "tagLabel": "1",
+            "isFirstNode": true
           },
           "width": 92,
           "height": 128,
           "selected": false,
           "positionAbsolute": {
-            "x": 140.33615824340177,
-            "y": -33.58506420269646
+            "x": 13.418522645876408,
+            "y": -47.582165149967494
           },
           "dragging": false
         },
         {
-          "id": "dndnode_44",
+          "id": "dndnode_56",
           "type": "customNode",
           "position": {
-            "x": 351.2692493518688,
-            "y": -37.54005966098026
+            "x": 246.9978991551879,
+            "y": -46.09439842060882
           },
           "data": {
             "label": "Login",
@@ -72,23 +75,59 @@ export const WORKFLOW_TEMPLATES: TemplateDefinition[] = [
               "fontWeight": "bold",
               "width": 140,
               "textAlign": "center"
-            }
+            },
+            "orderNumber": 2,
+            "tagLabel": "2",
+            "isFirstNode": false
           },
           "width": 132,
           "height": 136,
           "selected": false,
           "positionAbsolute": {
-            "x": 351.2692493518688,
-            "y": -37.54005966098026
+            "x": 246.9978991551879,
+            "y": -46.09439842060882
           },
           "dragging": false
         },
         {
-          "id": "dndnode_45",
+          "id": "dndnode_58",
           "type": "customNode",
           "position": {
-            "x": 761.2784565579408,
-            "y": -120.94763455483235
+            "x": 635.3050155178014,
+            "y": -22.290130750870063
+          },
+          "data": {
+            "label": "Route?",
+            "nodeType": "route",
+            "style": {
+              "background": "red",
+              "color": "white",
+              "border": "2px solid darkred",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            },
+            "orderNumber": 3,
+            "tagLabel": "3",
+            "isFirstNode": false
+          },
+          "width": 100,
+          "height": 100,
+          "selected": false,
+          "positionAbsolute": {
+            "x": 635.3050155178014,
+            "y": -22.290130750870063
+          },
+          "dragging": false
+        },
+        {
+          "id": "dndnode_59",
+          "type": "customNode",
+          "position": {
+            "x": 864.421091839037,
+            "y": -130.89710199405314
           },
           "data": {
             "label": "User-Login",
@@ -103,23 +142,26 @@ export const WORKFLOW_TEMPLATES: TemplateDefinition[] = [
               "fontWeight": "bold",
               "width": 140,
               "textAlign": "center"
-            }
+            },
+            "orderNumber": 4,
+            "tagLabel": "4",
+            "isFirstNode": false
           },
           "width": 103,
           "height": 128,
           "selected": false,
           "positionAbsolute": {
-            "x": 761.2784565579408,
-            "y": -120.94763455483235
+            "x": 864.421091839037,
+            "y": -130.89710199405314
           },
           "dragging": false
         },
         {
-          "id": "dndnode_46",
+          "id": "dndnode_60",
           "type": "customNode",
           "position": {
-            "x": 760.4807667580083,
-            "y": 35.93385195708976
+            "x": 871.8599254858303,
+            "y": 50.61043898770488
           },
           "data": {
             "label": "User-Admin",
@@ -134,23 +176,26 @@ export const WORKFLOW_TEMPLATES: TemplateDefinition[] = [
               "fontWeight": "bold",
               "width": 140,
               "textAlign": "center"
-            }
+            },
+            "orderNumber": 5,
+            "tagLabel": "5",
+            "isFirstNode": false
           },
           "width": 108,
           "height": 128,
           "selected": false,
           "positionAbsolute": {
-            "x": 760.4807667580083,
-            "y": 35.93385195708976
+            "x": 871.8599254858303,
+            "y": 50.61043898770488
           },
           "dragging": false
         },
         {
-          "id": "dndnode_47",
+          "id": "dndnode_61",
           "type": "customNode",
           "position": {
-            "x": 1019.0317885325278,
-            "y": -125.92648323870816
+            "x": 1149.2848963632966,
+            "y": -140.02635801944064
           },
           "data": {
             "label": "Home-User",
@@ -164,23 +209,26 @@ export const WORKFLOW_TEMPLATES: TemplateDefinition[] = [
               "fontWeight": "bold",
               "width": 140,
               "textAlign": "center"
-            }
+            },
+            "orderNumber": 6,
+            "tagLabel": "6",
+            "isFirstNode": false
           },
           "width": 132,
           "height": 136,
           "selected": false,
           "positionAbsolute": {
-            "x": 1019.0317885325278,
-            "y": -125.92648323870816
+            "x": 1149.2848963632966,
+            "y": -140.02635801944064
           },
           "dragging": false
         },
         {
-          "id": "dndnode_48",
+          "id": "dndnode_62",
           "type": "customNode",
           "position": {
-            "x": 1023.4363030075872,
-            "y": 29.476711068173813
+            "x": 1147.611763604173,
+            "y": 45.691378243316336
           },
           "data": {
             "label": "Home-Admin",
@@ -194,53 +242,26 @@ export const WORKFLOW_TEMPLATES: TemplateDefinition[] = [
               "fontWeight": "bold",
               "width": 140,
               "textAlign": "center"
-            }
+            },
+            "orderNumber": 7,
+            "tagLabel": "7",
+            "isFirstNode": false
           },
           "width": 132,
           "height": 136,
           "selected": false,
           "positionAbsolute": {
-            "x": 1023.4363030075872,
-            "y": 29.476711068173813
+            "x": 1147.611763604173,
+            "y": 45.691378243316336
           },
           "dragging": false
         },
         {
-          "id": "dndnode_49",
+          "id": "dndnode_63",
           "type": "customNode",
           "position": {
-            "x": 565.4272572441535,
-            "y": -23.995355790108135
-          },
-          "data": {
-            "label": "Route?",
-            "nodeType": "route",
-            "style": {
-              "background": "red",
-              "color": "white",
-              "border": "2px solid darkred",
-              "borderRadius": "10px",
-              "fontSize": "14px",
-              "fontWeight": "bold",
-              "width": 140,
-              "textAlign": "center"
-            }
-          },
-          "width": 100,
-          "height": 100,
-          "selected": false,
-          "positionAbsolute": {
-            "x": 565.4272572441535,
-            "y": -23.995355790108135
-          },
-          "dragging": false
-        },
-        {
-          "id": "dndnode_50",
-          "type": "customNode",
-          "position": {
-            "x": 361.56500234695363,
-            "y": 154.80186776727214
+            "x": 245.79320643637107,
+            "y": 141.05994551338074
           },
           "data": {
             "label": "Landing",
@@ -254,113 +275,26 @@ export const WORKFLOW_TEMPLATES: TemplateDefinition[] = [
               "fontWeight": "bold",
               "width": 140,
               "textAlign": "center"
-            }
+            },
+            "orderNumber": 8,
+            "tagLabel": "8",
+            "isFirstNode": false
           },
           "width": 132,
           "height": 136,
           "selected": false,
           "positionAbsolute": {
-            "x": 361.56500234695363,
-            "y": 154.80186776727214
+            "x": 245.79320643637107,
+            "y": 141.05994551338074
           },
           "dragging": false
         },
         {
-          "id": "dndnode_51",
+          "id": "dndnode_64",
           "type": "customNode",
           "position": {
-            "x": 1024.8662696449767,
-            "y": 315.7001362569847
-          },
-          "data": {
-            "label": "CRUD Component",
-            "nodeType": "crud-component",
-            "style": {
-              "background": "#8B5CF6",
-              "color": "white",
-              "border": "2px solid #6D28D9",
-              "borderRadius": "10px",
-              "fontSize": "14px",
-              "fontWeight": "bold",
-              "width": 140,
-              "textAlign": "center"
-            }
-          },
-          "width": 145,
-          "height": 136,
-          "selected": false,
-          "positionAbsolute": {
-            "x": 1024.8662696449767,
-            "y": 315.7001362569847
-          },
-          "dragging": false
-        },
-        {
-          "id": "dndnode_52",
-          "type": "customNode",
-          "position": {
-            "x": 1007.5748169286926,
-            "y": -291.57590876478974
-          },
-          "data": {
-            "label": "Settings Component",
-            "nodeType": "settings-component",
-            "style": {
-              "background": "#8B5CF6",
-              "color": "white",
-              "border": "2px solid #6D28D9",
-              "borderRadius": "10px",
-              "fontSize": "14px",
-              "fontWeight": "bold",
-              "width": 140,
-              "textAlign": "center"
-            }
-          },
-          "width": 157,
-          "height": 136,
-          "selected": false,
-          "positionAbsolute": {
-            "x": 1007.5748169286926,
-            "y": -291.57590876478974
-          },
-          "dragging": false
-        },
-        {
-          "id": "dndnode_53",
-          "type": "customNode",
-          "position": {
-            "x": 1018.6725864430475,
-            "y": 465.08412885041366
-          },
-          "data": {
-            "label": "Settings Component",
-            "nodeType": "settings-component",
-            "style": {
-              "background": "#8B5CF6",
-              "color": "white",
-              "border": "2px solid #6D28D9",
-              "borderRadius": "10px",
-              "fontSize": "14px",
-              "fontWeight": "bold",
-              "width": 140,
-              "textAlign": "center"
-            }
-          },
-          "width": 157,
-          "height": 136,
-          "selected": false,
-          "positionAbsolute": {
-            "x": 1018.6725864430475,
-            "y": 465.08412885041366
-          },
-          "dragging": false
-        },
-        {
-          "id": "dndnode_54",
-          "type": "customNode",
-          "position": {
-            "x": 1009.3457083197547,
-            "y": 181.37350114880894
+            "x": 1509.89444195087,
+            "y": -41.59872684478308
           },
           "data": {
             "label": "Dashboard Component",
@@ -374,128 +308,275 @@ export const WORKFLOW_TEMPLATES: TemplateDefinition[] = [
               "fontWeight": "bold",
               "width": 140,
               "textAlign": "center"
-            }
+            },
+            "orderNumber": 9,
+            "tagLabel": "9",
+            "isFirstNode": false
           },
           "width": 173,
           "height": 136,
           "selected": false,
           "positionAbsolute": {
-            "x": 1009.3457083197547,
-            "y": 181.37350114880894
+            "x": 1509.89444195087,
+            "y": -41.59872684478308
+          },
+          "dragging": false
+        },
+        {
+          "id": "dndnode_65",
+          "type": "customNode",
+          "position": {
+            "x": 1521.7377733040835,
+            "y": 104.50681014087121
+          },
+          "data": {
+            "label": "CRUD Component",
+            "nodeType": "crud-component",
+            "style": {
+              "background": "#8B5CF6",
+              "color": "white",
+              "border": "2px solid #6D28D9",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            },
+            "orderNumber": 10,
+            "tagLabel": "10",
+            "isFirstNode": false
+          },
+          "width": 145,
+          "height": 136,
+          "selected": false,
+          "positionAbsolute": {
+            "x": 1521.7377733040835,
+            "y": 104.50681014087121
+          },
+          "dragging": false
+        },
+        {
+          "id": "dndnode_66",
+          "type": "customNode",
+          "position": {
+            "x": 1515.5324153890595,
+            "y": 253.43540010144744
+          },
+          "data": {
+            "label": "Settings Component",
+            "nodeType": "settings-component",
+            "style": {
+              "background": "#8B5CF6",
+              "color": "white",
+              "border": "2px solid #6D28D9",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            },
+            "orderNumber": 11,
+            "tagLabel": "11",
+            "isFirstNode": false
+          },
+          "width": 157,
+          "height": 136,
+          "selected": false,
+          "positionAbsolute": {
+            "x": 1515.5324153890595,
+            "y": 253.43540010144744
+          },
+          "dragging": false
+        },
+        {
+          "id": "dndnode_67",
+          "type": "customNode",
+          "position": {
+            "x": 1519.6693206657421,
+            "y": -222.30870671705998
+          },
+          "data": {
+            "label": "Settings Component",
+            "nodeType": "settings-component",
+            "style": {
+              "background": "#8B5CF6",
+              "color": "white",
+              "border": "2px solid #6D28D9",
+              "borderRadius": "10px",
+              "fontSize": "14px",
+              "fontWeight": "bold",
+              "width": 140,
+              "textAlign": "center"
+            },
+            "orderNumber": 12,
+            "tagLabel": "12",
+            "isFirstNode": false
+          },
+          "width": 157,
+          "height": 136,
+          "selected": false,
+          "positionAbsolute": {
+            "x": 1519.6693206657421,
+            "y": -222.30870671705998
           },
           "dragging": false
         }
       ],
       edges: [
         {
-          "source": "dndnode_43",
+          "source": "dndnode_55",
           "sourceHandle": "output",
-          "target": "dndnode_44",
+          "target": "dndnode_56",
           "targetHandle": "input",
+          "type": "customEdge",
           "markerEnd": {
             "type": "arrowclosed"
           },
-          "id": "reactflow__edge-dndnode_43output-dndnode_44input"
+          "data": {
+            "label": "Call"
+          },
+          "id": "reactflow__edge-dndnode_55output-dndnode_56input",
+          "selected": false
         },
         {
-          "source": "dndnode_45",
+          "source": "dndnode_56",
           "sourceHandle": "output",
-          "target": "dndnode_47",
+          "target": "dndnode_58",
           "targetHandle": "input",
+          "type": "customEdge",
           "markerEnd": {
             "type": "arrowclosed"
           },
-          "id": "reactflow__edge-dndnode_45output-dndnode_47input"
+          "data": {
+            "label": "Connection"
+          },
+          "id": "reactflow__edge-dndnode_56output-dndnode_58input"
         },
         {
-          "source": "dndnode_46",
+          "source": "dndnode_58",
           "sourceHandle": "output",
-          "target": "dndnode_48",
+          "target": "dndnode_59",
           "targetHandle": "input",
+          "type": "customEdge",
           "markerEnd": {
             "type": "arrowclosed"
           },
-          "id": "reactflow__edge-dndnode_46output-dndnode_48input"
+          "data": {
+            "label": "Connection"
+          },
+          "id": "reactflow__edge-dndnode_58output-dndnode_59input"
         },
         {
-          "source": "dndnode_44",
+          "source": "dndnode_58",
           "sourceHandle": "output",
-          "target": "dndnode_49",
+          "target": "dndnode_60",
           "targetHandle": "input",
+          "type": "customEdge",
           "markerEnd": {
             "type": "arrowclosed"
           },
-          "id": "reactflow__edge-dndnode_44output-dndnode_49input"
+          "data": {
+            "label": "Connection"
+          },
+          "id": "reactflow__edge-dndnode_58output-dndnode_60input"
         },
         {
-          "source": "dndnode_49",
+          "source": "dndnode_59",
           "sourceHandle": "output",
-          "target": "dndnode_45",
+          "target": "dndnode_61",
           "targetHandle": "input",
+          "type": "customEdge",
           "markerEnd": {
             "type": "arrowclosed"
           },
-          "id": "reactflow__edge-dndnode_49output-dndnode_45input"
+          "data": {
+            "label": "Connection"
+          },
+          "id": "reactflow__edge-dndnode_59output-dndnode_61input"
         },
         {
-          "source": "dndnode_49",
+          "source": "dndnode_60",
           "sourceHandle": "output",
-          "target": "dndnode_46",
+          "target": "dndnode_62",
           "targetHandle": "input",
+          "type": "customEdge",
           "markerEnd": {
             "type": "arrowclosed"
           },
-          "id": "reactflow__edge-dndnode_49output-dndnode_46input"
+          "data": {
+            "label": "Connection"
+          },
+          "id": "reactflow__edge-dndnode_60output-dndnode_62input"
         },
         {
-          "source": "dndnode_43",
+          "source": "dndnode_55",
           "sourceHandle": "output",
-          "target": "dndnode_50",
+          "target": "dndnode_63",
           "targetHandle": "input",
+          "type": "customEdge",
           "markerEnd": {
             "type": "arrowclosed"
           },
-          "id": "reactflow__edge-dndnode_43output-dndnode_50input"
+          "data": {
+            "label": "Connection"
+          },
+          "id": "reactflow__edge-dndnode_55output-dndnode_63input"
         },
         {
-          "source": "dndnode_46",
+          "source": "dndnode_62",
           "sourceHandle": "output",
-          "target": "dndnode_51",
+          "target": "dndnode_64",
           "targetHandle": "input",
+          "type": "customEdge",
           "markerEnd": {
             "type": "arrowclosed"
           },
-          "id": "reactflow__edge-dndnode_46output-dndnode_51input"
+          "data": {
+            "label": "Connection"
+          },
+          "id": "reactflow__edge-dndnode_62output-dndnode_64input"
         },
         {
-          "source": "dndnode_45",
+          "source": "dndnode_62",
           "sourceHandle": "output",
-          "target": "dndnode_52",
+          "target": "dndnode_65",
           "targetHandle": "input",
+          "type": "customEdge",
           "markerEnd": {
             "type": "arrowclosed"
           },
-          "id": "reactflow__edge-dndnode_45output-dndnode_52input"
+          "data": {
+            "label": "Connection"
+          },
+          "id": "reactflow__edge-dndnode_62output-dndnode_65input"
         },
         {
-          "source": "dndnode_46",
+          "source": "dndnode_62",
           "sourceHandle": "output",
-          "target": "dndnode_53",
+          "target": "dndnode_66",
           "targetHandle": "input",
+          "type": "customEdge",
           "markerEnd": {
             "type": "arrowclosed"
           },
-          "id": "reactflow__edge-dndnode_46output-dndnode_53input"
+          "data": {
+            "label": "Connection"
+          },
+          "id": "reactflow__edge-dndnode_62output-dndnode_66input"
         },
         {
-          "source": "dndnode_46",
+          "source": "dndnode_61",
           "sourceHandle": "output",
-          "target": "dndnode_54",
+          "target": "dndnode_67",
           "targetHandle": "input",
+          "type": "customEdge",
           "markerEnd": {
             "type": "arrowclosed"
           },
-          "id": "reactflow__edge-dndnode_46output-dndnode_54input"
+          "data": {
+            "label": "Connection"
+          },
+          "id": "reactflow__edge-dndnode_61output-dndnode_67input"
         }
       ]
     }
